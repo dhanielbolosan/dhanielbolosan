@@ -1,0 +1,5 @@
+{
+  "singleAttributePerLine": true,
+  "bracketSameLine": false,
+  "printWidth": 80
+}
