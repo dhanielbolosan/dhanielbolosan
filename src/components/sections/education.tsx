@@ -6,70 +6,49 @@ import {
   AccordionTrigger,
 } from "../imports/accordion";
 
-const data = [
+const education = [
   {
-    company: "Penn State University",
-    avatar: "/PENN.jpg",
-    role: "AI Cybersecurity Training Program Participant",
-    date: "May 2026",
-    description: ["Test1", "Test2", "Test3"],
-  },
-  {
-    company: "Naval Information Warfare Center",
-    avatar: "/NIWC.png",
-    role: "Undergraduate AI Security Researcher",
-    date: "Jan. 2026 - May 2026",
-    description: ["Test1", "Test2", "Test3"],
-  },
-  {
-    company: "Blockchain in Paradise",
-    avatar: "/BIP.jpg",
-    role: "Full-Stack Software Developer Intern",
-    date: "Jan. 2026 - May 2026",
-    description: ["Test1", "Test2", "Test3"],
-  },
-  {
-    company: "University of Hawai'i Office of Government Relations",
-    avatar: "/UHOGR.jpg",
-    role: "Backend Cloud Developer Intern",
-    date: "Aug. 2025 - Dec. 2025",
-    description: ["Test1", "Test2", "Test3"],
-  },
-  {
-    company: "University of Hawai'i at Manoa",
+    school: "University of Hawai'i at Manoa",
     avatar: "/UHM.png",
-    role: "Undergraduate Teaching Assistant",
-    date: "Aug. 2025 - Dec. 2025",
+    degree: "Computer Science, B.S.",
+    date: "Aug. 2024 - May 2026",
+    description: ["Test1", "Test2", "Test3"],
+  },
+  {
+    school: "University of Hawai'i Maui College",
+    avatar: "/UHMC.jpg",
+    degree: "Natural Science - Information and Computer Sciences, A.S",
+    date: "Aug. 2022 - May 2024",
     description: ["Test1", "Test2", "Test3"],
   },
 ];
 
-export const Experience = () => {
+export const Education = () => {
   return (
     <div className="flex flex-col w-full">
       <Accordion
         type="single"
         collapsible
       >
-        {data.map((item) => (
+        {education.map((item) => (
           <AccordionItem
-            key={item.company}
-            value={item.company}
+            key={item.school}
+            value={item.school}
           >
             <AccordionTrigger>
               <div className="flex items-center gap-2 w-full pr-5">
                 <Avatar>
                   <AvatarImage
                     src={item.avatar}
-                    alt={item.company}
+                    alt={item.school}
                   />
                   <AvatarFallback>
-                    {item.company.slice(0, 4).toUpperCase()}
+                    {item.school.slice(0, 4).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
-                  <span className="font-bold">{item.company}</span>
-                  <span className="text-sm">{item.role}</span>
+                  <span className="font-bold">{item.school}</span>
+                  <span className="text-sm">{item.degree}</span>
                 </div>
                 <span className="ml-auto text-sm">{item.date}</span>
               </div>

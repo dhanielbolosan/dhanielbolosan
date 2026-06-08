@@ -1,6 +1,7 @@
-import { Experience } from "./components/sections/Experience";
-import { Education } from "./components/sections/Education";
-import { SkillsMarquee } from "./components/sections/Skills";
+import { Experience } from "./components/sections/experience";
+import { Education } from "./components/sections/education";
+import { Skills } from "./components/sections/skills";
+import { Projects } from "./components/sections/projects";
 
 function App() {
   return (
@@ -18,9 +19,12 @@ function App() {
       </div>
       <div>
         Skills
-        <SkillsMarquee />
+        <Skills />
       </div>
-      <div>Projects</div>
+      <div>Projects
+        <Projects />
+      </div>
+
       <div>Contact</div>
     </>
   );
