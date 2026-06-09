@@ -108,30 +108,40 @@ const SkillBadge = ({ name, avatar: Icon }: Skill) => {
 
 export const Skills = () => {
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-      <Marquee
-        pauseOnHover
-        className="[--duration:60s]"
-      >
-        {firstRow.map((skill) => (
-          <SkillBadge
-            key={skill.name}
-            {...skill}
-          />
-        ))}
-      </Marquee>
-      <Marquee
-        reverse
-        pauseOnHover
-        className="[--duration:60s]"
-      >
-        {secondRow.map((skill) => (
-          <SkillBadge
-            key={skill.name}
-            {...skill}
-          />
-        ))}
-      </Marquee>
-    </div>
+    <section className="flex flex-col w-full gap-5 pb-10">
+
+      <div className="w-full max-w-4xl mx-auto px-5">
+        <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+          Skills
+        </h2>
+      </div>
+
+      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
+        <Marquee
+          pauseOnHover
+          className="[--duration:60s]"
+        >
+          {firstRow.map((skill) => (
+            <SkillBadge
+              key={skill.name}
+              {...skill}
+            />
+          ))}
+        </Marquee>
+        <Marquee
+          reverse
+          pauseOnHover
+          className="[--duration:60s]"
+        >
+          {secondRow.map((skill) => (
+            <SkillBadge
+              key={skill.name}
+              {...skill}
+            />
+          ))}
+        </Marquee>
+      </div>
+
+    </section>
   );
 };

@@ -24,31 +24,38 @@ const projects = [
         name: "Pathfinity",
         image: "https://placehold.co/600x400",
         description: "Full-stack semantic search interface enabling students to query university course data via natural language.",
-        stack: ["Next.js", "Vercel", "OpenAI", "Shadcn UI", "Neon Postgres"],
+        stack: ["Hackathon", "Next.js", "OpenAI", "Shadcn UI", "Neon Postgres"],
     },
 ]
 
 export const Projects = () => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.map((item) => (
-                <Card className="relative mx-auto w-full max-w-sm pt-0">
-                    <img
-                        src={item.image}
-                        alt={item.name}
-                        className="relative z-20 aspect-video w-full object-cover"
-                    />
-                    <CardHeader>
-                        <CardTitle>{item.name}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        {item.stack.map((i) => (
-                            <Badge variant="secondary">{i}</Badge>
-                        ))}
-                    </CardFooter>
-                </Card>
-            ))}
-        </div>
+        <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
+
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+                Projects
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {projects.map((item) => (
+                    <Card key={item.name} className="relative w-full flex flex-col pt-0 overflow-hidden">
+                        <img
+                            src={item.image}
+                            alt={item.name}
+                            className="relative aspect-video w-full object-cover"
+                        />
+                        <CardHeader className="flex-grow">
+                            <CardTitle>{item.name}</CardTitle>
+                            <CardDescription>{item.description}</CardDescription>
+                        </CardHeader>
+                        <CardFooter className="flex flex-wrap gap-2">
+                            {item.stack.map((i) => (
+                                <Badge variant="secondary">{i}</Badge>
+                            ))}
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        </section>
     )
 }

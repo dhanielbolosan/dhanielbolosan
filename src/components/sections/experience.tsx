@@ -46,7 +46,12 @@ const experience = [
 
 export const Experience = () => {
   return (
-    <div className="flex flex-col w-full">
+    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
+
+      <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+        Experience
+      </h2>
+
       <Accordion
         type="single"
         collapsible
@@ -89,6 +94,7 @@ export const Experience = () => {
           </AccordionItem>
         ))}
       </Accordion>
-    </div>
+
+    </section>
   );
 };

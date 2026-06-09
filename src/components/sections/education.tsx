@@ -25,7 +25,12 @@ const education = [
 
 export const Education = () => {
   return (
-    <div className="flex flex-col w-full">
+    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
+
+      <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+        Education
+      </h2>
+
       <Accordion
         type="single"
         collapsible
@@ -68,6 +73,7 @@ export const Education = () => {
           </AccordionItem>
         ))}
       </Accordion>
-    </div>
+
+    </section>
   );
 };
