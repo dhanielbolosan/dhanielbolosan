@@ -108,13 +108,11 @@ const SkillBadge = ({ name, avatar: Icon }: Skill) => {
 
 export const Skills = () => {
   return (
-    <section className="flex flex-col w-full gap-5 pb-10">
+    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
 
-      <div className="w-full max-w-4xl mx-auto px-5">
-        <h2 className="text-xl md:text-2xl font-bold tracking-tight">
-          Skills
-        </h2>
-      </div>
+      <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+        Skills
+      </h2>
 
       <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
         <Marquee
@@ -140,6 +138,8 @@ export const Skills = () => {
             />
           ))}
         </Marquee>
+        <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/16 bg-gradient-to-r"></div>
+        <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/16 bg-gradient-to-l"></div>
       </div>
 
     </section>
