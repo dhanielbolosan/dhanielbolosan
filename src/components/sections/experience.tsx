@@ -62,7 +62,7 @@ export const Experience = () => {
             value={item.company}
           >
             <AccordionTrigger>
-              <div className="flex items-center gap-2 w-full pr-5">
+              <div className="flex items-center gap-2 w-full">
                 <Avatar>
                   <AvatarImage
                     src={item.avatar}
@@ -80,7 +80,7 @@ export const Experience = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <ul className="flex flex-col gap-1 list-disc list-inside">
+              <ul className="flex flex-col gap-1 list-disc list-inside pl-10">
                 {item.description.map((point, i) => (
                   <li
                     key={i}
