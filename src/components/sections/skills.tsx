@@ -91,7 +91,7 @@ const secondRow = allSkills.slice(Math.ceil(allSkills.length / 2));
 
 const SkillBadge = ({ name, avatar: Icon }: Skill) => {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border px-4 py-2">
+    <div className="hover:cursor-pointer hover:bg-muted/50 inline-flex items-center gap-2 rounded-full border p-2">
       <Avatar size="sm">
         <AvatarFallback>
           {Icon ? (

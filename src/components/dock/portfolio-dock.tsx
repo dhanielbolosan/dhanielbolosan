@@ -14,7 +14,7 @@ export const PortfolioDock = () => {
     <div className="relative">
       <Dock
         className="rounded-full"
-        iconMagnification={75}
+        iconMagnification={60}
       >
         <DockIcon className="rounded-full border bg-background">
           <Tooltip>

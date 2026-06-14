@@ -5,7 +5,7 @@ const projects = [
     {
         name: "KopeChain",
         image: "https://placehold.co/600x400",
-        description: "Decentralized supply chain tracker on Base Sepolia to verify the origin of local Hawaiian coffee.",
+        description: "Decentralized supply chain tracker on Base Sepolia Testnet to verify the origin of local Hawaiian coffee.",
         stack: ["Scaffold-ETH 2", "Solidity", "Hardhat", "Pinata", "DaisyUI"],
     },
     {
@@ -50,7 +50,7 @@ export const Projects = () => {
                         </CardHeader>
                         <CardFooter className="flex flex-wrap gap-2">
                             {item.stack.map((i) => (
-                                <Badge variant="secondary">{i}</Badge>
+                                <Badge className="bg-muted text-black">{i}</Badge>
                             ))}
                         </CardFooter>
                     </Card>

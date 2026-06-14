@@ -12,14 +12,20 @@ const education = [
     avatar: "/UHM.png",
     degree: "Computer Science, B.S.",
     date: "Aug. 2024 - May 2026",
-    description: ["Test1", "Test2", "Test3"],
+    description: [
+      "Cumulative GPA: 3.31/4.00",
+      "Dean's List (Spring 2025)"
+    ],
   },
   {
     school: "University of Hawai'i Maui College",
     avatar: "/UHMC.jpg",
     degree: "Natural Science - Information and Computer Sciences, A.S",
     date: "Aug. 2022 - May 2024",
-    description: ["Test1", "Test2", "Test3"],
+    description: [
+      "Cumulative GPA: 3.10/4.00",
+      "Dean's List (Fall 2022)"
+    ],
   },
 ];
 
@@ -34,13 +40,15 @@ export const Education = () => {
       <Accordion
         type="single"
         collapsible
+        className="border-none"
       >
         {education.map((item) => (
           <AccordionItem
             key={item.school}
             value={item.school}
+            className="border-none data-[state=open]:bg-muted rounded-md"
           >
-            <AccordionTrigger>
+            <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50 rounded-md">
               <div className="flex items-center gap-2 w-full">
                 <Avatar>
                   <AvatarImage
@@ -59,7 +67,7 @@ export const Education = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <ul className="flex flex-col gap-1 list-disc list-inside pl-10">
+              <ul className="flex flex-col gap-1 list-disc list-inside pl-10 pb-1">
                 {item.description.map((point, i) => (
                   <li
                     key={i}
