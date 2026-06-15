@@ -3,6 +3,7 @@ import { Experience } from "./components/sections/experience";
 import { Education } from "./components/sections/education";
 import { Skills } from "./components/sections/skills";
 import { Projects } from "./components/sections/projects";
+import { Contact } from "./components/sections/contact";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Education />
       <Skills />
       <Projects />
+      <Contact />
     </>
   );
 }

@@ -2,7 +2,7 @@ export const Hero = () => {
     return (
         <section className="flex flex-col-reverse md:flex-row items-center justify-between w-full max-w-4xl mx-auto gap-10 pt-20 pb-10 px-5">
 
-            <div className="flex flex-col items-start text-left space-y-5">
+            <div className="flex flex-col items-start text-left space-y-4">
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                     Aloha, I'm Dhaniel
                 </h1>

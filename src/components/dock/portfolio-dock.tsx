@@ -7,7 +7,7 @@ import {
 import { Separator } from "../imports/separator";
 import { Dock, DockIcon } from "../imports/dock";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../imports/tooltip";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "../theme-toggle";
 
 export const PortfolioDock = () => {
   return (

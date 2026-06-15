@@ -1,5 +1,5 @@
 import { IconSun, IconMoon } from "@tabler/icons-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../imports/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./imports/tooltip";
 import { useTheme } from "@/lib/theme-provider";
 
 export const ThemeToggle = () => {
