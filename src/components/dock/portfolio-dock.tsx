@@ -25,6 +25,7 @@ export const PortfolioDock = () => {
           </Tooltip>
         </DockIcon>
 
+        {/* TODO: MINI RAG MODEL???
         <DockIcon className="rounded-full border bg-background">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -33,10 +34,20 @@ export const PortfolioDock = () => {
             <TooltipContent>RAG</TooltipContent>
           </Tooltip>
         </DockIcon>
+        */}
 
         <Separator orientation="vertical" />
 
-        <DockIcon className="rounded-full border bg-background">
+        <DockIcon
+          className="rounded-full border bg-background"
+          onClick={() =>
+            window.open(
+              "https://github.com/dhanielbolosan",
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
+        >
           <Tooltip>
             <TooltipTrigger asChild>
               <IconBrandGithub className="size-full" />
@@ -45,7 +56,16 @@ export const PortfolioDock = () => {
           </Tooltip>
         </DockIcon>
 
-        <DockIcon className="rounded-full border bg-background">
+        <DockIcon
+          className="rounded-full border bg-background"
+          onClick={() =>
+            window.open(
+              "https://www.linkedin.com/in/dhaniel-bolosan",
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
+        >
           <Tooltip>
             <TooltipTrigger asChild>
               <IconBrandLinkedin className="size-full" />

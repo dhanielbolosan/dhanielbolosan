@@ -15,7 +15,7 @@ const experience = [
     description: [
       "Participated in an NSF-funded intensive AI security training program in collaboration with Penn State and NC State University.",
       "Investigated adversarial vulnerabilities in LLMs, focusing on prompt injection and jailbreaking techniques.",
-      "Executed red-team attack strategies, evaluating their effectiveness against LLM guardrails."
+      "Executed red-team attack strategies, evaluating their effectiveness against LLM guardrails.",
     ],
   },
   {
@@ -26,7 +26,7 @@ const experience = [
     description: [
       "Researched RAG pipeline vulnerabilities by designing methods to evaluate data retrieval integrity.",
       "Developed exploits using targeted vector manipulation, invisible text, and font poisoning in PDF documents to manipulate LLM data retrieval.",
-      "Designed an interactive demonstration UI to visualize attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings."
+      "Designed an interactive demonstration UI to visualize attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.",
     ],
   },
   {
@@ -37,7 +37,7 @@ const experience = [
     description: [
       "Deployed a decentralized supply chain tracker on Base Sepolia Testnet using Solidity smart contracts to verify the origin of local Hawaiian coffee.",
       "Engineered a full-stack Web3 application using Next.js and Vercel, integrating QR code generation, 3D map visualization, and NFT creation.",
-      "Implemented IPFS-based asset storage to enable immutable data persistence across the supply chain."
+      "Implemented IPFS-based asset storage to enable immutable data persistence across the supply chain.",
     ],
   },
   {
@@ -48,15 +48,14 @@ const experience = [
     description: [
       "Architected a cost-efficient FastAPI backend on Google Cloud, streamlining manual legislative analysis workflows for university staff.",
       "Engineered an automated daily notification system that kept staff informed of legislation impacting the University of Hawaiʻi.",
-      "Integrated an AI-powered bill summarization and comparison tool directly into the office's internal website, reducing the time staff spent parsing legislative documents."
+      "Integrated an AI-powered bill summarization and comparison tool directly into the office's internal website, reducing the time staff spent parsing legislative documents.",
     ],
-  }
+  },
 ];
 
 export const Experience = () => {
   return (
     <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
-
       <h2 className="text-xl md:text-2xl font-bold tracking-tight">
         Experience
       </h2>
@@ -64,15 +63,14 @@ export const Experience = () => {
       <Accordion
         type="single"
         collapsible
-        className="border-none"
       >
         {experience.map((item) => (
           <AccordionItem
             key={item.company}
             value={item.company}
-            className="border-none data-[state=open]:bg-muted rounded-md"
+            className="data-[state=open]:bg-muted"
           >
-            <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50 rounded-md">
+            <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50">
               <div className="flex items-center gap-2 w-full">
                 <Avatar>
                   <AvatarImage
@@ -105,7 +103,6 @@ export const Experience = () => {
           </AccordionItem>
         ))}
       </Accordion>
-
     </section>
   );
 };

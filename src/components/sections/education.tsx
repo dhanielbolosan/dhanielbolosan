@@ -12,27 +12,20 @@ const education = [
     avatar: "/UHM.png",
     degree: "Computer Science, B.S.",
     date: "Aug. 2024 - May 2026",
-    description: [
-      "Cumulative GPA: 3.31/4.00",
-      "Dean's List (Spring 2025)"
-    ],
+    description: ["Cumulative GPA: 3.31/4.00", "Dean's List (Spring 2025)"],
   },
   {
     school: "University of Hawai'i Maui College",
     avatar: "/UHMC.jpg",
     degree: "Natural Science - Information and Computer Sciences, A.S",
     date: "Aug. 2022 - May 2024",
-    description: [
-      "Cumulative GPA: 3.10/4.00",
-      "Dean's List (Fall 2022)"
-    ],
+    description: ["Cumulative GPA: 3.10/4.00", "Dean's List (Fall 2022)"],
   },
 ];
 
 export const Education = () => {
   return (
     <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
-
       <h2 className="text-xl md:text-2xl font-bold tracking-tight">
         Education
       </h2>
@@ -40,15 +33,14 @@ export const Education = () => {
       <Accordion
         type="single"
         collapsible
-        className="border-none"
       >
         {education.map((item) => (
           <AccordionItem
             key={item.school}
             value={item.school}
-            className="border-none data-[state=open]:bg-muted rounded-md"
+            className="data-[state=open]:bg-muted"
           >
-            <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50 rounded-md">
+            <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50">
               <div className="flex items-center gap-2 w-full">
                 <Avatar>
                   <AvatarImage
@@ -81,7 +73,6 @@ export const Education = () => {
           </AccordionItem>
         ))}
       </Accordion>
-
     </section>
   );
 };
