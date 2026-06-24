@@ -29,8 +29,22 @@ export const Contact = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof contactSchema>) {
-    toast.success(JSON.stringify(data));
+  async function onSubmit(data: z.infer<typeof contactSchema>) {
+    const toastId = toast.loading("Sending...");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error();
+
+      toast.success("Message Sent! Will get back to you soon.", { id: toastId });
+      form.reset();
+    } catch {
+      toast.error("Something went wrong. Try again.", { id: toastId });
+    }
   }
 
   function onError(errors: typeof form.formState.errors) {
@@ -79,7 +93,7 @@ export const Contact = () => {
                 <IconBrandLinkedin className="h-8 w-8" />
               </a>
 
-              <a href="mailto:dhanielb0326@gmail.com">
+              <a href="mailto:dhanielb808@gmail.com">
                 <IconMail className="h-8 w-8" />
               </a>
             </div>

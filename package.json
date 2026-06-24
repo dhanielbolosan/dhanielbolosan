@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
+    "@cloudflare/workers-types": "^4.20260621.1",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.3.0",
@@ -48,6 +49,7 @@
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "wrangler": "^4.103.0"
   }
 }

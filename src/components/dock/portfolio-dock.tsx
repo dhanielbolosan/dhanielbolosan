@@ -1,6 +1,6 @@
 import {
   IconHome,
-  IconRobot,
+  // IconRobot,
   IconBrandGithub,
   IconBrandLinkedin,
 } from "@tabler/icons-react";
