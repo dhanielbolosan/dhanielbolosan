@@ -60,7 +60,7 @@ export const Projects = () => {
             </CardHeader>
             <CardFooter className="flex flex-wrap gap-2">
               {item.stack.map((i) => (
-                <Badge className="bg-muted text-black">{i}</Badge>
+                <Badge className="bg-muted text-black dark:text-white">{i}</Badge>
               ))}
             </CardFooter>
           </Card>

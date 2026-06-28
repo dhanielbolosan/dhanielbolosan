@@ -69,11 +69,10 @@ export const Contact = () => {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 px-8 py-4">
           <div className="flex flex-col pr-4 space-y-4">
             <h2 className="text-xl md:text-2xl font-bold tracking-tight">
-              await contact()
+              Wanna Chat?
             </h2>
             <p className="text-base">
-              Wanna chat? Whether it's projects, opportunities, or anything
-              else, I'm happy to talk. Feel free to reach out and I'll get back
+              I'm always open to discussing new projects, opportunities, or just talking. Feel free to reach out and I'll get back
               to you.
             </p>
             <div className="flex flex-row mt-auto gap-4">
