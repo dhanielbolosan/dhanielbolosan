@@ -39,10 +39,18 @@ const projects = [
   },
 ];
 
-const ProjectCard = ({ name, images, description, stack }) => {
+interface ProjectProps {
+  name: string;
+  images: string[];
+  description: string;
+  stack: string[];
+}
+
+const ProjectCard = ({ name, images, description, stack }: ProjectProps) => {
   const [currImage, setCurrImage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (!isHovering || images.length <= 1) {
       setCurrImage(0);
@@ -65,7 +73,7 @@ const ProjectCard = ({ name, images, description, stack }) => {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="relative aspect-video w-full overflow-hidden">
-        {images.map((src, i) => (
+        {images.map((src: string, i: number) => (
           <img
             key={src}
             src={src}
@@ -80,7 +88,7 @@ const ProjectCard = ({ name, images, description, stack }) => {
         <CardDescription className="text-sm">{description}</CardDescription>
       </CardHeader>
       <CardFooter className="flex flex-wrap gap-2">
-        {stack.map((i) => (
+        {stack.map((i: string) => (
           <Badge key={i} className="bg-muted text-black dark:text-white">{i}</Badge>
         ))}
       </CardFooter>
