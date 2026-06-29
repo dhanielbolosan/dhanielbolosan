@@ -99,7 +99,7 @@ const SkillBadge = ({ name, avatar: Icon }: Skill) => {
           {Icon ? (
             <Icon className="size-4" />
           ) : (
-            <span className="text-[10px] font-medium">{name.slice(0, 2)}</span>
+            <span className="text-sm font-medium">{name.slice(0, 2)}</span>
           )}
         </AvatarFallback>
       </Avatar>

@@ -82,10 +82,10 @@ export const Experience = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
-                  <span className="font-bold">{item.company}</span>
-                  <span className="text-sm">{item.role}</span>
+                  <span className="font-bold text-base">{item.company}</span>
+                  <span className="text-base">{item.role}</span>
                 </div>
-                <span className="ml-auto text-sm whitespace-nowrap shrink-0">{item.date}</span>
+                <span className="ml-auto text-base whitespace-nowrap shrink-0">{item.date}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>

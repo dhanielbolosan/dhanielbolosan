@@ -6,7 +6,6 @@ import { Field, FieldGroup } from "../imports/field";
 import { Input } from "../imports/input";
 import { Textarea } from "../imports/textarea";
 import { InteractiveHoverButton } from "../imports/interactive-hover-button";
-import { Button } from "../imports/button";
 import { toast } from "sonner";
 import {
   IconBrandGithub,
@@ -76,7 +75,7 @@ export const Contact = () => {
               I'm always open to discussing new projects, opportunities, or just talking. Feel free to reach out and I'll get back
               to you.
             </p>
-            <div className="flex flex-row mt-auto gap-4">
+            <div className="flex flex-row mt-auto gap-4 mb-4 md:mb-0">
               <a
                 href="https://github.com/dhanielbolosan"
                 target="_blank"

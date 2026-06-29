@@ -48,10 +48,13 @@ const ProjectCard = ({ name, images, description, stack }) => {
       setCurrImage(0);
       return;
     }
+
     setCurrImage(1 % images.length);
+
     const interval = setInterval(() => {
       setCurrImage((prev) => (prev + 1) % images.length);
     }, 1500);
+
     return () => clearInterval(interval);
   }, [isHovering, images.length]);
 
@@ -73,8 +76,8 @@ const ProjectCard = ({ name, images, description, stack }) => {
         ))}
       </div>
       <CardHeader className="flex-grow">
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-base">{name}</CardTitle>
+        <CardDescription className="text-sm">{description}</CardDescription>
       </CardHeader>
       <CardFooter className="flex flex-wrap gap-2">
         {stack.map((i) => (

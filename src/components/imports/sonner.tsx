@@ -34,6 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast: "cn-toast",
           description: "!text-[var(--normal-text)]",
+          icon: "hidden",
         },
       }}
       {...props}

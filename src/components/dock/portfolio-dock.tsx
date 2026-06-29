@@ -15,7 +15,12 @@ export const PortfolioDock = () => {
         className="rounded-full bg-background"
         iconMagnification={60}
       >
-        <DockIcon className="rounded-full border bg-background">
+        <DockIcon
+          className="rounded-full border bg-background"
+          onClick={() =>
+            document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })
+          }
+        >
           <Tooltip>
             <TooltipTrigger asChild>
               <IconHome className="size-full" />

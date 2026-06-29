@@ -52,10 +52,10 @@ export const Education = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
-                  <span className="font-bold">{item.school}</span>
-                  <span className="text-sm">{item.degree}</span>
+                  <span className="font-bold text-base">{item.school}</span>
+                  <span className="text-base">{item.degree}</span>
                 </div>
-                <span className="ml-auto text-sm whitespace-nowrap shrink-0">{item.date}</span>
+                <span className="ml-auto text-base whitespace-nowrap shrink-0">{item.date}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>
