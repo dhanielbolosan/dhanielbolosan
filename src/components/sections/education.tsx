@@ -38,7 +38,7 @@ export const Education = () => {
           <AccordionItem
             key={item.school}
             value={item.school}
-            className="data-[state=open]:bg-muted"
+            className="bg-card data-[state=open]:bg-muted"
           >
             <AccordionTrigger className="cursor-pointer hover:no-underline hover:bg-muted/50">
               <div className="flex items-center gap-2 w-full">
