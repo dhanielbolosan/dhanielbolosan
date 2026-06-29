@@ -9,7 +9,7 @@ import {
 const experience = [
   {
     company: "Penn State University",
-    avatar: "/PENN.jpg",
+    avatar: "/experience/penn-state.png",
     role: "AI Cybersecurity Training Program Participant",
     date: "May 2026",
     description: [
@@ -20,7 +20,7 @@ const experience = [
   },
   {
     company: "Naval Information Warfare Center",
-    avatar: "/NIWC.png",
+    avatar: "/experience/NIWC.png",
     role: "Undergraduate AI Security Researcher",
     date: "Jan. 2026 - May 2026",
     description: [
@@ -31,7 +31,7 @@ const experience = [
   },
   {
     company: "Blockchain in Paradise",
-    avatar: "/BIP.jpg",
+    avatar: "/experience/blockchain-in-paradise.jpg",
     role: "Full-Stack Software Developer Intern",
     date: "Jan. 2026 - May 2026",
     description: [
@@ -42,7 +42,7 @@ const experience = [
   },
   {
     company: "University of Hawai'i Office of Government Relations",
-    avatar: "/UHOGR.jpg",
+    avatar: "/experience/UH.png",
     role: "Backend Cloud Developer Intern",
     date: "Aug. 2025 - Dec. 2025",
     description: [
@@ -85,7 +85,7 @@ export const Experience = () => {
                   <span className="font-bold">{item.company}</span>
                   <span className="text-sm">{item.role}</span>
                 </div>
-                <span className="ml-auto text-sm">{item.date}</span>
+                <span className="ml-auto text-sm whitespace-nowrap shrink-0">{item.date}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>

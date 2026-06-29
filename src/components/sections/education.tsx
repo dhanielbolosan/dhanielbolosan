@@ -9,14 +9,14 @@ import {
 const education = [
   {
     school: "University of Hawai'i at Manoa",
-    avatar: "/UHM.png",
+    avatar: "/education/UHM.png",
     degree: "Computer Science, B.S.",
     date: "Aug. 2024 - May 2026",
     description: ["Cumulative GPA: 3.31/4.00", "Dean's List (Spring 2025)"],
   },
   {
     school: "University of Hawai'i Maui College",
-    avatar: "/UHMC.jpg",
+    avatar: "/education/UHMC.jpg",
     degree: "Natural Science - Information and Computer Sciences, A.S",
     date: "Aug. 2022 - May 2024",
     description: ["Cumulative GPA: 3.10/4.00", "Dean's List (Fall 2022)"],
@@ -55,7 +55,7 @@ export const Education = () => {
                   <span className="font-bold">{item.school}</span>
                   <span className="text-sm">{item.degree}</span>
                 </div>
-                <span className="ml-auto text-sm">{item.date}</span>
+                <span className="ml-auto text-sm whitespace-nowrap shrink-0">{item.date}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>

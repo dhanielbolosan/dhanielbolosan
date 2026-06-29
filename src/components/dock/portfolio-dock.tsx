@@ -1,6 +1,5 @@
 import {
   IconHome,
-  // IconRobot,
   IconBrandGithub,
   IconBrandLinkedin,
 } from "@tabler/icons-react";
@@ -13,7 +12,7 @@ export const PortfolioDock = () => {
   return (
     <div className="relative">
       <Dock
-        className="rounded-full"
+        className="rounded-full bg-background"
         iconMagnification={60}
       >
         <DockIcon className="rounded-full border bg-background">
@@ -24,17 +23,6 @@ export const PortfolioDock = () => {
             <TooltipContent>Home</TooltipContent>
           </Tooltip>
         </DockIcon>
-
-        {/* TODO: MINI RAG MODEL???
-        <DockIcon className="rounded-full border bg-background">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconRobot className="size-full" />
-            </TooltipTrigger>
-            <TooltipContent>RAG</TooltipContent>
-          </Tooltip>
-        </DockIcon>
-        */}
 
         <Separator orientation="vertical" />
 

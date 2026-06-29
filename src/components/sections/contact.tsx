@@ -5,6 +5,7 @@ import { Card, CardContent } from "../imports/card";
 import { Field, FieldGroup } from "../imports/field";
 import { Input } from "../imports/input";
 import { Textarea } from "../imports/textarea";
+import { InteractiveHoverButton } from "../imports/interactive-hover-button";
 import { Button } from "../imports/button";
 import { toast } from "sonner";
 import {
@@ -146,12 +147,12 @@ export const Contact = () => {
                     </Field>
                   )}
                 />
-                <Button
+                <InteractiveHoverButton
                   type="submit"
                   className="h-12 text-base cursor-pointer"
                 >
                   Submit
-                </Button>
+                </InteractiveHoverButton>
               </FieldGroup>
             </form>
           </div>
