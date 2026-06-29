@@ -20,7 +20,7 @@ const projects = [
     name: "Legislative Cloud Platform",
     images: ["/projects/uhgro1.png", "/projects/uhgro2.png"],
     description:
-      "Backend service powering AI bill summarization and automated notifications for university officials",
+      "Backend service powering AI bill summarization and automated notifications for university officials.",
     stack: ["FastAPI", "Google Cloud", "Docker", "Apify", "SMTP"],
   },
   {
