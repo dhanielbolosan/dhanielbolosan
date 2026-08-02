@@ -27,7 +27,7 @@ const projects = [
     name: "VENOM-RAG",
     images: ["/projects/venomrag1.png", "/projects/venomrag2.png"],
     description:
-      "Security research demonstrating adversarial data poisoning and retreival manipulation in RAG pipelines.",
+      "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines.",
     stack: ["Python", "Jupyter Notebook", "LangChain", "FAISS", "Ollama"],
   },
   {

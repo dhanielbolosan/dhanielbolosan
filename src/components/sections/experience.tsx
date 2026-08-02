@@ -8,6 +8,17 @@ import {
 
 const experience = [
   {
+    company: "Black Sand Solutions",
+    avatar: "/experience/black-sand-solutions.svg",
+    role: "Software Engineer Intern",
+    date: "June 2026 - July 2026",
+    description: [
+      "Engineered a geospatial intelligence dashboard and backend data pipeline that queried and rendered live data streams across desktop and mobile platforms.",
+      "Built interactive Space Domain Awareness simulations, including ML-based satellite thermal anomaly detection for missile launches, 5G mesh network visualizations, and a game-theoretic drone swarm engine.",
+      "Collaborated with the engineering team through daily syncs, translating open-ended defense technology concepts into scoped prototypes and functional software.",
+    ],
+  },
+  {
     company: "Penn State University",
     avatar: "/experience/penn-state.png",
     role: "AI Cybersecurity Training Program Participant",
@@ -24,9 +35,9 @@ const experience = [
     role: "Undergraduate AI Security Researcher",
     date: "Jan. 2026 - May 2026",
     description: [
-      "Researched RAG pipeline vulnerabilities by designing methods to evaluate data retrieval integrity.",
+      "Researched RAG pipeline vulnerabilities, establishing methods to evaluate data retrieval integrity.",
       "Developed exploits using targeted vector manipulation, invisible text, and font poisoning in PDF documents to manipulate LLM data retrieval.",
-      "Designed an interactive demonstration UI to visualize attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.",
+      "Designed an interactive demonstration UI to showcase attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.",
     ],
   },
   {
@@ -36,18 +47,18 @@ const experience = [
     date: "Jan. 2026 - May 2026",
     description: [
       "Deployed a decentralized supply chain tracker on Base Sepolia Testnet using Solidity smart contracts to verify the origin of local Hawaiian coffee.",
-      "Engineered a full-stack Web3 application using Next.js and Vercel, integrating QR code generation, 3D map visualization, and NFT creation.",
+      "Delivered a full-stack Web3 application using Next.js and Vercel, integrating QR code generation, 3D mapping, and NFT creation.",
       "Implemented IPFS-based asset storage to enable immutable data persistence across the supply chain.",
     ],
   },
   {
-    company: "University of Hawai'i Office of Government Relations",
+    company: "University of Hawaiʻi Office of Government Relations",
     avatar: "/experience/UH.png",
     role: "Backend Cloud Developer Intern",
     date: "Aug. 2025 - Dec. 2025",
     description: [
       "Architected a cost-efficient FastAPI backend on Google Cloud, streamlining manual legislative analysis workflows for university staff.",
-      "Engineered an automated daily notification system that kept staff informed of legislation impacting the University of Hawaiʻi.",
+      "Shipped an automated daily notification system that kept staff informed of legislation impacting the University of Hawaiʻi.",
       "Integrated an AI-powered bill summarization and comparison tool directly into the office's internal website, reducing the time staff spent parsing legislative documents.",
     ],
   },

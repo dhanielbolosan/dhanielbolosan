@@ -8,14 +8,14 @@ import {
 
 const education = [
   {
-    school: "University of Hawai'i at Manoa",
+    school: "University of Hawaiʻi at Mānoa",
     avatar: "/education/UHM.png",
     degree: "Computer Science, B.S.",
     date: "Aug. 2024 - May 2026",
     description: ["Cumulative GPA: 3.31/4.00", "Dean's List (Spring 2025)"],
   },
   {
-    school: "University of Hawai'i Maui College",
+    school: "University of Hawaiʻi Maui College",
     avatar: "/education/UHMC.jpg",
     degree: "Natural Science - Information and Computer Sciences, A.S",
     date: "Aug. 2022 - May 2024",

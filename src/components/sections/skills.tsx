@@ -35,6 +35,13 @@ import {
   PinataSvg,
   DaisyUISvg,
   CesiumSvg,
+  CapacitorSvg,
+  AndroidStudioSvg,
+  XcodeSvg,
+  RedisSvg,
+  NeonSvg,
+  JupyterSvg,
+  ApifySvg,
 } from "@/components/svg";
 
 type Skill = {
@@ -48,10 +55,14 @@ const skills: Record<string, Skill[]> = {
     { name: "TypeScript", avatar: TypeScriptSvg },
     { name: "JavaScript", avatar: JavaScriptSvg },
     { name: "Java", avatar: JavaSvg },
-    { name: "PostgreSQL", avatar: PostgresSQLSvg },
     { name: "HTML", avatar: HTMLSvg },
     { name: "CSS", avatar: CSSSvg },
     { name: "Solidity", avatar: SoliditySvg },
+  ],
+  databases: [
+    { name: "PostgreSQL", avatar: PostgresSQLSvg },
+    { name: "Redis", avatar: RedisSvg },
+    { name: "Neon", avatar: NeonSvg },
   ],
   frameworks: [
     { name: "React", avatar: ReactSvg },
@@ -62,6 +73,7 @@ const skills: Record<string, Skill[]> = {
     { name: "FastAPI", avatar: FastAPISvg },
     { name: "Scaffold-ETH 2", avatar: ScaffoldETHSvg },
     { name: "Hardhat", avatar: HardhatSvg },
+    { name: "Capacitor", avatar: CapacitorSvg },
   ],
   tools: [
     { name: "Git", avatar: GitSvg },
@@ -74,6 +86,10 @@ const skills: Record<string, Skill[]> = {
     { name: "Intellij", avatar: IntellijSvg },
     { name: "Ollama", avatar: OllamaSvg },
     { name: "Pinata", avatar: PinataSvg },
+    { name: "Android Studio", avatar: AndroidStudioSvg },
+    { name: "Xcode", avatar: XcodeSvg },
+    { name: "Jupyter Notebook", avatar: JupyterSvg },
+    { name: "Apify", avatar: ApifySvg },
   ],
   libraries: [
     { name: "LangChain", avatar: LangChainSvg },

@@ -10,7 +10,7 @@ export const Hero = () => {
           className="text-4xl md:text-6xl font-bold tracking-tight"
         />
         <p className="text-xl">
-          Full-stack software engineer based in Hawai'i with a passion for
+          Full-stack software engineer based in Hawaiʻi with a passion for
           building impactful applications and tools utilizing modern
           technologies across AI, Cloud, and Web3.
         </p>
