@@ -12,14 +12,14 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #1c3d6e;
+  --primary-foreground: #f8fafc;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: #eaf2ff;
+  --accent-foreground: #1c3d6e;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -38,11 +38,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --github-contribution-0: #ebedf0;
-  --github-contribution-1: #9be9a8;
-  --github-contribution-2: #40c463;
-  --github-contribution-3: #30a14e;
-  --github-contribution-4: #216e39;
+  --github-contribution-0: #eaf2ff;
+  --github-contribution-1: #b8cff0;
+  --github-contribution-2: #78a6dc;
+  --github-contribution-3: #3e71b5;
+  --github-contribution-4: #1c3d6e;
 }
 
 .dark {
@@ -52,14 +52,14 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #a8c7fa;
+  --primary-foreground: #0b1220;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #102a43;
+  --accent-foreground: #dbeafe;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -77,11 +77,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --github-contribution-0: #161b22;
-  --github-contribution-1: #0e4429;
-  --github-contribution-2: #006d32;
-  --github-contribution-3: #26a641;
-  --github-contribution-4: #39d353;
+  --github-contribution-0: #102a43;
+  --github-contribution-1: #154264;
+  --github-contribution-2: #216b9c;
+  --github-contribution-3: #5d8ece;
+  --github-contribution-4: #a8c7fa;
 }
 
 @theme inline {
