@@ -2,7 +2,10 @@ import { TypingAnimation } from "../imports/typing-animation";
 
 export const Hero = () => {
   return (
-    <section id="hero" className="flex flex-col-reverse md:flex-row items-center justify-between w-full max-w-4xl mx-auto gap-10 pt-20 pb-10 px-5">
+    <section
+      id="hero"
+      className="flex flex-col-reverse md:flex-row items-center justify-between w-full max-w-4xl mx-auto gap-10 pt-20 pb-10 px-5"
+    >
       <div className="flex flex-col items-start text-left space-y-4">
         <TypingAnimation
           words={["Aloha, I'm Dhaniel!"]}

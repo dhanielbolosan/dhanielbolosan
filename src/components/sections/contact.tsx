@@ -81,7 +81,7 @@ export const Contact = () => {
                 target="_blank"
                 rel="noreferrer"
               >
-                <IconBrandGithub className="h-8 w-8" />
+                <IconBrandGithub className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
               </a>
 
               <a
@@ -89,11 +89,11 @@ export const Contact = () => {
                 target="_blank"
                 rel="noreferrer"
               >
-                <IconBrandLinkedin className="h-8 w-8" />
+                <IconBrandLinkedin className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
               </a>
 
               <a href="mailto:dhanielb808@gmail.com">
-                <IconMail className="h-8 w-8" />
+                <IconMail className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
               </a>
             </div>
           </div>

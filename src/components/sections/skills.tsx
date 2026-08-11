@@ -42,6 +42,10 @@ import {
   NeonSvg,
   JupyterSvg,
   ApifySvg,
+  ClaudeCodeSvg,
+  CodexSvg,
+  JestSvg,
+  NestJSSvg,
 } from "@/components/svg";
 
 type Skill = {
@@ -68,17 +72,21 @@ const skills: Record<string, Skill[]> = {
     { name: "React", avatar: ReactSvg },
     { name: "Next.js", avatar: NextJSSvg },
     { name: "Node.js", avatar: NodeJSSvg },
+    { name: "NestJS", avatar: NestJSSvg },
     { name: "Tailwind CSS", avatar: TailwindCSSSvg },
     { name: "Flask", avatar: FlaskSvg },
     { name: "FastAPI", avatar: FastAPISvg },
     { name: "Scaffold-ETH 2", avatar: ScaffoldETHSvg },
     { name: "Hardhat", avatar: HardhatSvg },
     { name: "Capacitor", avatar: CapacitorSvg },
+    { name: "Jest", avatar: JestSvg },
   ],
   tools: [
     { name: "Git", avatar: GitSvg },
     { name: "GitHub", avatar: GitHubSvg },
     { name: "VSCode", avatar: VSCodeSvg },
+    { name: "Claude Code", avatar: ClaudeCodeSvg },
+    { name: "Codex", avatar: CodexSvg },
     { name: "Docker", avatar: DockerSvg },
     { name: "Vercel", avatar: VercelSvg },
     { name: "Google Cloud", avatar: GoogleCloudSvg },
