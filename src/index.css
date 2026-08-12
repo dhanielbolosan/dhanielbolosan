@@ -39,9 +39,9 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --github-contribution-0: #eaf2ff;
-  --github-contribution-1: #b8cff0;
-  --github-contribution-2: #78a6dc;
-  --github-contribution-3: #3e71b5;
+  --github-contribution-1: #aac3e7;
+  --github-contribution-2: #6e94cd;
+  --github-contribution-3: #3966a9;
   --github-contribution-4: #1c3d6e;
 }
 
@@ -77,10 +77,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --github-contribution-0: #102a43;
-  --github-contribution-1: #154264;
-  --github-contribution-2: #216b9c;
-  --github-contribution-3: #5d8ece;
+  --github-contribution-0: #111e33;
+  --github-contribution-1: #2a436c;
+  --github-contribution-2: #476ba8;
+  --github-contribution-3: #7298d8;
   --github-contribution-4: #a8c7fa;
 }
 
