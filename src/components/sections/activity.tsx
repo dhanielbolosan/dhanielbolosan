@@ -7,6 +7,8 @@ import {
 
 const githubUsername = "dhanielbolosan";
 
+const toLocalDateString = (date: Date) => date.toLocaleDateString("en-CA");
+
 export const Activity = () => {
   const [calendar, setCalendar] = useState<ContributionCalendarData>();
 
@@ -15,11 +17,11 @@ export const Activity = () => {
 
     const to = new Date();
     const from = new Date(to);
-    from.setUTCDate(from.getUTCDate() - 364);
+    from.setDate(from.getDate() - 364);
 
     const params = new URLSearchParams({
-      from: from.toISOString().slice(0, 10),
-      to: to.toISOString().slice(0, 10),
+      from: toLocalDateString(from),
+      to: toLocalDateString(to),
       username: githubUsername,
     });
 
