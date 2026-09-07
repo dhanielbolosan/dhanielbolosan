@@ -10,6 +10,7 @@ import {
   CSSSvg,
   SoliditySvg,
   ReactSvg,
+  SvelteSvg,
   NextJSSvg,
   NodeJSSvg,
   TailwindCSSSvg,
@@ -70,6 +71,7 @@ const skills: Record<string, Skill[]> = {
   ],
   frameworks: [
     { name: "React", avatar: ReactSvg },
+    { name: "Svelte", avatar: SvelteSvg },
     { name: "Next.js", avatar: NextJSSvg },
     { name: "Node.js", avatar: NodeJSSvg },
     { name: "NestJS", avatar: NestJSSvg },
