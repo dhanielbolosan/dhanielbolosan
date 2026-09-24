@@ -1,6 +1,6 @@
-import { EntryList, type Entry } from "../entry-list";
+import type { Entry } from "./history";
 
-const education: Entry[] = [
+export const education: Entry[] = [
   {
     name: "University of Hawaiʻi at Mānoa",
     subtitle: "Computer Science, B.S.",
@@ -14,5 +14,3 @@ const education: Entry[] = [
     description: ["Cumulative GPA: 3.10/4.00", "Dean's List (Fall 2022)"],
   },
 ];
-
-export const Education = () => <EntryList entries={education} />;

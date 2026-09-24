@@ -11,9 +11,9 @@ const githubUsername = "dhanielbolosan";
 const stats = [
   ["Role", "Full-Stack Engineer"],
   ["Origin", "Bacarra, Philippines"],
-  ["OS", "CachyOS"],
   ["Device", "ROG Zephyrus G16"],
   ["GPU", "RTX 5070 Ti"],
+  ["OS", "CachyOS"],
   ["Status", "Open to Work"],
 ];
 
@@ -177,11 +177,11 @@ export const Hero = () => {
         >
           {saved
             ? saved.at.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })
             : "—"}
         </dd>
       </dl>

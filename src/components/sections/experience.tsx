@@ -1,6 +1,6 @@
-import { EntryList, type Entry } from "../entry-list";
+import type { Entry } from "./history";
 
-const experience: Entry[] = [
+export const experience: Entry[] = [
   {
     name: "Black Sand Solutions",
     subtitle: "Software Engineer Intern",
@@ -52,5 +52,3 @@ const experience: Entry[] = [
     ],
   },
 ];
-
-export const Experience = () => <EntryList entries={experience} />;

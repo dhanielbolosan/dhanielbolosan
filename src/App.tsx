@@ -3,8 +3,7 @@ import { Tabs } from "radix-ui";
 import { motion } from "motion/react";
 import { Hero } from "./components/sections/hero";
 import { Activity } from "./components/sections/activity";
-import { Experience } from "./components/sections/experience";
-import { Education } from "./components/sections/education";
+import { History } from "./components/sections/history";
 import { Skills } from "./components/sections/skills";
 import { Projects } from "./components/sections/projects";
 import { Contact } from "./components/sections/contact";
@@ -25,11 +24,8 @@ const columns = [
     ],
   },
   {
-    label: "Experience",
-    windows: [
-      { title: "Experience", Section: Experience },
-      { title: "Education", Section: Education },
-    ],
+    label: "History",
+    windows: [{ title: undefined, Section: History }],
   },
   {
     label: "Item",
@@ -51,7 +47,7 @@ const subscribe = (onChange: () => void) => {
 function App() {
   const wide = useSyncExternalStore(subscribe, () => twoColumns.matches);
   const [active, setActive] = useState(0);
-  // About is always visible on two columns, so the right column falls back to Experience.
+  // About is always visible on two columns, so the right column falls back to History.
   const right = active === 0 ? 1 : active;
   const selected = wide ? right : active;
 
@@ -62,13 +58,13 @@ function App() {
         onValueChange={(v) => setActive(Number(v))}
         className="window shrink-0 xl:hidden"
       >
-        <Tabs.List className="flex h-12 items-stretch justify-center gap-3 md:gap-10">
+        <Tabs.List className="flex h-12 items-stretch justify-center gap-2 px-2 md:gap-10">
           {columns.map((column, i) => (
             <Tabs.Trigger
               key={column.label}
               value={String(i)}
               className={cn(
-                "relative flex cursor-pointer items-center pl-7 font-heading text-sm font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11 md:text-lg",
+                "relative flex cursor-pointer items-center pl-6 font-heading text-base font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11",
                 i === 0 && "md:hidden",
               )}
             >
@@ -76,8 +72,9 @@ function App() {
                 <motion.span
                   layoutId="tab-hand"
                   transition={{ duration: 0.15, ease: "linear" }}
-                  className="absolute inset-y-0 -left-1 flex items-center"
+                  className="absolute inset-y-0 left-0 flex items-center"
                 >
+                  {/* 24px on phones so four tabs fit; 36px like every other hand from md up. */}
                   <PixelHand className="w-6 motion-safe:animate-bob md:w-9" />
                 </motion.span>
               )}
