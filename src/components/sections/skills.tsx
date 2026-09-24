@@ -97,13 +97,13 @@ export const Skills = () => (
           />
           {group.label}
         </h3>
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-1 font-heading text-sm @xs:grid-cols-3 @sm:text-base">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-1 font-heading text-sm @xs:grid-cols-3">
           {group.skills.map((skill) => {
             const Logo = logos[skill];
             return (
               <li
                 key={skill}
-                className="flex items-center gap-2"
+                className="flex min-w-0 items-center gap-1.5"
               >
                 {Logo ? (
                   <svg
@@ -116,7 +116,8 @@ export const Skills = () => (
                 ) : (
                   <span className="size-4 shrink-0" />
                 )}
-                {skill}
+                {/* One line; names too long for the column end in "…", like the Projects stack. */}
+                <span className="truncate">{skill}</span>
               </li>
             );
           })}

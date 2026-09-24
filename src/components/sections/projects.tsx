@@ -323,8 +323,8 @@ export const Projects = () => {
 
         <p className="text-sm leading-relaxed">{info.description}</p>
 
-        {/* Stack as materia: each tech wears its type's orb. */}
-        <ul className="mt-auto grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
+        {/* Stack as materia, right under the description: each tech wears its type's orb. */}
+        <ul className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
           {info.stack.map(({ name: tech, type }) => (
             <li
               key={tech}

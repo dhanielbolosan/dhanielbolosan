@@ -62,11 +62,15 @@
     inset 0 0 0 4px #d8d8da,
     inset 0 0 0 5px #9a9aa2,
     inset 0 0 0 6px #1e1c28;
-  --github-contribution-0: #1c1733;
-  --github-contribution-1: #4a3f6b;
-  --github-contribution-2: #7a6aa8;
-  --github-contribution-3: #b3a6dc;
-  --github-contribution-4: #efeaff;
+  /* Contribution levels, built with the dataviz method: a sequential ramp in one hue
+     (FF7 gold, warmed slightly toward amber at the dim end so it never reads olive),
+     stepped evenly in OKLCH lightness from dim to bright for the dark tiles. Level 0
+     is "no contributions", not a ramp step: a quiet neutral that still shows. */
+  --github-contribution-0: #47474e;
+  --github-contribution-1: #7f5c1d;
+  --github-contribution-2: #ad852b;
+  --github-contribution-3: #d4b045;
+  --github-contribution-4: #fddc67;
 }
 
 @theme inline {

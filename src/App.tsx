@@ -36,9 +36,12 @@ const columns = [
   },
   {
     label: "Config",
-    // Split now so a second window (e.g. the window color picker) gets 50/50 for free.
     split: true,
-    windows: [{ title: "Activity", Section: Activity }],
+    windows: [
+      { title: "Activity", Section: Activity },
+      // Placeholder: the window color picker and other settings go here.
+      { title: "Config", Section: () => null },
+    ],
   },
 ];
 
