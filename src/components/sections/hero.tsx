@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTypewriter } from "@/lib/use-typewriter";
+import { Bar } from "../bar";
 
 // LV and the EXP bar are derived from this.
 const birthday = { year: 2004, month: 3, day: 26 };
@@ -120,20 +121,11 @@ export const Hero = () => {
               </span>
             </span>
           </div>
-          {/* FF7 EXP bar: light frame, dark track, red-pink fill with a vertical shine. */}
-          <span
-            role="meter"
-            aria-label="EXP to next level"
-            aria-valuenow={Math.round(exp * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            className="block h-3.5 overflow-hidden rounded-[2px] border-2 border-[#c9c7dc] bg-[#1a1730] shadow-[0_0_0_1px_#15121a]"
-          >
-            <span
-              className="block h-full bg-[linear-gradient(to_bottom,#da9b99_0%,#964746_15%,#ba8889_38%,#ecc3c5_52%,#d18a8b_64%,#bf7f81_82%,#b49797_100%)]"
-              style={{ width: `${exp * 100}%` }}
-            />
-          </span>
+          <Bar
+            value={exp}
+            label="EXP to next level"
+            className="h-3.5"
+          />
           <div className="flex items-baseline justify-between gap-2 text-sm">
             <span>next level:</span>
             <span className="font-semibold tabular-nums">{daysLeft}d</span>
@@ -177,11 +169,11 @@ export const Hero = () => {
         >
           {saved
             ? saved.at.toLocaleString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
             : "—"}
         </dd>
       </dl>

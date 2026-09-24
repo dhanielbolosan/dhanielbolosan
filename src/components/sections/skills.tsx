@@ -1,8 +1,4 @@
-import magic from "@/assets/materia/magic.png";
-import command from "@/assets/materia/command.png";
-import support from "@/assets/materia/support.png";
-import independent from "@/assets/materia/independent.png";
-import summon from "@/assets/materia/summon.png";
+import { groups } from "./skill-groups";
 import {
   siBootstrap,
   siClaude,
@@ -33,60 +29,6 @@ import {
   siVercel,
   type SimpleIcon,
 } from "simple-icons";
-
-// Each skill category is a materia type, colored the way FF7 colors them. Orb sprites
-// are from a fan-made sheet by JackTheRippa (The Spriters Resource), free to use.
-const groups = [
-  {
-    label: "Languages",
-    orb: magic,
-    skills: ["Python", "TypeScript", "Java", "HTML", "CSS", "Solidity"],
-  },
-  {
-    label: "Frameworks",
-    orb: command,
-    skills: [
-      "React",
-      "Svelte",
-      "Next.js",
-      "Tailwind CSS",
-      "FastAPI",
-      "Capacitor",
-    ],
-  },
-  {
-    label: "Libraries",
-    orb: support,
-    skills: [
-      "LangChain",
-      "Shadcn UI",
-      "Bootstrap",
-      "Prisma ORM",
-      "Drizzle ORM",
-      "HyperFrames",
-    ],
-  },
-  {
-    label: "Tools",
-    orb: independent,
-    skills: [
-      "Git",
-      "Claude Code",
-      "Codex",
-      "Docker",
-      "Google Cloud",
-      "Vercel",
-      "Cloudflare",
-      "Ollama",
-      "Apify",
-    ],
-  },
-  {
-    label: "Databases",
-    orb: summon,
-    skills: ["PostgreSQL", "Redis", "SQLite"],
-  },
-];
 
 // Brand icons from Simple Icons (CC0): one monochrome style on a shared 24x24 grid.
 // Codex and Apify aren't in Simple Icons; theirs come from Devicon Plain (MIT), the
@@ -155,7 +97,7 @@ export const Skills = () => (
           />
           {group.label}
         </h3>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-1 font-heading text-base @sm:grid-cols-3">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-1 font-heading text-sm @xs:grid-cols-3 @sm:text-base">
           {group.skills.map((skill) => {
             const Logo = logos[skill];
             return (

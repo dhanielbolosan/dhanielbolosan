@@ -1,15 +1,10 @@
-import {
-  useEffect,
-  useState,
-  type KeyboardEvent,
-  type MouseEvent,
-} from "react";
+import { useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "../imports/input";
 import { Textarea } from "../imports/textarea";
-import { PixelHand } from "../pixel-hand";
+import { Choices, type Choice } from "../choices";
 import { useTypewriter } from "@/lib/use-typewriter";
 
 // What the NPC still needs, per field; joined into one line by `missingLine`.
@@ -27,9 +22,10 @@ const contactSchema = z.object({
 
 // "your name" / "your name and a valid email" / "your name, a valid email, and a message…"
 const missingLine = (parts: string[]) =>
-  `Hold on! I still need ${parts.length < 3
-    ? parts.join(" and ")
-    : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
+  `Hold on! I still need ${
+    parts.length < 3
+      ? parts.join(" and ")
+      : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
   }.`;
 
 type ContactForm = z.infer<typeof contactSchema>;
@@ -47,95 +43,6 @@ const lines = {
 
 const field =
   "rounded-[3px] border-frame/50 bg-black/30 font-heading text-base placeholder:text-muted-foreground/70 md:text-base";
-
-type Choice = {
-  label: string;
-  href?: string;
-  onSelect?: () => void;
-  submit?: boolean;
-};
-
-// FF7 dialogue choices: the hand marks the hovered or focused option; arrow keys move it.
-// `boxed` renders them as an FF7 command window in the parent window's bottom-right
-// corner, with the hand pointing in from outside its left edge.
-const Choices = ({ items, boxed }: { items: Choice[]; boxed?: boolean }) => {
-  const [active, setActive] = useState(0);
-
-  const move = (event: KeyboardEvent<HTMLUListElement>) => {
-    const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
-    if (!step) return;
-    event.preventDefault();
-    const options =
-      event.currentTarget.querySelectorAll<HTMLElement>("a, button");
-    options[(active + step + options.length) % options.length]?.focus();
-  };
-
-  // Plain left clicks go through onSelect; modified clicks keep normal link behavior.
-  const onLinkClick = (event: MouseEvent, item: Choice) => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)
-      return;
-    event.preventDefault();
-    item.onSelect?.();
-  };
-
-  const list = (
-    <ul
-      className="flex flex-col gap-1"
-      onKeyDown={move}
-    >
-      {items.map((item, i) => {
-        const props = {
-          onMouseEnter: () => setActive(i),
-          onFocus: () => setActive(i),
-          className: `relative flex w-fit cursor-pointer items-center py-0.5 font-heading text-lg text-foreground outline-none ${boxed ? "" : "pl-11"}`,
-        };
-        const body = (
-          <>
-            {i === active && (
-              <PixelHand
-                className={`absolute motion-safe:animate-bob ${boxed ? "right-full mr-2" : "left-0"}`}
-              />
-            )}
-            {item.label}
-          </>
-        );
-        return (
-          <li key={item.label}>
-            {item.href ? (
-              <a
-                {...props}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(event) => onLinkClick(event, item)}
-              >
-                {body}
-              </a>
-            ) : (
-              <button
-                {...props}
-                type={item.submit ? "submit" : "button"}
-                form={item.submit ? "contact-form" : undefined}
-                onClick={item.onSelect}
-              >
-                {body}
-              </button>
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
-
-  // Flush with the Contact window's bottom-right corner (past its p-5 padding).
-  return boxed ? (
-    <div className="window mt-auto -mr-5 -mb-5 self-end py-3 pr-8 pl-6">
-      {list}
-    </div>
-  ) : (
-    list
-  );
-};
 
 export const Contact = () => {
   const [mode, setMode] = useState<"menu" | "form" | "sent">("menu");
@@ -212,31 +119,66 @@ export const Contact = () => {
     onSelect: () => redirect(href),
   });
 
-  const titleClass = "window-title float-right -mt-5 mb-1 ml-3 indent-0";
-  const title = <span className={titleClass}>Contact</span>;
+  const formCommands: Choice[] = [
+    { label: "Send", submit: "contact-form" },
+    { label: "Back", onSelect: () => go("menu") },
+  ];
+  const commands: Choice[] | undefined =
+    mode === "form"
+      ? formCommands
+      : mode === "sent"
+        ? [{ label: "Back", onSelect: () => go("menu") }]
+        : undefined;
+
+  const reserved = {
+    menu: [lines.menu, lines.redirect],
+    form: [lines.form, lines.sending, lines.failed, lines.allErrors],
+    sent: [lines.sent],
+  };
+
+  // Top-right corner, FF7-style: the title box, which the command box temporarily
+  // replaces while there are commands. Flush with the frame; the dialogue wraps it.
+  const cornerFor = (items?: Choice[]) => (
+    // The command box's hand points in from its left, so leave room for it there.
+    <div
+      className={`float-right -mt-5 mb-1 indent-0 ${items ? "ml-11" : "ml-3"}`}
+    >
+      {items ? (
+        <>
+          <h2 className="sr-only">Contact</h2>
+          <Choices
+            boxed
+            items={items}
+            className="-mr-5"
+          />
+        </>
+      ) : (
+        <h2 className="window-title">Contact</h2>
+      )}
+    </div>
+  );
 
   const dialogue =
     "col-start-1 row-start-1 pl-[0.4em] -indent-[0.4em] font-heading text-lg leading-snug whitespace-pre-line";
 
   return (
-    <section className="flex grow flex-col gap-4">
-      {/* Every line is laid out invisibly in the same grid cell, so the box is always as
-          tall as the longest one: typing never shifts what's below, and the menu choices
-          and the form start at the same spot on every screen.
-          The window title floats in each layer so every copy wraps around it the same way;
-          only the visible layer's title shows. */}
+    <section className="flex grow flex-col">
+      {/* Every line this screen can show is laid out invisibly in the same grid cell,
+          wrapped around this screen's corner, so the box is as tall as its longest line
+          and typing never shifts what's below. */}
       <div className="grid">
-        {Object.values(lines).map((text) => (
+        {reserved[mode].map((text) => (
           <div
             key={text}
             aria-hidden="true"
+            inert
             className={`invisible ${dialogue}`}
           >
-            {title}“{text}”
+            {cornerFor(commands)}“{text}”
           </div>
         ))}
         <div className={dialogue}>
-          <h2 className={titleClass}>Contact</h2>
+          {cornerFor(commands)}
           <span aria-hidden="true">
             {shown && `“${shown}${shown === line ? "”" : ""}`}
           </span>
@@ -255,7 +197,7 @@ export const Contact = () => {
           id="contact-form"
           noValidate
           onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-2 font-heading"
+          className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
         >
           <label
             htmlFor="contact-name"
@@ -290,41 +232,29 @@ export const Contact = () => {
           >
             Message
           </label>
-          {/* Fixed-size box that fills the window's leftover height and scrolls inside,
-              so long messages never make the Contact window taller. */}
+          {/* Starts small and grows with the message up to 304px (what fits the window at
+              1080p); past that it scrolls inside, so the Contact window stays put. */}
           <Textarea
             id="contact-message"
             placeholder="Enter your message here"
-            className={`h-full min-h-20 self-stretch overflow-y-auto py-2 field-sizing-fixed ${field}`}
+            className={`max-h-76 min-h-24 self-start overflow-y-auto py-2 field-sizing-content ${field}`}
             {...form.register("message")}
           />
         </form>
       )}
 
+      {/* Answer choices sit right under the dialogue, like FF7's. */}
       {mode === "menu" && (
-        <Choices
-          items={[
-            { label: "Leave a message", onSelect: () => go("form") },
-            link("GitHub", "https://github.com/dhanielbolosan"),
-            link("LinkedIn", "https://www.linkedin.com/in/dhaniel-bolosan/"),
-            link("Email", "mailto:dhanielb808@gmail.com"),
-          ]}
-        />
-      )}
-      {mode === "form" && (
-        <Choices
-          boxed
-          items={[
-            { label: "Send", submit: true },
-            { label: "Back", onSelect: () => go("menu") },
-          ]}
-        />
-      )}
-      {mode === "sent" && (
-        <Choices
-          boxed
-          items={[{ label: "Back", onSelect: () => go("menu") }]}
-        />
+        <div className="mt-2">
+          <Choices
+            items={[
+              { label: "Leave a message", onSelect: () => go("form") },
+              link("GitHub", "https://github.com/dhanielbolosan"),
+              link("LinkedIn", "https://www.linkedin.com/in/dhaniel-bolosan/"),
+              link("Email", "mailto:dhanielb808@gmail.com"),
+            ]}
+          />
+        </div>
       )}
     </section>
   );

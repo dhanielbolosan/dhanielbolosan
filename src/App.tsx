@@ -1,9 +1,9 @@
 import { useState, useSyncExternalStore } from "react";
 import { Tabs } from "radix-ui";
-import { motion } from "motion/react";
 import { Hero } from "./components/sections/hero";
 import { Activity } from "./components/sections/activity";
 import { History } from "./components/sections/history";
+import { Projects } from "./components/sections/projects";
 import { Skills } from "./components/sections/skills";
 import { Contact } from "./components/sections/contact";
 import { BlurFade } from "./components/imports/blur-fade";
@@ -30,13 +30,16 @@ const columns = [
     label: "Materia",
     split: true,
     windows: [
-      // Placeholder until the Projects window is redesigned; its old carousel stays in
-      // sections/projects.tsx for reference.
-      { title: "Projects", Section: () => null },
+      { title: undefined, Section: Projects },
       { title: undefined, Section: Skills },
     ],
   },
-  { label: "Config", windows: [{ title: "Activity", Section: Activity }] },
+  {
+    label: "Config",
+    // Split now so a second window (e.g. the window color picker) gets 50/50 for free.
+    split: true,
+    windows: [{ title: "Activity", Section: Activity }],
+  },
 ];
 
 // Matches Tailwind's md breakpoint, where About is pinned left and the tabs pick the right column.
@@ -49,6 +52,8 @@ const subscribe = (onChange: () => void) => {
 function App() {
   const wide = useSyncExternalStore(subscribe, () => twoColumns.matches);
   const [active, setActive] = useState(0);
+  // The nav hand only shows while a tab is hovered or focused; text color marks the active tab.
+  const [pointed, setPointed] = useState<number>();
   // About is always visible on two columns, so the right column falls back to History.
   const right = active === 0 ? 1 : active;
   const selected = wide ? right : active;
@@ -60,25 +65,27 @@ function App() {
         onValueChange={(v) => setActive(Number(v))}
         className="window shrink-0 xl:hidden"
       >
-        <Tabs.List className="flex h-12 items-stretch justify-center gap-2 px-2 md:gap-10">
+        <Tabs.List
+          className="flex h-12 items-stretch justify-center gap-2 px-2 md:gap-10"
+          onMouseLeave={() => setPointed(undefined)}
+        >
           {columns.map((column, i) => (
             <Tabs.Trigger
               key={column.label}
               value={String(i)}
+              onMouseEnter={() => setPointed(i)}
+              onFocus={() => setPointed(i)}
+              onBlur={() => setPointed(undefined)}
               className={cn(
                 "relative flex cursor-pointer items-center pl-6 font-heading text-base font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11",
                 i === 0 && "md:hidden",
               )}
             >
-              {i === selected && (
-                <motion.span
-                  layoutId="tab-hand"
-                  transition={{ duration: 0.15, ease: "linear" }}
-                  className="absolute inset-y-0 left-0 flex items-center"
-                >
+              {i === pointed && (
+                <span className="absolute inset-y-0 left-0 flex items-center">
                   {/* 24px on phones so four tabs fit; 36px like every other hand from md up. */}
                   <PixelHand className="w-6 motion-safe:animate-bob md:w-9" />
-                </motion.span>
+                </span>
               )}
               {column.label}
             </Tabs.Trigger>
@@ -110,6 +117,12 @@ function App() {
                   className={cn(
                     "window flex grow flex-col gap-3 px-5 pb-5",
                     !title && "pt-5",
+                    // Split columns scroll independently, so their windows can't share a
+                    // row height. A shared minimum for each split column's top window keeps
+                    // the dividing lines level on shorter tablet screens. It sits on the
+                    // window, not the wrapper, so the wrapper still grows to fit taller
+                    // content instead of clipping it.
+                    column.split && j === 0 && "md:min-h-128 xl:min-h-0",
                   )}
                 >
                   {title && <h2 className="window-title">{title}</h2>}
