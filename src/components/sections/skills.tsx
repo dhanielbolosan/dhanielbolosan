@@ -96,6 +96,11 @@ const devicon = (path: string) => ({ path, viewBox: "0 0 128 128" });
 type Icon = Pick<SimpleIcon, "path"> & { viewBox?: string };
 
 const logos: Record<string, Icon> = {
+  // HyperFrames symbol from its repo (docs/logo/symbol-light.svg), gradient dropped.
+  HyperFrames: {
+    path: "M10.1851 57.8021L33.1145 73.8313C36.2202 75.9978 41.5173 73.5433 42.4816 69.4984L51.7611 30.4271C52.7253 26.3822 48.5802 23.9277 44.4602 26.0942L13.917 42.1235C6.96677 45.7676 4.97564 54.1579 10.1851 57.8021Z M87.5129 57.5141L56.9696 73.5433C52.8371 75.7098 48.7046 73.2553 49.6688 69.2104L58.9483 30.1391C59.9125 26.0942 65.2097 23.6397 68.3154 25.8062L91.2447 41.8354C96.4668 45.4796 94.4631 53.8699 87.5129 57.5141Z",
+    viewBox: "0 0 100 100",
+  },
   Capacitor: siCapacitor,
   Apify: devicon(
     "M1.94 0A1.94 1.94 0 0 0 0 1.94v80.47c0 1.928 2.507 2.675 3.562 1.063L56.218 3c.844-1.289-.082-3-1.623-3Zm71.465 0c-1.541 0-2.467 1.711-1.624 3.002l52.657 80.47c1.055 1.613 3.562.866 3.562-1.062V1.94A1.94 1.94 0 0 0 126.06 0Zm-8.922 63.855a1.93 1.93 0 0 0-1.384.573L3.28 124.695C2.067 125.919 2.933 128 4.657 128h118.736c1.717 0 2.585-2.067 1.386-3.295L65.86 64.44a1.93 1.93 0 0 0-1.378-.584z",
@@ -134,7 +139,7 @@ const logos: Record<string, Icon> = {
 // FF7 Materia list: each category header carries its materia orb; skills are logo + name.
 export const Skills = () => (
   <section className="flow-root">
-    <h2 className="window-title float-right -mt-5 mb-3 ml-3">Skills</h2>
+    <h2 className="window-title float-right -mt-5 mb-1 ml-3">Skills</h2>
 
     {groups.map((group) => (
       <div
