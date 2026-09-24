@@ -5,7 +5,6 @@ import { Hero } from "./components/sections/hero";
 import { Activity } from "./components/sections/activity";
 import { History } from "./components/sections/history";
 import { Skills } from "./components/sections/skills";
-import { Projects } from "./components/sections/projects";
 import { Contact } from "./components/sections/contact";
 import { BlurFade } from "./components/imports/blur-fade";
 import { PixelHand } from "./components/pixel-hand";
@@ -28,10 +27,13 @@ const columns = [
     windows: [{ title: undefined, Section: History }],
   },
   {
-    label: "Item",
+    label: "Materia",
+    split: true,
     windows: [
-      { title: "Materia", Section: Skills },
-      { title: "Item", Section: Projects },
+      // Placeholder until the Projects window is redesigned; its old carousel stays in
+      // sections/projects.tsx for reference.
+      { title: "Projects", Section: () => null },
+      { title: undefined, Section: Skills },
     ],
   },
   { label: "Config", windows: [{ title: "Activity", Section: Activity }] },
