@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { Badge } from "../imports/badge";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../imports/card";
+import { motion } from "motion/react";
+import { PixelHand } from "../pixel-hand";
+import { cn } from "@/lib/utils";
 
 const projects = [
   {
     name: "KopeChain",
-    images: ["/projects/kopechain1.png", "/projects/kopechain2.png", "/projects/kopechain3.png"],
+    images: [
+      "/projects/kopechain1.png",
+      "/projects/kopechain2.png",
+      "/projects/kopechain3.png",
+    ],
     description:
       "Decentralized supply chain tracker on Base Sepolia Testnet to verify the origin of local Hawaiian coffee.",
     stack: ["Scaffold-ETH 2", "Solidity", "Hardhat", "Pinata", "DaisyUI"],
@@ -67,43 +66,91 @@ const ProjectCard = ({ name, images, description, stack }: ProjectProps) => {
   }, [isHovering, images.length]);
 
   return (
-    <Card
-      className="relative w-full flex flex-col pt-0 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:cursor-pointer"
+    <article
+      className="flex flex-col gap-3 rounded-[3px] border border-frame/40 bg-black/25 p-3"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-video w-full overflow-hidden rounded-[3px] border border-frame/60">
         {images.map((src: string, i: number) => (
           <img
             key={src}
             src={src}
             alt={name}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === currImage ? "opacity-100" : "opacity-0"
-              }`}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${i === currImage ? "opacity-100" : "opacity-0"}`}
           />
         ))}
       </div>
-      <CardHeader className="flex-grow">
-        <CardTitle className="text-base">{name}</CardTitle>
-        <CardDescription className="text-sm">{description}</CardDescription>
-      </CardHeader>
-      <CardFooter className="flex flex-wrap gap-2">
-        {stack.map((i: string) => (
-          <Badge key={i} className="bg-muted text-black dark:text-white">{i}</Badge>
-        ))}
-      </CardFooter>
-    </Card>
+      <h3 className="font-heading text-base font-semibold">{name}</h3>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        {description}
+      </p>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 font-heading text-sm">
+        <dt className="text-label">Equip</dt>
+        <dd>{stack.join(" · ")}</dd>
+      </dl>
+    </article>
   );
 };
 
+const step =
+  "cursor-pointer rounded-[3px] p-1.5 outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring";
+
 export const Projects = () => {
+  const [index, setIndex] = useState(0);
+  const [dir, setDir] = useState(1);
+
+  const go = (next: number) => {
+    setDir(next > index ? 1 : -1);
+    setIndex((next + projects.length) % projects.length);
+  };
+
   return (
-    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
-      <h2 className="text-xl md:text-2xl font-bold tracking-tight">Projects</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {projects.map((item) => (
-          <ProjectCard key={item.name} {...item} />
-        ))}
+    <section className="flex flex-col gap-4">
+      <motion.div
+        key={index}
+        initial={{ opacity: 0, x: dir * 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <ProjectCard {...projects[index]} />
+      </motion.div>
+
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => go(index - 1)}
+          aria-label="Previous project"
+          className={step}
+        >
+          <PixelHand className="w-6 -scale-x-100" />
+        </button>
+        <div className="flex items-center gap-2">
+          <span className="mr-1 font-heading text-sm text-label tabular-nums">
+            {index + 1} / {projects.length}
+          </span>
+          {projects.map((project, i) => (
+            <button
+              key={project.name}
+              type="button"
+              onClick={() => go(i)}
+              aria-label={project.name}
+              aria-current={i === index || undefined}
+              className={cn(
+                "size-2.5 cursor-pointer rounded-[1px] border border-frame outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                i === index ? "bg-frame" : "bg-transparent hover:bg-frame/40",
+              )}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => go(index + 1)}
+          aria-label="Next project"
+          className={step}
+        >
+          <PixelHand className="w-6" />
+        </button>
       </div>
     </section>
   );

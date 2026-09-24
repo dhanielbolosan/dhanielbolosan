@@ -1,5 +1,4 @@
 import { Marquee } from "@/components/imports/marquee";
-import { Avatar, AvatarFallback } from "@/components/imports/avatar";
 import {
   PythonSvg,
   TypeScriptSvg,
@@ -119,54 +118,33 @@ const allSkills = Object.values(skills).flat();
 const firstRow = allSkills.slice(0, Math.ceil(allSkills.length / 2));
 const secondRow = allSkills.slice(Math.ceil(allSkills.length / 2));
 
-const SkillBadge = ({ name, avatar: Icon }: Skill) => {
-  return (
-    <div className="hover:cursor-pointer bg-card hover:bg-muted/50 inline-flex items-center gap-2 rounded-full border p-2">
-      <Avatar size="sm">
-        <AvatarFallback>
-          {Icon ? (
-            <Icon className="size-4" />
-          ) : (
-            <span className="text-sm font-medium">{name.slice(0, 2)}</span>
-          )}
-        </AvatarFallback>
-      </Avatar>
-      <span className="text-sm font-medium whitespace-nowrap">{name}</span>
-    </div>
-  );
-};
+const SkillChip = ({ name, avatar: Icon }: Skill) => (
+  <div className="flex items-center gap-2 rounded-[3px] border border-frame/40 bg-black/25 px-2.5 py-1.5 font-heading text-sm whitespace-nowrap">
+    {Icon && <Icon className="size-4 shrink-0" />}
+    {name}
+  </div>
+);
 
 export const Skills = () => {
   return (
-    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-10 px-5">
-      <h2 className="text-xl md:text-2xl font-bold tracking-tight">Skills</h2>
-
-      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-        <Marquee
-          pauseOnHover
-          className="[--duration:60s]"
-        >
-          {firstRow.map((skill) => (
-            <SkillBadge
-              key={skill.name}
-              {...skill}
-            />
-          ))}
-        </Marquee>
-        <Marquee
-          reverse
-          pauseOnHover
-          className="[--duration:60s]"
-        >
-          {secondRow.map((skill) => (
-            <SkillBadge
-              key={skill.name}
-              {...skill}
-            />
-          ))}
-        </Marquee>
-        <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/16 bg-gradient-to-r"></div>
-        <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/16 bg-gradient-to-l"></div>
+    <section className="flex flex-col gap-4">
+      {/* Mask fades the rows into the window edges instead of painting over the gradient. */}
+      <div className="flex flex-col [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+        {[firstRow, secondRow].map((row, i) => (
+          <Marquee
+            key={i}
+            reverse={i === 1}
+            pauseOnHover
+            className="p-1 [--duration:60s] [--gap:0.5rem]"
+          >
+            {row.map((skill) => (
+              <SkillChip
+                key={skill.name}
+                {...skill}
+              />
+            ))}
+          </Marquee>
+        ))}
       </div>
     </section>
   );

@@ -1,17 +1,24 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { Card, CardContent } from "../imports/card";
 import { Field, FieldGroup } from "../imports/field";
 import { Input } from "../imports/input";
 import { Textarea } from "../imports/textarea";
-import { InteractiveHoverButton } from "../imports/interactive-hover-button";
+import { PixelHand } from "../pixel-hand";
 import { toast } from "sonner";
-import {
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconMail,
-} from "@tabler/icons-react";
+
+const links = [
+  { label: "GitHub", href: "https://github.com/dhanielbolosan" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/dhaniel-bolosan/" },
+  { label: "Email", href: "mailto:dhanielb808@gmail.com" },
+];
+
+const field =
+  "h-11 rounded-[3px] border-frame/50 bg-black/30 font-heading text-base placeholder:text-base placeholder:text-muted-foreground md:text-base";
+
+// Hover or focus shows the hand beside a menu option.
+const menuHand =
+  "invisible absolute top-1/2 left-0 w-6 -translate-y-1/2 group-hover:visible group-focus-visible:visible";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name must be at least 1 characters"),
@@ -40,7 +47,9 @@ export const Contact = () => {
 
       if (!res.ok) throw new Error();
 
-      toast.success("Message Sent! Will get back to you soon.", { id: toastId });
+      toast.success("Message Sent! Will get back to you soon.", {
+        id: toastId,
+      });
       form.reset();
     } catch {
       toast.error("Something went wrong. Try again.", { id: toastId });
@@ -64,99 +73,84 @@ export const Contact = () => {
   }
 
   return (
-    <section className="flex flex-col w-full max-w-4xl mx-auto gap-5 pb-40 px-5">
-      <Card>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 px-8 py-4">
-          <div className="flex flex-col pr-4 space-y-4">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight">
-              Wanna Chat?
-            </h2>
-            <p className="text-base">
-              I'm always open to discussing new projects, opportunities, or just talking. Feel free to reach out and I'll get back
-              to you.
-            </p>
-            <div className="flex flex-row mt-auto gap-4 mb-4 md:mb-0">
-              <a
-                href="https://github.com/dhanielbolosan"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <IconBrandGithub className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
-              </a>
+    <section className="flex flex-col gap-4">
+      <p className="text-sm leading-relaxed">
+        I'm always open to discussing new projects, opportunities, or just
+        talking. Feel free to reach out and I'll get back to you.
+      </p>
 
-              <a
-                href="https://www.linkedin.com/in/dhaniel-bolosan/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <IconBrandLinkedin className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
-              </a>
-
-              <a href="mailto:dhanielb808@gmail.com">
-                <IconMail className="h-8 w-8 hover:scale-125 motion-reduce:transform-none transition-transform duration-300 ease-out" />
-              </a>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4 pl-4">
-            <form
-              id="contact-form"
-              onSubmit={form.handleSubmit(onSubmit, onError)}
+      <ul className="flex flex-wrap gap-x-4 gap-y-1">
+        {links.map((link) => (
+          <li key={link.label}>
+            <a
+              href={link.href}
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel="noreferrer"
+              className="group relative inline-block py-0.5 pl-7 font-heading text-base font-semibold outline-none hover:text-foreground"
             >
-              <FieldGroup>
-                <Controller
-                  name="name"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Field>
-                      <Input
-                        {...field}
-                        placeholder="Name"
-                        className="h-12 placeholder:text-base text-base"
-                      />
-                    </Field>
-                  )}
-                />
+              <PixelHand className={menuHand} />
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
 
-                <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Field>
-                      <Input
-                        {...field}
-                        placeholder="Email"
-                        className="h-12 placeholder:text-base text-base"
-                      />
-                    </Field>
-                  )}
+      <form
+        id="contact-form"
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+      >
+        <FieldGroup>
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field: props }) => (
+              <Field>
+                <Input
+                  {...props}
+                  placeholder="Name"
+                  className={field}
                 />
+              </Field>
+            )}
+          />
 
-                <Controller
-                  name="message"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Field>
-                      <Textarea
-                        {...field}
-                        placeholder="Message"
-                        rows={4}
-                        className="placeholder:text-base text-base"
-                      />
-                    </Field>
-                  )}
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field: props }) => (
+              <Field>
+                <Input
+                  {...props}
+                  placeholder="Email"
+                  className={field}
                 />
-                <InteractiveHoverButton
-                  type="submit"
-                  className="h-12 text-base cursor-pointer"
-                >
-                  Submit
-                </InteractiveHoverButton>
-              </FieldGroup>
-            </form>
-          </div>
-        </CardContent>
-      </Card>
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="message"
+            control={form.control}
+            render={({ field: props }) => (
+              <Field>
+                <Textarea
+                  {...props}
+                  placeholder="Message"
+                  rows={4}
+                  className={`${field} h-auto min-h-24 py-2`}
+                />
+              </Field>
+            )}
+          />
+          <button
+            type="submit"
+            className="group window relative h-11 cursor-pointer pl-4 font-heading text-base font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <PixelHand className={`${menuHand} left-3`} />
+            Send
+          </button>
+        </FieldGroup>
+      </form>
     </section>
   );
 };
