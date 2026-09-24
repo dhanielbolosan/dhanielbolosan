@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { TypingAnimation } from "../imports/typing-animation";
+import { useTypewriter } from "@/lib/use-typewriter";
 
 // LV and the EXP bar are derived from this.
 const birthday = { year: 2004, month: 3, day: 26 };
+
+const name = "Dhaniel Bolosan";
 
 const githubUsername = "dhanielbolosan";
 
@@ -78,6 +80,7 @@ export const Hero = () => {
   const now = useNow();
   const { level, exp, daysLeft, daysLived } = getLevel(now);
   const saved = useLastSaved();
+  const typedName = useTypewriter(name, 75);
 
   return (
     <section className="flex grow flex-col justify-between gap-4">
@@ -94,12 +97,15 @@ export const Hero = () => {
             flows around it, and anything past its bottom edge gets the full width. */}
         <div className="flow-root min-w-0 grow space-y-1.5 font-heading">
           <h2 className="window-title float-right -mt-5 mb-1 ml-3">Status</h2>
-          <TypingAnimation
-            as="div"
-            words={["Dhaniel Bolosan"]}
-            typeSpeed={75}
-            className="text-2xl leading-tight font-semibold tracking-wide"
-          />
+          {/* The untyped rest stays in place invisibly, so the name keeps its final
+              width and wrapping while it types. */}
+          <h1 className="text-2xl leading-tight font-semibold tracking-wide">
+            <span aria-hidden="true">
+              {typedName}
+              <span className="invisible">{name.slice(typedName.length)}</span>
+            </span>
+            <span className="sr-only">{name}</span>
+          </h1>
           <div className="flex items-baseline justify-between gap-2">
             <span className="flex items-baseline gap-2">
               <span className="text-sm text-label">LV</span>

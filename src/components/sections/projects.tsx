@@ -123,7 +123,7 @@ export const Projects = () => {
           aria-label="Previous project"
           className={step}
         >
-          <PixelHand className="w-6 -scale-x-100" />
+          <PixelHand className="-scale-x-100" />
         </button>
         <div className="flex items-center gap-2">
           <span className="mr-1 font-heading text-sm text-label tabular-nums">
@@ -149,7 +149,7 @@ export const Projects = () => {
           aria-label="Next project"
           className={step}
         >
-          <PixelHand className="w-6" />
+          <PixelHand />
         </button>
       </div>
     </section>

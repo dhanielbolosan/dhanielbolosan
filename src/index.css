@@ -153,6 +153,11 @@
   html {
     @apply font-sans;
   }
+
+  /* Browsers default buttons to text-shadow: none; keep the window's hard shadow. */
+  button {
+    text-shadow: inherit;
+  }
 }
 
 /* FF-style menu window: corner gradient, bright frame, dark inner line, hard text shadow. */

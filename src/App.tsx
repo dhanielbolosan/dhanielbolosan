@@ -21,7 +21,7 @@ const columns = [
     split: true,
     windows: [
       { title: undefined, Section: Hero },
-      { title: "PHS", Section: Contact },
+      { title: undefined, Section: Contact },
     ],
   },
   {
@@ -68,7 +68,7 @@ function App() {
               key={column.label}
               value={String(i)}
               className={cn(
-                "relative flex cursor-pointer items-center pl-7 font-heading text-sm font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-14 md:text-lg",
+                "relative flex cursor-pointer items-center pl-7 font-heading text-sm font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11 md:text-lg",
                 i === 0 && "md:hidden",
               )}
             >
@@ -78,7 +78,7 @@ function App() {
                   transition={{ duration: 0.15, ease: "linear" }}
                   className="absolute inset-y-0 -left-1 flex items-center"
                 >
-                  <PixelHand className="w-6 motion-safe:animate-bob md:w-12" />
+                  <PixelHand className="w-6 motion-safe:animate-bob md:w-9" />
                 </motion.span>
               )}
               {column.label}
