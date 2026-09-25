@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { PixelHand } from "../pixel-hand";
@@ -12,9 +12,9 @@ const corners = [
   { key: "br", label: "Bottom right", fallback: "#15112a" },
 ] as const;
 
-// The site keeps text to two colors so both can be customized: primary text is
-// --foreground, the teal accent is --label. Highlight (--gold) is the link color, and
-// the Activity graph's ramp is derived from it (see index.css).
+// The site keeps text to a small palette so it can all be customized: primary text
+// (--foreground), the teal accent (--label), the highlight (--gold: links, and the
+// Activity graph's ramp is derived from it, see index.css), and the hard text shadow.
 const textColors = [
   { key: "text", label: "Text", cssVar: "--foreground", fallback: "#f3f1f7" },
   { key: "accent", label: "Accent", cssVar: "--label", fallback: "#6fd6e8" },
@@ -23,6 +23,12 @@ const textColors = [
     label: "Highlight",
     cssVar: "--gold",
     fallback: "#f4d35e",
+  },
+  {
+    key: "shadow",
+    label: "Shadow",
+    cssVar: "--text-shadow",
+    fallback: "#15121a",
   },
 ] as const;
 
@@ -83,40 +89,38 @@ const channels = [
 ];
 
 const settings = [
-  { id: "window", label: "Window color" },
-  { id: "text", label: "Text color" },
-  { id: "accent", label: "Accent color" },
-  { id: "highlight", label: "Highlight color" },
-  { id: "reset", label: "Reset to default" },
+  { id: "window", label: "Window color", parts: corners },
+  { id: "text", label: "Text colors", parts: textColors },
+  { id: "reset", label: "Reset to default", parts: [] },
 ] as const;
 
 type Setting = (typeof settings)[number]["id"];
-
-// Settings that edit a color with the slider popover.
-const isColor = (id: Setting | undefined) =>
-  id === "window" || id === "text" || id === "accent" || id === "highlight";
 
 const labelFor = (key: ColorKey) =>
   all.find((c) => c.key === key)!.label.toLowerCase();
 
 // FF7 Config menu, step by step like the game:
 // 1. Hover a setting to show the hand; click it to pin the hand there.
-// 2. Window color only: a second hand appears on the preview rectangle; point at a
-//    corner and click it, and its swatch appears beside the rectangle.
+// 2. A second hand appears on its preview: a corner of the window rectangle, or one of
+//    the text color swatches. Point at one and click it (a picked corner also gets its
+//    swatch beside the rectangle).
 // 3. A popover opens with only the R/G/B sliders, where another hand follows the
-//    channel being edited. Text and Accent color go straight here.
+//    channel being edited.
 // Hands left behind at earlier steps idle-bob; the active one holds still. Escape (or
 // clicking away) steps back. Everything recolors live. Reset to default restores all.
 export const Config = () => {
   const [colors, setColors] = useState(load);
   const [hovered, setHovered] = useState<Setting>();
   const [open, setOpen] = useState<Setting>();
-  const [corner, setCorner] = useState<Corner>();
-  const [pointedCorner, setPointedCorner] = useState<Corner>();
-  // The last corner picked; the hand returns there when the picker reopens.
-  const [lastCorner, setLastCorner] = useState<Corner>("tl");
+  // The corner or swatch picked in step 2, and the one under the pointer.
+  const [part, setPart] = useState<ColorKey>();
+  const [pointedPart, setPointedPart] = useState<ColorKey>();
+  // Each row's last pick; the hand returns there when the row reopens.
+  const [lastPart, setLastPart] = useState<Record<string, ColorKey>>({
+    window: "tl",
+    text: "text",
+  });
   const [channel, setChannel] = useState(0);
-  const windowRow = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     for (const c of all)
@@ -131,14 +135,6 @@ export const Config = () => {
     }
   }, [colors]);
 
-  // The color the sliders edit, once a step has chosen one.
-  const editing: ColorKey | undefined =
-    open === "window"
-      ? corner
-      : isColor(open)
-        ? (open as TextColor)
-        : undefined;
-
   const setValue = (key: ColorKey, i: number, value: number) =>
     setColors((current) => {
       const next = [...current[key]] as Rgb;
@@ -148,11 +144,11 @@ export const Config = () => {
 
   const close = () => {
     setOpen(undefined);
-    setCorner(undefined);
+    setPart(undefined);
   };
 
   const stepBack = () => {
-    if (open === "window" && corner) setCorner(undefined);
+    if (part) setPart(undefined);
     else close();
   };
 
@@ -167,18 +163,17 @@ export const Config = () => {
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  // While picking a corner, pressing anywhere outside the row steps back, like the
+  // While picking a part, pressing anywhere outside the row steps back, like the
   // popover does one step later. (With the popover open, Radix handles that press.)
   useEffect(() => {
-    if (open !== "window" || corner) return;
+    if (!open || part) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (!windowRow.current?.contains(event.target as Node)) close();
+      if (!(event.target as Element).closest(`[data-setting="${open}"]`))
+        close();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open, corner]);
-
-  const handCorner = pointedCorner ?? corner ?? lastCorner;
+  }, [open, part]);
 
   const sliders = (key: ColorKey) =>
     channels.map((c, i) => (
@@ -207,66 +202,103 @@ export const Config = () => {
       </label>
     ));
 
-  // What sits after each label: the window's four-corner preview (a corner picker once
-  // open, then the picked corner's swatch), or a text color's swatch.
+  // A step-2 pick target: a corner quadrant of the rectangle, or a whole swatch.
+  const pick = (key: ColorKey, label: string, className: string) => (
+    <button
+      key={key}
+      type="button"
+      role="radio"
+      aria-checked={part === key}
+      aria-label={label}
+      onClick={() => {
+        setPart(key);
+        setLastPart((current) => ({ ...current, [open!]: key }));
+      }}
+      onMouseEnter={() => setPointedPart(key)}
+      onFocus={() => setPointedPart(key)}
+      onBlur={() => setPointedPart(undefined)}
+      className={cn(
+        "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        className,
+      )}
+    />
+  );
+
+  // The step-2 hand: bobs once its pick is made, holds still while pointing.
+  const partHand = (className: string) => (
+    <PixelHand
+      className={cn(
+        "pointer-events-none absolute z-10",
+        className,
+        part && !pointedPart && "motion-safe:animate-bob",
+      )}
+    />
+  );
+
+  // What sits after each label, on one grid of 36px columns. Where the window is wide
+  // enough (23rem of content), that's one row 12px apart: the four text color swatches
+  // in a row, the window rectangle spanning the first two columns, and the picked
+  // corner's swatch above the third. Narrower (1280-1680 desktops, phones), the row
+  // doesn't fit, so the palette is 2 x 2 with columns 44px apart, the rectangle spans
+  // both, and the corner swatch wraps below. Swatch picks put the hand 8px to the left;
+  // in the one-row layout it overlaps the neighboring swatch, drawn on top.
   const preview = (id: Setting) => {
+    const active = open === id;
+    const handAt = pointedPart ?? part ?? lastPart[id];
     if (id === "window")
       return (
         <>
           <div
-            role={open === "window" ? "radiogroup" : undefined}
-            aria-label={open === "window" ? "Window corner" : undefined}
-            onMouseLeave={() => setPointedCorner(undefined)}
-            className="window-bg h-9 w-24 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
+            role={active ? "radiogroup" : undefined}
+            aria-label={active ? "Window corner" : undefined}
+            onMouseLeave={() => setPointedPart(undefined)}
+            className="window-bg h-9 w-29 shrink-0 rounded-[4px] @min-[23rem]:w-21 [box-shadow:var(--frame-bevel)]"
           >
-            {open === "window" &&
-              corners.map((c) => (
-                <button
-                  key={c.key}
-                  type="button"
-                  role="radio"
-                  aria-checked={corner === c.key}
-                  aria-label={`${c.label} corner`}
-                  onClick={() => {
-                    setCorner(c.key);
-                    setLastCorner(c.key);
-                  }}
-                  onMouseEnter={() => setPointedCorner(c.key)}
-                  onFocus={() => setPointedCorner(c.key)}
-                  onBlur={() => setPointedCorner(undefined)}
-                  className={cn(
-                    "absolute h-1/2 w-1/2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            {active &&
+              corners.map((c) =>
+                pick(
+                  c.key,
+                  `${c.label} corner`,
+                  cn(
+                    "absolute h-1/2 w-1/2",
                     c.key[0] === "t" ? "top-0" : "bottom-0",
                     c.key[1] === "l" ? "left-0" : "right-0",
-                  )}
-                />
-              ))}
-            {open === "window" && (
-              <PixelHand
-                className={cn(
-                  "pointer-events-none absolute",
-                  handPosition[handCorner],
-                  corner && !pointedCorner && "motion-safe:animate-bob",
-                )}
-              />
-            )}
+                  ),
+                ),
+              )}
+            {active && partHand(handPosition[handAt as Corner])}
           </div>
-          {open === "window" && corner && (
+          {active && part && (
             <span
               aria-hidden="true"
               className="size-9 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
-              style={{ background: toHex(colors[corner]) }}
+              style={{ background: toHex(colors[part]) }}
             />
           )}
         </>
       );
     if (id === "reset") return null;
     return (
-      <span
-        aria-hidden="true"
-        className="size-9 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
-        style={{ background: toHex(colors[id]) }}
-      />
+      <div
+        role={active ? "radiogroup" : undefined}
+        aria-label={active ? "Text color" : undefined}
+        onMouseLeave={() => setPointedPart(undefined)}
+        className="grid grid-cols-2 gap-x-11 gap-y-3 @min-[23rem]:grid-cols-4 @min-[23rem]:gap-x-3"
+      >
+        {textColors.map((c) => (
+          <span
+            key={c.key}
+            title={c.label}
+            className="relative size-9 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
+            style={{ background: toHex(colors[c.key]) }}
+          >
+            {active && pick(c.key, `${c.label} color`, "absolute inset-0")}
+            {active &&
+              handAt === c.key &&
+              partHand("inset-y-0 right-full my-auto mr-2")}
+          </span>
+        ))}
+      </div>
     );
   };
 
@@ -278,14 +310,13 @@ export const Config = () => {
         // stays for keyboard use; its click bubbles up here.
         <li
           key={id}
-          ref={id === "window" ? windowRow : undefined}
           data-setting={id}
           onMouseEnter={() => setHovered(id)}
           onMouseLeave={() => setHovered(undefined)}
           onClick={(event) => {
             const target = event.target as Element;
-            // Corner picks belong to the picker, and popover clicks bubble here
-            // through the React portal without being inside the row.
+            // Picks belong to the picker, and popover clicks bubble here through the
+            // React portal without being inside the row.
             if (
               !event.currentTarget.contains(target) ||
               target.closest('[role="radio"]')
@@ -296,7 +327,7 @@ export const Config = () => {
               close();
             } else if (open === id) close();
             else {
-              setCorner(undefined);
+              setPart(undefined);
               setOpen(id);
             }
           }}
@@ -304,10 +335,15 @@ export const Config = () => {
         >
           <button
             type="button"
-            aria-expanded={isColor(id) ? open === id : undefined}
+            aria-expanded={id === "reset" ? undefined : open === id}
             onFocus={() => setHovered(id)}
             onBlur={() => setHovered(undefined)}
-            className="relative cursor-pointer py-0.5 pl-11 text-left text-base outline-none"
+            // Reset has no preview, so its label spans both columns and doesn't widen
+            // the label column the previews line up against.
+            className={cn(
+              "relative cursor-pointer py-0.5 pl-11 text-left text-base outline-none",
+              id === "reset" && "col-span-2",
+            )}
           >
             <PixelHand
               className={cn(
@@ -319,13 +355,12 @@ export const Config = () => {
             <span className="text-label">{label}</span>
           </button>
 
-          {!isColor(id) && preview(id)}
-          {isColor(id) && (
+          {id !== "reset" && (
             <Popover.Root
-              open={open === id && editing !== undefined}
+              open={open === id && part !== undefined}
               onOpenChange={(next) => !next && stepBack()}
             >
-              <Popover.Anchor className="ml-11 flex items-center gap-3">
+              <Popover.Anchor className="ml-11 flex flex-wrap items-center gap-x-11 gap-y-3 @min-[23rem]:gap-x-3">
                 {preview(id)}
               </Popover.Anchor>
 
@@ -335,7 +370,7 @@ export const Config = () => {
                   align="start"
                   sideOffset={6}
                   collisionPadding={12}
-                  // Presses inside this row are the row's (switching corners, or
+                  // Presses inside this row are the row's (switching picks, or
                   // toggling it closed); they must not also dismiss the popover.
                   onEscapeKeyDown={(event) => event.preventDefault()}
                   onInteractOutside={(event) =>
@@ -346,7 +381,7 @@ export const Config = () => {
                   aria-label={`${label} sliders`}
                   className="window z-50 flex w-72 max-w-[calc(100vw-24px)] flex-col gap-2 p-4 font-heading"
                 >
-                  {editing && sliders(editing)}
+                  {open === id && part && sliders(part)}
                 </Popover.Content>
               </Popover.Portal>
             </Popover.Root>

@@ -109,7 +109,7 @@ export const Skills = () => (
                   <svg
                     viewBox={Logo.viewBox ?? "0 0 24 24"}
                     aria-hidden="true"
-                    className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_#15121a]"
+                    className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
                   >
                     <path d={Logo.path} />
                   </svg>
