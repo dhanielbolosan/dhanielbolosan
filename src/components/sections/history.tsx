@@ -75,9 +75,7 @@ export const History = () => {
                         {entry.name}
                       </span>
                       <span className="text-sm">{entry.subtitle}</span>
-                      <span className="text-sm">
-                        {entry.date}
-                      </span>
+                      <span className="text-sm">{entry.date}</span>
                     </span>
                   </Popover.Trigger>
 

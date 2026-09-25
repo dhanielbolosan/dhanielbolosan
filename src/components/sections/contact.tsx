@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Input } from "../imports/input";
-import { Textarea } from "../imports/textarea";
 import { Choices, type Choice } from "../choices";
 import { useTypewriter } from "@/lib/use-typewriter";
 
@@ -43,8 +41,9 @@ const lines = {
   allErrors: missingLine(Object.values(errors)),
 };
 
+// Shared look of the form's text fields.
 const field =
-  "rounded-[4px] border-frame/50 bg-black/30 font-heading text-base placeholder:text-muted-foreground/70 md:text-base";
+  "w-full min-w-0 rounded-[4px] border border-frame/50 bg-input/30 px-2 font-heading text-base transition-colors outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30";
 
 export const Contact = () => {
   const [mode, setMode] = useState<"menu" | "form" | "sent">("menu");
@@ -216,11 +215,11 @@ export const Contact = () => {
           >
             Name
           </label>
-          <Input
+          <input
             id="contact-name"
             autoComplete="name"
             placeholder="John Doe"
-            className={`h-10 ${field}`}
+            className={`h-10 py-0.5 ${field}`}
             {...form.register("name")}
           />
           <label
@@ -229,12 +228,12 @@ export const Contact = () => {
           >
             Email
           </label>
-          <Input
+          <input
             id="contact-email"
             type="email"
             autoComplete="email"
             placeholder="example@gmail.com"
-            className={`h-10 ${field}`}
+            className={`h-10 py-0.5 ${field}`}
             {...form.register("email")}
           />
           <label
@@ -245,10 +244,10 @@ export const Contact = () => {
           </label>
           {/* Starts small and grows with the message up to 304px (what fits the window at
               1080p); past that it scrolls inside, so the Contact window stays put. */}
-          <Textarea
+          <textarea
             id="contact-message"
             placeholder="Enter your message here"
-            className={`max-h-76 min-h-24 self-start overflow-y-auto py-2 field-sizing-content ${field}`}
+            className={`max-h-76 min-h-24 resize-none self-start overflow-y-auto py-2 field-sizing-content ${field}`}
             {...form.register("message")}
           />
         </form>

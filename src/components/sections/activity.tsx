@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type {
   ContributionCalendarData,
   ContributionDay,
-} from "../github-contribution-calendar";
+} from "@/lib/contributions";
 import { ContributionMonths } from "../contribution-months";
 
 const githubUsername = "dhanielbolosan";

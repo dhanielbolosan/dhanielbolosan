@@ -7,7 +7,6 @@ import { Config } from "./components/sections/config";
 import { Projects } from "./components/sections/projects";
 import { Skills } from "./components/sections/skills";
 import { Contact } from "./components/sections/contact";
-import { BlurFade } from "./components/imports/blur-fade";
 import { PixelHand } from "./components/pixel-hand";
 import { cn } from "./lib/utils";
 
@@ -113,9 +112,8 @@ function App() {
           >
             {column.windows.map(({ title, Section }, j) => (
               // The last window grows so every column reaches the bottom of the screen.
-              <BlurFade
+              <div
                 key={j}
-                delay={0.1 + (i + j) * 0.1}
                 className={cn(
                   "flex shrink-0 flex-col last:grow",
                   column.split && "md:basis-0 md:grow",
@@ -138,7 +136,7 @@ function App() {
                     <Section />
                   </div>
                 </div>
-              </BlurFade>
+              </div>
             ))}
           </div>
         ))}

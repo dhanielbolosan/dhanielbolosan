@@ -169,11 +169,11 @@ export const Hero = () => {
         >
           {saved
             ? saved.at.toLocaleString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
             : "—"}
         </dd>
       </dl>

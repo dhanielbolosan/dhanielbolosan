@@ -2,7 +2,7 @@ import type {
   ContributionCalendarData,
   ContributionDay,
   ContributionLevel,
-} from "./github-contribution-calendar";
+} from "@/lib/contributions";
 
 const levelIndex: Record<ContributionLevel, number> = {
   NONE: 0,
