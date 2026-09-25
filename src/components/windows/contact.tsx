@@ -3,6 +3,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Choices, type Choice } from "../choices";
+import { CornerBox } from "../corner-box";
+import { useWindowFade } from "@/lib/window-fade";
+import { Faded } from "../window";
 import { useTypewriter } from "@/lib/use-typewriter";
 
 // What the NPC still needs, per field; joined into one line by `missingLine`.
@@ -32,6 +35,10 @@ const missingLine = (parts: string[]) =>
 
 type ContactForm = z.infer<typeof contactSchema>;
 
+// Joins a line's last two words with a non-breaking space so it never ends on a lone
+// word ("out?”" by itself). Same length, so typing progress lines up either way.
+const keepLastPair = (text: string) => text.replace(/ (?=\S+$)/, "\u00a0");
+
 const lines = {
   menu: "I'm always open to discussing new projects, opportunities, or just talking. How would you like to reach out?",
   form: "Leave your name, email, and a\u00a0message. I'll get back to you ASAP!",
@@ -50,7 +57,7 @@ const field =
 export const Contact = () => {
   const [mode, setMode] = useState<"menu" | "form" | "sent">("menu");
   const [line, setLine] = useState(lines.menu);
-  const [shown, typingLine] = useTypewriter(line);
+  const [shown, typingLine] = useTypewriter(line, undefined, mode);
   const [pendingHref, setPendingHref] = useState<string>();
 
   const form = useForm<ContactForm>({
@@ -58,10 +65,13 @@ export const Contact = () => {
     defaultValues: { name: "", email: "", message: "" },
   });
 
-  const go = (next: typeof mode) => {
-    setMode(next);
-    setLine(lines[next]);
-  };
+  // Changing screens fades the window out and back in (all but its corner box).
+  const { fadeTo } = useWindowFade();
+  const go = (next: typeof mode) =>
+    fadeTo(() => {
+      setMode(next);
+      setLine(lines[next]);
+    });
 
   const redirect = (href: string) => {
     setPendingHref(href);
@@ -148,26 +158,32 @@ export const Contact = () => {
   // replaces while there are commands. Flush with the frame, in its own column: the
   // dialogue stays beside it and never wraps underneath.
   const cornerFor = (items?: Choice[]) => (
-    // The command box's hand points in from its left, so leave room for it there.
-    <div className={`-mt-5 shrink-0 ${items ? "ml-7" : "ml-3"}`}>
-      {items ? (
-        <>
-          <h2 className="sr-only">Contact</h2>
-          <Choices
-            boxed
-            items={items}
-            className="-mr-5"
-          />
-        </>
-      ) : (
-        <h2 className="window-title">Contact</h2>
-      )}
+    // 12px from the dialogue: room for the part of the command box's hand that sticks
+    // out past the box's left edge, and no more.
+    <div className="-mt-5 ml-3 shrink-0">
+      <CornerBox
+        view={items}
+        id={items ? items.map((item) => item.label).join() : "title"}
+        render={(view) =>
+          view ? (
+            <>
+              <h2 className="sr-only">Contact</h2>
+              <Choices
+                boxed
+                items={view}
+              />
+            </>
+          ) : (
+            <h2>Contact</h2>
+          )
+        }
+      />
     </div>
   );
 
   // The line being typed or erased, with its quotes, and how much of it shows: the
   // opening quote with the first letter, the closing one once the line is complete.
-  const full = `“${typingLine}”`;
+  const full = `“${keepLastPair(typingLine)}”`;
   const typed = shown ? shown.length + 1 + (shown === typingLine ? 1 : 0) : 0;
 
   const dialogue =
@@ -179,7 +195,7 @@ export const Contact = () => {
         {/* Every line this screen can show is laid out invisibly in the same grid cell,
           so the box is as tall as its longest line and typing never shifts what's
           below. */}
-        <div className="grid min-w-0 flex-1">
+        <Faded className="grid min-w-0 flex-1">
           {reserved.map((text) => (
             <div
               key={text}
@@ -187,7 +203,7 @@ export const Contact = () => {
               inert
               className={`invisible ${dialogue}`}
             >
-              “{text}”
+              “{keepLastPair(text)}”
             </div>
           ))}
           <div className={dialogue}>
@@ -205,74 +221,79 @@ export const Contact = () => {
           >
             {line}
           </p>
-        </div>
+        </Faded>
         {cornerFor(commands)}
       </div>
 
-      {mode === "form" && (
-        <form
-          id="contact-form"
-          noValidate
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
-        >
-          <label
-            htmlFor="contact-name"
-            className="text-label"
+      <Faded className="flex min-h-0 grow flex-col">
+        {mode === "form" && (
+          <form
+            id="contact-form"
+            noValidate
+            onSubmit={form.handleSubmit(onSubmit, onError)}
+            className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
           >
-            Name
-          </label>
-          <input
-            id="contact-name"
-            autoComplete="name"
-            placeholder="John Doe"
-            className={`h-10 py-0.5 ${field}`}
-            {...form.register("name")}
-          />
-          <label
-            htmlFor="contact-email"
-            className="text-label"
-          >
-            Email
-          </label>
-          <input
-            id="contact-email"
-            type="email"
-            autoComplete="email"
-            placeholder="example@gmail.com"
-            className={`h-10 py-0.5 ${field}`}
-            {...form.register("email")}
-          />
-          <label
-            htmlFor="contact-message"
-            className="self-start pt-2 text-label"
-          >
-            Message
-          </label>
-          {/* Starts small and grows with the message up to 304px (what fits the window at
+            <label
+              htmlFor="contact-name"
+              className="text-label"
+            >
+              Name
+            </label>
+            <input
+              id="contact-name"
+              autoComplete="name"
+              placeholder="John Doe"
+              className={`h-10 py-0.5 ${field}`}
+              {...form.register("name")}
+            />
+            <label
+              htmlFor="contact-email"
+              className="text-label"
+            >
+              Email
+            </label>
+            <input
+              id="contact-email"
+              type="email"
+              autoComplete="email"
+              placeholder="example@gmail.com"
+              className={`h-10 py-0.5 ${field}`}
+              {...form.register("email")}
+            />
+            <label
+              htmlFor="contact-message"
+              className="self-start pt-2 text-label"
+            >
+              Message
+            </label>
+            {/* Starts small and grows with the message up to 304px (what fits the window at
               1080p); past that it scrolls inside, so the Contact window stays put. */}
-          <textarea
-            id="contact-message"
-            placeholder="Enter your message here"
-            className={`max-h-76 min-h-24 resize-none self-start overflow-y-auto py-2 field-sizing-content ${field}`}
-            {...form.register("message")}
-          />
-        </form>
-      )}
+            <textarea
+              id="contact-message"
+              placeholder="Enter your message here"
+              className={`max-h-76 min-h-24 resize-none self-start overflow-y-auto py-2 field-sizing-content ${field}`}
+              {...form.register("message")}
+            />
+          </form>
+        )}
 
-      {/* Answer choices sit right under the dialogue, like FF7's. */}
-      {mode === "menu" && (
-        <div className="mt-2">
-          <Choices
-            items={[
-              { label: "Leave a message", onSelect: () => go("form") },
-              link("GitHub", "https://github.com/dhanielbolosan"),
-              link("LinkedIn", "https://www.linkedin.com/in/dhaniel-bolosan/"),
-              link("Email", "mailto:dhanielb808@gmail.com"),
-            ]}
-          />
-        </div>
-      )}
+        {/* Answer choices sit right under the dialogue, like FF7's. */}
+        {mode === "menu" && (
+          <div className="mt-2">
+            <Choices
+              items={[
+                { label: "Leave a message", onSelect: () => go("form") },
+                link("GitHub", "https://github.com/dhanielbolosan"),
+                link(
+                  "LinkedIn",
+                  "https://www.linkedin.com/in/dhaniel-bolosan/",
+                ),
+                link("Email", "mailto:dhanielb808@gmail.com"),
+              ]}
+            />
+          </div>
+        )}
+      </Faded>
     </section>
   );
 };

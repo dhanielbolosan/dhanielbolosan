@@ -12,16 +12,17 @@ export type Choice = {
 // FF7 dialogue choices: the hand marks the hovered or focused option; arrow keys move it.
 // The menu is always waiting for input, so its hand always bobs.
 // Rows use the dialogue's own line spacing, so choices read as its continuation.
-// `boxed` renders them as a small FF7 command window (positioned by the caller via
-// `className`), with the hand pointing in from outside its left edge.
+// `boxed` is for choices inside a command window (a CornerBox): the hand points in from
+// outside the box's left edge instead of taking room inside it. `onPoint` hears which
+// option the hand moves to (for help text).
 export const Choices = ({
   items,
   boxed,
-  className,
+  onPoint,
 }: {
   items: Choice[];
   boxed?: boolean;
-  className?: string;
+  onPoint?: (index: number) => void;
 }) => {
   const [active, setActive] = useState(0);
 
@@ -49,8 +50,14 @@ export const Choices = ({
     >
       {items.map((item, i) => {
         const props = {
-          onMouseEnter: () => setActive(i),
-          onFocus: () => setActive(i),
+          onMouseEnter: () => {
+            setActive(i);
+            onPoint?.(i);
+          },
+          onFocus: () => {
+            setActive(i);
+            onPoint?.(i);
+          },
           className: `relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none ${boxed ? "" : "pl-7"}`,
         };
         const body = (
@@ -96,9 +103,5 @@ export const Choices = ({
     </ul>
   );
 
-  return boxed ? (
-    <div className={`window px-5 py-2 ${className ?? ""}`}>{list}</div>
-  ) : (
-    list
-  );
+  return list;
 };

@@ -8,6 +8,7 @@ import { Projects } from "./components/windows/projects";
 import { Skills } from "./components/windows/skills";
 import { Contact } from "./components/windows/contact";
 import { PixelHand } from "./components/pixel-hand";
+import { Window } from "./components/window";
 import { useMedia } from "./lib/use-media";
 import { cn } from "./lib/utils";
 
@@ -39,8 +40,8 @@ const columns = [
     label: "Extras",
     split: true,
     windows: [
-      { title: "Activity", Section: Activity },
-      { title: "Config", Section: Config },
+      { title: undefined, Section: Activity },
+      { title: undefined, Section: Config },
     ],
   },
 ];
@@ -113,23 +114,19 @@ function App() {
                   column.split && "md:basis-0 md:grow",
                 )}
               >
-                <div
+                <Window
+                  title={title}
+                  // Split columns scroll independently, so their windows can't share a
+                  // row height. A shared minimum for each split column's top window keeps
+                  // the dividing lines level on shorter tablet screens. It sits on the
+                  // window, not the wrapper, so the wrapper still grows to fit taller
+                  // content instead of clipping it.
                   className={cn(
-                    "window flex grow flex-col gap-3 px-5 pb-5",
-                    !title && "pt-5",
-                    // Split columns scroll independently, so their windows can't share a
-                    // row height. A shared minimum for each split column's top window keeps
-                    // the dividing lines level on shorter tablet screens. It sits on the
-                    // window, not the wrapper, so the wrapper still grows to fit taller
-                    // content instead of clipping it.
                     column.split && j === 0 && "md:min-h-128 xl:min-h-0",
                   )}
                 >
-                  {title && <h2 className="window-title">{title}</h2>}
-                  <div className="@container flex grow flex-col">
-                    <Section />
-                  </div>
-                </div>
+                  <Section />
+                </Window>
               </div>
             ))}
           </div>

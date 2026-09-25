@@ -1,5 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import { localDate, shortDate } from "@/lib/dates";
 import { useContributions, type ContributionDay } from "@/lib/github";
+import { Choices } from "../choices";
+import { CornerBox } from "../corner-box";
+import { PixelHand } from "../pixel-hand";
+import { useWindowFade } from "@/lib/window-fade";
+import { Faded, WindowHeader } from "../window";
 import { Stats } from "../stats";
 import { ActivityCalendar } from "./activity-calendar";
 
@@ -64,7 +70,20 @@ const getStats = (days: ContributionDay[]) => {
   return pairs;
 };
 
-export const Activity = () => {
+const screens = ["GitHub", "Music", "Games"] as const;
+type Screen = (typeof screens)[number];
+
+// Help bar text, like FF7's help window (no periods, like its menus): an instruction by
+// default, and what each option does while the menu hand points at it.
+const instruction = "Select Activity to view more";
+const picking: Record<Screen, string> = {
+  GitHub: "View my GitHub activity for the past year",
+  Music: "View the music I've been listening to",
+  Games: "View the games I've been playing",
+};
+
+// The GitHub screen: a year of contributions.
+const GitHub = () => {
   const calendar = useContributions();
 
   // Stats and the month calendar both cover the full year.
@@ -72,7 +91,7 @@ export const Activity = () => {
   const stats = getStats(days);
 
   return (
-    <section className="flex flex-col gap-3">
+    <>
       {/* Same 2 x 2 stat grid as the Projects info window. */}
       <Stats
         pairs={stats}
@@ -101,6 +120,101 @@ export const Activity = () => {
           More
         </span>
       </div>
+    </>
+  );
+};
+
+// Activity has several screens. Its title box is a menu: clicking it grows the box into
+// a command window listing the screens; picking one (or clicking away, or Escape)
+// shrinks it back to the title. The box overlays the content while open.
+export const Activity = () => {
+  const [screen, setScreen] = useState<Screen>("GitHub");
+  const [menu, setMenu] = useState(false);
+  const { fadeTo } = useWindowFade();
+  // The help bar describes the menu option under the hand, or else gives the instruction.
+  const [pointedOption, setPointedOption] = useState(0);
+  const helpText = menu ? picking[screens[pointedOption]] : instruction;
+  const header = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menu) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!header.current?.contains(event.target as Node)) setMenu(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenu(false);
+    };
+    // Keyboard users land on the first option once the menu has faded in.
+    const focus = setTimeout(
+      () => header.current?.querySelector<HTMLElement>("a, button")?.focus(),
+      260,
+    );
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      clearTimeout(focus);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menu]);
+
+  return (
+    <section className="flex flex-col gap-3">
+      <WindowHeader
+        ref={header}
+        help={helpText}
+      >
+        <CornerBox
+          view={menu}
+          id={menu ? "menu" : "title"}
+          className="window-corner"
+          render={(open) =>
+            open ? (
+              <>
+                <h2 className="sr-only">Activity</h2>
+                <Choices
+                  boxed
+                  onPoint={setPointedOption}
+                  items={screens.map((label) => ({
+                    label,
+                    // A new screen fades the window; picking the current one just
+                    // closes the menu.
+                    onSelect: () =>
+                      label === screen
+                        ? setMenu(false)
+                        : fadeTo(() => {
+                            setScreen(label);
+                            setMenu(false);
+                          }),
+                  }))}
+                />
+              </>
+            ) : (
+              <h2>
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  onClick={() => {
+                    setPointedOption(0);
+                    setMenu(true);
+                  }}
+                  className="group relative cursor-pointer outline-none"
+                >
+                  {/* Shows while hovered or focused, placed like the command menus' hand. */}
+                  <PixelHand className="invisible absolute inset-y-0 right-full my-auto mr-2 group-hover:visible group-focus-visible:visible motion-safe:animate-bob" />
+                  Activity
+                </button>
+              </h2>
+            )
+          }
+        />
+      </WindowHeader>
+
+      {/* Changing screens fades the window out and back in. Music and Games are empty
+          for now. */}
+      <Faded className="flex flex-col gap-3">
+        {screen === "GitHub" && <GitHub />}
+      </Faded>
     </section>
   );
 };

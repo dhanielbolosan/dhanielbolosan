@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { PixelHand, RowHand } from "../pixel-hand";
+import { canHoverQuery, useMedia } from "@/lib/use-media";
+import { WindowHeader } from "../window";
 
 // FF7 colors each window corner separately. Each corner is a CSS custom property every
 // window reads (see the window-bg utility).
@@ -95,6 +97,14 @@ const settings = [
 ] as const;
 
 type Setting = (typeof settings)[number]["id"];
+
+// Help bar text, like FF7's (no periods): what the pointed or open setting does, or
+// else the window's instruction.
+const help: Record<Setting, string> = {
+  window: "Select colors for each corner of the window",
+  text: "Select colors for each text type",
+  reset: "Select to reset configs to default",
+};
 
 const labelFor = (key: ColorKey) =>
   all.find((c) => c.key === key)!.label.toLowerCase();
@@ -305,89 +315,101 @@ export const Config = () => {
     );
   };
 
+  // On touch screens a cursor rests on the first setting until one is used, since
+  // there's no hover to discover them; the help bar keeps the window's instruction.
+  const canHover = useMedia(canHoverQuery);
+  const resting = !canHover && !hovered && !open ? "window" : undefined;
+  const pointed = hovered ?? open;
+
   return (
-    // Labels share one column so every preview lines up.
-    <ul className="grid grid-cols-[auto_1fr] gap-y-2 font-heading">
-      {settings.map(({ id, label }) => (
-        // The whole row points and clicks, like a History entry. The label button
-        // stays for keyboard use; its click bubbles up here.
-        <li
-          key={id}
-          data-setting={id}
-          onMouseEnter={() => setHovered(id)}
-          onMouseLeave={() => setHovered(undefined)}
-          onClick={(event) => {
-            const target = event.target as Element;
-            // Picks belong to the picker, and popover clicks bubble here through the
-            // React portal without being inside the row.
-            if (
-              !event.currentTarget.contains(target) ||
-              target.closest('[role="radio"]')
-            )
-              return;
-            if (id === "reset") {
-              setColors(defaults);
-              close();
-            } else if (open === id) close();
-            else {
-              setPart(undefined);
-              setOpen(id);
-            }
-          }}
-          className="col-span-2 grid min-h-9 cursor-pointer grid-cols-subgrid items-center"
-        >
-          <button
-            type="button"
-            aria-expanded={id === "reset" ? undefined : open === id}
-            onFocus={() => setHovered(id)}
-            onBlur={() => setHovered(undefined)}
-            // Reset has no preview, so its label spans both columns and doesn't widen
-            // the label column the previews line up against.
-            className={cn(
-              "relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
-              id === "reset" && "col-span-2",
-            )}
+    <section className="flex flex-col gap-3">
+      <WindowHeader
+        title="Config"
+        help={pointed ? help[pointed] : "Select config to customize site"}
+      />
+      {/* Labels share one column so every preview lines up. */}
+      <ul className="grid grid-cols-[auto_1fr] gap-y-2 font-heading">
+        {settings.map(({ id, label }) => (
+          // The whole row points and clicks, like a History entry. The label button
+          // stays for keyboard use; its click bubbles up here.
+          <li
+            key={id}
+            data-setting={id}
+            onMouseEnter={() => setHovered(id)}
+            onMouseLeave={() => setHovered(undefined)}
+            onClick={(event) => {
+              const target = event.target as Element;
+              // Picks belong to the picker, and popover clicks bubble here through the
+              // React portal without being inside the row.
+              if (
+                !event.currentTarget.contains(target) ||
+                target.closest('[role="radio"]')
+              )
+                return;
+              if (id === "reset") {
+                setColors(defaults);
+                close();
+              } else if (open === id) close();
+              else {
+                setPart(undefined);
+                setOpen(id);
+              }
+            }}
+            className="col-span-2 grid min-h-9 cursor-pointer grid-cols-subgrid items-center"
           >
-            <RowHand
-              show={hovered === id || open === id}
-              bob={hovered === id && open !== id}
-            />
-            <span className="text-label">{label}</span>
-          </button>
-
-          {id !== "reset" && (
-            <Popover.Root
-              open={open === id && part !== undefined}
-              onOpenChange={(next) => !next && stepBack()}
+            <button
+              type="button"
+              aria-expanded={id === "reset" ? undefined : open === id}
+              onFocus={() => setHovered(id)}
+              onBlur={() => setHovered(undefined)}
+              // Reset has no preview, so its label spans both columns and doesn't widen
+              // the label column the previews line up against.
+              className={cn(
+                "relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
+                id === "reset" && "col-span-2",
+              )}
             >
-              <Popover.Anchor className="ml-7 flex flex-wrap items-center gap-x-7 gap-y-3 @min-[21rem]:gap-x-3">
-                {preview(id)}
-              </Popover.Anchor>
+              <RowHand
+                show={hovered === id || open === id || resting === id}
+                bob={(hovered === id && open !== id) || resting === id}
+              />
+              <span className="text-label">{label}</span>
+            </button>
 
-              <Popover.Portal>
-                <Popover.Content
-                  side="bottom"
-                  align="start"
-                  sideOffset={6}
-                  collisionPadding={12}
-                  // Presses inside this row are the row's (switching picks, or
-                  // toggling it closed); they must not also dismiss the popover.
-                  onEscapeKeyDown={(event) => event.preventDefault()}
-                  onInteractOutside={(event) =>
-                    (event.target as Element).closest(
-                      `[data-setting="${id}"]`,
-                    ) && event.preventDefault()
-                  }
-                  aria-label={`${label} sliders`}
-                  className="window z-50 flex w-72 max-w-[calc(100vw-24px)] flex-col gap-2 p-4 font-heading"
-                >
-                  {open === id && part && sliders(part)}
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-          )}
-        </li>
-      ))}
-    </ul>
+            {id !== "reset" && (
+              <Popover.Root
+                open={open === id && part !== undefined}
+                onOpenChange={(next) => !next && stepBack()}
+              >
+                <Popover.Anchor className="ml-7 flex flex-wrap items-center gap-x-7 gap-y-3 @min-[21rem]:gap-x-3">
+                  {preview(id)}
+                </Popover.Anchor>
+
+                <Popover.Portal>
+                  <Popover.Content
+                    side="bottom"
+                    align="start"
+                    sideOffset={6}
+                    collisionPadding={12}
+                    // Presses inside this row are the row's (switching picks, or
+                    // toggling it closed); they must not also dismiss the popover.
+                    onEscapeKeyDown={(event) => event.preventDefault()}
+                    onInteractOutside={(event) =>
+                      (event.target as Element).closest(
+                        `[data-setting="${id}"]`,
+                      ) && event.preventDefault()
+                    }
+                    aria-label={`${label} sliders`}
+                    className="window z-50 flex w-72 max-w-[calc(100vw-24px)] flex-col gap-2 p-4 font-heading"
+                  >
+                    {open === id && part && sliders(part)}
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 };
