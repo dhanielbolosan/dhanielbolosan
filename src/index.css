@@ -16,17 +16,17 @@
   --background: #0c0a14;
   --foreground: #f3f1f7;
   --card: #1d1833;
-  --card-foreground: #f3f1f7;
+  --card-foreground: var(--foreground);
   --popover: #221c3d;
-  --popover-foreground: #f3f1f7;
+  --popover-foreground: var(--foreground);
   --primary: #e9e6f0;
   --primary-foreground: #15112a;
   --secondary: #2a2346;
-  --secondary-foreground: #f3f1f7;
+  --secondary-foreground: var(--foreground);
   --muted: #2a2346;
   --muted-foreground: #aaa3c2;
   --accent: #3a3160;
-  --accent-foreground: #f3f1f7;
+  --accent-foreground: var(--foreground);
   --destructive: #ff8a80;
   --border: rgb(233 230 240 / 25%);
   --input: rgb(233 230 240 / 30%);
@@ -38,11 +38,11 @@
   --chart-5: #221c3d;
   --radius: 0.4375rem;
   --sidebar: #1d1833;
-  --sidebar-foreground: #f3f1f7;
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: #e9e6f0;
   --sidebar-primary-foreground: #15112a;
   --sidebar-accent: #2a2346;
-  --sidebar-accent-foreground: #f3f1f7;
+  --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: rgb(233 230 240 / 25%);
   --sidebar-ring: #e9e6f0;
   --frame: #e9e6f0;
@@ -50,18 +50,17 @@
   --label: #6fd6e8;
   /* FF7 menu gold, for links. */
   --gold: #f4d35e;
-  --window-from: #4a3f6b;
-  --window-to: #15112a;
+  /* Window corner colors (FF7 Config > Window color); the Config section overrides them. */
+  --window-tl: #4a3f6b;
+  --window-tr: #2f284a;
+  --window-bl: #2f284a;
+  --window-br: #15112a;
   --text-shadow: #15121a;
   /* FF7 window frame, sampled from an FF7 status screen: a 5px gray bevel (dark edge,
      light middle) plus a dark inner line. Stacked inset rings, smallest first. */
   --frame-bevel:
-    inset 0 0 0 1px #6e6e78,
-    inset 0 0 0 2px #a4a4ac,
-    inset 0 0 0 3px #c6c6ca,
-    inset 0 0 0 4px #d8d8da,
-    inset 0 0 0 5px #9a9aa2,
-    inset 0 0 0 6px #1e1c28;
+    inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
+    inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
   /* Contribution levels, built with the dataviz method: a sequential ramp in one hue
      (FF7 gold, warmed slightly toward amber at the dim end so it never reads olive),
      stepped evenly in OKLCH lightness from dim to bright for the dark tiles. Level 0
@@ -71,6 +70,25 @@
   --github-contribution-2: #ad852b;
   --github-contribution-3: #d4b045;
   --github-contribution-4: #fddc67;
+}
+
+/* Config > Highlight color sets --gold; the ramp follows it. Level 4 is that color, and
+   each dimmer level keeps the default ramp's proportions in OKLCH: lightness 88% / 73% /
+   57% of it, chroma 93% / 82% / 65%, hue turned 3 / 10 / 15 degrees (warmer for gold, so
+   the dim end never reads olive). Browsers without relative colors keep the hex ramp. */
+@supports (color: oklch(from red l c h)) {
+  :root {
+    --github-contribution-1: oklch(
+      from var(--gold) calc(l * 0.57) calc(c * 0.65) calc(h - 15)
+    );
+    --github-contribution-2: oklch(
+      from var(--gold) calc(l * 0.73) calc(c * 0.82) calc(h - 10)
+    );
+    --github-contribution-3: oklch(
+      from var(--gold) calc(l * 0.88) calc(c * 0.93) calc(h - 3)
+    );
+    --github-contribution-4: var(--gold);
+  }
 }
 
 @theme inline {
@@ -126,19 +144,54 @@
 
   @keyframes limit {
     0% {
-      background-image: linear-gradient(to bottom, #a88c78 0%, #d8c0a8 30%, #fdfbf5 52%, #d8c0a8 70%, #a88c78 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #a88c78 0%,
+        #d8c0a8 30%,
+        #fdfbf5 52%,
+        #d8c0a8 70%,
+        #a88c78 100%
+      );
     }
     20% {
-      background-image: linear-gradient(to bottom, #a0a070 0%, #d8d8a8 30%, #fdfbf5 52%, #d8d8a8 70%, #a0a070 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #a0a070 0%,
+        #d8d8a8 30%,
+        #fdfbf5 52%,
+        #d8d8a8 70%,
+        #a0a070 100%
+      );
     }
     40% {
-      background-image: linear-gradient(to bottom, #6f9fb8 0%, #a8d8f0 30%, #fdfbf5 52%, #a8d8f0 70%, #6f9fb8 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #6f9fb8 0%,
+        #a8d8f0 30%,
+        #fdfbf5 52%,
+        #a8d8f0 70%,
+        #6f9fb8 100%
+      );
     }
     60% {
-      background-image: linear-gradient(to bottom, #7088a4 0%, #a8c0d8 30%, #fdfbf5 52%, #a8c0d8 70%, #7088a4 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #7088a4 0%,
+        #a8c0d8 30%,
+        #fdfbf5 52%,
+        #a8c0d8 70%,
+        #7088a4 100%
+      );
     }
     80% {
-      background-image: linear-gradient(to bottom, #8888a8 0%, #c0c0d8 30%, #fdfbf5 52%, #c0c0d8 70%, #8888a8 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #8888a8 0%,
+        #c0c0d8 30%,
+        #fdfbf5 52%,
+        #c0c0d8 70%,
+        #8888a8 100%
+      );
     }
   }
 
@@ -190,9 +243,29 @@
   }
 }
 
+/* FF7 four-corner window fill: the bottom edge's gradient, with the top edge's gradient
+   over it fading out downward, so each corner shows its own color. The top layer is a
+   pseudo-element (z-index -1 in its own stacking context, so under the content) inset
+   past the 6px frame bevel, which it would otherwise paint over. */
+@utility window-bg {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(to right, var(--window-bl), var(--window-br));
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    z-index: -1;
+    border-radius: 1px;
+    background: linear-gradient(to right, var(--window-tl), var(--window-tr));
+    mask-image: linear-gradient(to bottom, #000, transparent);
+    pointer-events: none;
+  }
+}
+
 /* FF-style menu window: corner gradient, bright frame, dark inner line, hard text shadow. */
 @utility window {
-  background: linear-gradient(135deg, var(--window-from), var(--window-to));
+  @apply window-bg;
   border-radius: var(--radius);
   box-shadow:
     var(--frame-bevel),
@@ -207,7 +280,7 @@
   align-self: flex-end;
   margin-right: -1.25rem;
   padding: 0.5rem 1.25rem;
-  background: linear-gradient(135deg, var(--window-from), var(--window-to));
+  @apply window-bg;
   border-radius: var(--radius);
   box-shadow:
     var(--frame-bevel),
@@ -225,4 +298,35 @@
 
 [data-sonner-toaster] [data-icon] {
   display: none !important;
+}
+
+/* FF7 Config slider: a flat dark track in a light frame with a gray block thumb. */
+.ff7-slider {
+  appearance: none;
+  width: 100%;
+  height: 0.875rem;
+  background: #1a1730;
+  border: 2px solid #c9c7dc;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #15121a;
+  cursor: pointer;
+}
+.ff7-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.75rem;
+  height: 1.25rem;
+  background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
+  border: 1px solid #15121a;
+  border-radius: 1px;
+}
+.ff7-slider::-moz-range-thumb {
+  width: 0.75rem;
+  height: 1.25rem;
+  background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
+  border: 1px solid #15121a;
+  border-radius: 1px;
+}
+.ff7-slider:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }

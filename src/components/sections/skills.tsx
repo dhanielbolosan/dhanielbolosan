@@ -86,10 +86,10 @@ export const Skills = () => (
     {groups.map((group) => (
       <div
         key={group.label}
-        className="not-first-of-type:pt-4"
+        className="not-first-of-type:pt-5"
       >
         {/* One orb per category: the group is the materia type. 8px sprite at 2x. */}
-        <h3 className="mb-1.5 flex items-center gap-2 font-heading text-base text-label">
+        <h3 className="mb-2 flex items-center gap-2 font-heading text-base text-label">
           <img
             src={group.orb}
             alt=""

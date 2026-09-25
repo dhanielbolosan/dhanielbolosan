@@ -81,13 +81,13 @@ export const Hero = () => {
   const now = useNow();
   const { level, exp, daysLeft, daysLived } = getLevel(now);
   const saved = useLastSaved();
-  const typedName = useTypewriter(name, 75);
+  const [typedName] = useTypewriter(name, 40);
 
   return (
-    <section className="flex grow flex-col justify-between gap-4">
-      <div className="flex items-start gap-4">
+    <section className="flex grow flex-col justify-between gap-3">
+      <div className="flex items-start gap-3">
         {/* Same bevel as the windows; an img can't show inset shadows, so it gets a wrapper. */}
-        <div className="shrink-0 rounded-[5px] p-1.5 [box-shadow:var(--frame-bevel)]">
+        <div className="shrink-0 rounded-[4px] p-1.5 [box-shadow:var(--frame-bevel)]">
           <img
             src="https://github.com/dhanielbolosan.png"
             alt="Dhaniel"
@@ -151,10 +151,10 @@ export const Hero = () => {
         technologies across AI, Cloud, and Web3.
       </p>
 
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-t border-frame/30 pt-3 font-heading text-sm">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 font-heading text-sm">
         {/* Always Hawaiʻi time, not the visitor's; refreshes with useNow each minute. */}
-        <dt className="text-label">Time</dt>
-        <dd className="text-right font-semibold tabular-nums">
+        <dt className="text-label">Local time</dt>
+        <dd className="text-right tabular-nums">
           {now.toLocaleTimeString("en-US", {
             timeZone: "Pacific/Honolulu",
             hour: "numeric",
@@ -164,16 +164,16 @@ export const Hero = () => {
         </dd>
         <dt className="text-label">Last saved</dt>
         <dd
-          className="text-right font-semibold"
+          className="text-right"
           title={saved?.repo}
         >
           {saved
             ? saved.at.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })
             : "—"}
         </dd>
       </dl>

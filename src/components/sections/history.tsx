@@ -27,7 +27,7 @@ export const History = () => {
 
   return (
     <section className="flow-root">
-      <h2 className="window-title float-right -mt-5 mb-3 ml-3">History</h2>
+      <h2 className="window-title float-right -mt-5 mb-1 ml-3">History</h2>
 
       {groups.map((group) => (
         <div
@@ -37,7 +37,7 @@ export const History = () => {
           <h3 className="mb-2 font-heading text-base text-label">
             {group.label}
           </h3>
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-2">
             {group.entries.map((entry) => (
               <li key={entry.name}>
                 <Popover.Root
@@ -75,7 +75,7 @@ export const History = () => {
                         {entry.name}
                       </span>
                       <span className="text-sm">{entry.subtitle}</span>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm">
                         {entry.date}
                       </span>
                     </span>

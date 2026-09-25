@@ -11,13 +11,15 @@ import { useTypewriter } from "@/lib/use-typewriter";
 const errors = {
   name: "your name",
   email: "a valid email",
-  message: "a message of at least 10 characters",
+  // Short on purpose: the all-errors line must wrap no taller than the form's line,
+  // or it leaves a gap above the form (the dialogue reserves its longest line).
+  message: "a longer message",
 };
 
 const contactSchema = z.object({
   name: z.string().min(1, errors.name),
   email: z.email(errors.email),
-  message: z.string().min(10, errors.message),
+  message: z.string().min(10, errors.message), // 10+ characters
 });
 
 // "your name" / "your name and a valid email" / "your name, a valid email, and a message…"
@@ -31,7 +33,7 @@ const missingLine = (parts: string[]) =>
 type ContactForm = z.infer<typeof contactSchema>;
 
 const lines = {
-  menu: "I'm always open to discussing new projects, opportunities, or just talking.\nHow would you like to reach out?",
+  menu: "I'm always open to discussing new projects, opportunities, or just talking. How would you like to reach out?",
   form: "Leave your name, email, and a message. I'll get back to you ASAP!",
   sending: "Sending…",
   sent: "Message sent, I'll get back to you soon!",
@@ -42,12 +44,12 @@ const lines = {
 };
 
 const field =
-  "rounded-[3px] border-frame/50 bg-black/30 font-heading text-base placeholder:text-muted-foreground/70 md:text-base";
+  "rounded-[4px] border-frame/50 bg-black/30 font-heading text-base placeholder:text-muted-foreground/70 md:text-base";
 
 export const Contact = () => {
   const [mode, setMode] = useState<"menu" | "form" | "sent">("menu");
   const [line, setLine] = useState(lines.menu);
-  const shown = useTypewriter(line);
+  const [shown, typingLine] = useTypewriter(line);
   const [pendingHref, setPendingHref] = useState<string>();
 
   const form = useForm<ContactForm>({
@@ -137,12 +139,11 @@ export const Contact = () => {
   };
 
   // Top-right corner, FF7-style: the title box, which the command box temporarily
-  // replaces while there are commands. Flush with the frame; the dialogue wraps it.
+  // replaces while there are commands. Flush with the frame, in its own column: the
+  // dialogue stays beside it and never wraps underneath.
   const cornerFor = (items?: Choice[]) => (
     // The command box's hand points in from its left, so leave room for it there.
-    <div
-      className={`float-right -mt-5 mb-1 indent-0 ${items ? "ml-11" : "ml-3"}`}
-    >
+    <div className={`-mt-5 shrink-0 ${items ? "ml-11" : "ml-3"}`}>
       {items ? (
         <>
           <h2 className="sr-only">Contact</h2>
@@ -158,38 +159,48 @@ export const Contact = () => {
     </div>
   );
 
+  // The line being typed or erased, with its quotes, and how much of it shows: the
+  // opening quote with the first letter, the closing one once the line is complete.
+  const full = `“${typingLine}”`;
+  const typed = shown ? shown.length + 1 + (shown === typingLine ? 1 : 0) : 0;
+
   const dialogue =
-    "col-start-1 row-start-1 pl-[0.4em] -indent-[0.4em] font-heading text-lg leading-snug whitespace-pre-line";
+    "col-start-1 row-start-1 pl-[0.4em] -indent-[0.4em] font-heading text-lg leading-snug text-balance";
 
   return (
     <section className="flex grow flex-col">
-      {/* Every line this screen can show is laid out invisibly in the same grid cell,
-          wrapped around this screen's corner, so the box is as tall as its longest line
-          and typing never shifts what's below. */}
-      <div className="grid">
-        {reserved[mode].map((text) => (
-          <div
-            key={text}
-            aria-hidden="true"
-            inert
-            className={`invisible ${dialogue}`}
-          >
-            {cornerFor(commands)}“{text}”
+      <div className="flex items-start">
+        {/* Every line this screen can show is laid out invisibly in the same grid cell,
+          so the box is as tall as its longest line and typing never shifts what's
+          below. */}
+        <div className="grid min-w-0 flex-1">
+          {reserved[mode].map((text) => (
+            <div
+              key={text}
+              aria-hidden="true"
+              inert
+              className={`invisible ${dialogue}`}
+            >
+              “{text}”
+            </div>
+          ))}
+          <div className={dialogue}>
+            {/* The rest of the line is laid out but invisible, so words keep their
+              places instead of jumping lines while typing or erasing. */}
+            <span aria-hidden="true">
+              {full.slice(0, typed)}
+              <span className="invisible">{full.slice(typed)}</span>
+            </span>
           </div>
-        ))}
-        <div className={dialogue}>
-          {cornerFor(commands)}
-          <span aria-hidden="true">
-            {shown && `“${shown}${shown === line ? "”" : ""}`}
-          </span>
+          {/* Screen readers get each whole line once, not every typed character. */}
+          <p
+            role="status"
+            className="sr-only"
+          >
+            {line}
+          </p>
         </div>
-        {/* Screen readers get each whole line once, not every typed character. */}
-        <p
-          role="status"
-          className="sr-only"
-        >
-          {line}
-        </p>
+        {cornerFor(commands)}
       </div>
 
       {mode === "form" && (

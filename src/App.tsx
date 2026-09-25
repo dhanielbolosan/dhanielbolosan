@@ -3,6 +3,7 @@ import { Tabs } from "radix-ui";
 import { Hero } from "./components/sections/hero";
 import { Activity } from "./components/sections/activity";
 import { History } from "./components/sections/history";
+import { Config } from "./components/sections/config";
 import { Projects } from "./components/sections/projects";
 import { Skills } from "./components/sections/skills";
 import { Contact } from "./components/sections/contact";
@@ -39,8 +40,7 @@ const columns = [
     split: true,
     windows: [
       { title: "Activity", Section: Activity },
-      // Placeholder: the window color picker and other settings go here.
-      { title: "Config", Section: () => null },
+      { title: "Config", Section: Config },
     ],
   },
 ];
@@ -69,7 +69,7 @@ function App() {
         className="window shrink-0 xl:hidden"
       >
         <Tabs.List
-          className="flex h-12 items-stretch justify-center gap-2 px-2 md:gap-10"
+          className="flex h-12 -translate-x-3.5 items-stretch justify-center gap-2 md:-translate-x-[1.375rem] md:gap-10"
           onMouseLeave={() => setPointed(undefined)}
         >
           {columns.map((column, i) => (
@@ -80,14 +80,19 @@ function App() {
               onFocus={() => setPointed(i)}
               onBlur={() => setPointed(undefined)}
               className={cn(
-                "relative flex cursor-pointer items-center pl-6 font-heading text-base font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11",
+                "relative flex cursor-pointer items-center pl-7 font-heading text-xs font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11 md:text-base",
                 i === 0 && "md:hidden",
               )}
             >
+              {/* Each tab reserves its hand's space plus the 8px gap: 28px on phones
+                  (20px hand), 44px from md up (36px hand), like the menus. That space
+                  sits left of every label, so the row shifts left by half of it
+                  (the translate on the list) to center the labels themselves. Phone
+                  labels are 12px and tabs 8px apart, so all four fit with every hand
+                  clear of the label before it and inside the frame. */}
               {i === pointed && (
                 <span className="absolute inset-y-0 left-0 flex items-center">
-                  {/* 24px on phones so four tabs fit; 36px like every other hand from md up. */}
-                  <PixelHand className="w-6 motion-safe:animate-bob md:w-9" />
+                  <PixelHand className="w-5 motion-safe:animate-bob md:w-9" />
                 </span>
               )}
               {column.label}

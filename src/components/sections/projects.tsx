@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { Bar } from "../bar";
 import { Choices } from "../choices";
@@ -167,13 +168,13 @@ const Thumbnail = ({
   return (
     <div
       className={cn(
-        "rounded-[5px] p-1.5 [box-shadow:var(--frame-bevel)]",
+        "rounded-[4px] p-1.5 [box-shadow:var(--frame-bevel)]",
         className,
       )}
     >
       <div className="relative size-full overflow-hidden rounded-[2px] bg-black/30">
         {project.images.length === 0 && (
-          <span className="absolute inset-0 grid place-items-center p-1 text-center font-heading text-xs text-muted-foreground">
+          <span className="absolute inset-0 grid place-items-center p-1 text-center font-heading text-xs">
             {project.name}
           </span>
         )}
@@ -207,6 +208,30 @@ export const Projects = () => {
   const [last, setLast] = useState(0);
   const info = projects[expanded ? selected : (hovered ?? last)];
 
+  // The hand sits 8px left of the pointed thumbnail like every other hand, but there's
+  // no room for it between thumbnails (or before the first column), so it's drawn on
+  // top of the page instead: a fixed layer placed from the thumbnail's position, which
+  // the column's scroll edge can't clip. Scrolling or resizing moves it along.
+  const pointed = useRef<HTMLElement>(null);
+  const [handAt, setHandAt] = useState<DOMRect>();
+  const point = (i: number, element: HTMLElement) => {
+    setHovered(i);
+    setLast(i);
+    pointed.current = element;
+    setHandAt(element.getBoundingClientRect());
+  };
+  useEffect(() => {
+    if (hovered === undefined) return;
+    const follow = () =>
+      pointed.current && setHandAt(pointed.current.getBoundingClientRect());
+    window.addEventListener("scroll", follow, true);
+    window.addEventListener("resize", follow);
+    return () => {
+      window.removeEventListener("scroll", follow, true);
+      window.removeEventListener("resize", follow);
+    };
+  }, [hovered]);
+
   return (
     <section
       className="flex grow flex-col"
@@ -228,7 +253,7 @@ export const Projects = () => {
       </div>
 
       {expanded ? (
-        <div className="h-60 shrink-0 py-1.5">
+        <div className="h-63 shrink-0 py-3">
           <button
             type="button"
             aria-label={`Close ${current.name}`}
@@ -244,7 +269,7 @@ export const Projects = () => {
         </div>
       ) : (
         <ul
-          className="grid h-60 shrink-0 grid-cols-3 place-content-evenly place-items-center gap-y-3 py-1.5"
+          className="grid h-63 shrink-0 grid-cols-3 place-content-evenly place-items-center gap-y-3 py-3"
           onMouseLeave={() => setHovered(undefined)}
         >
           {projects.map((project, i) => (
@@ -258,20 +283,11 @@ export const Projects = () => {
                   setExpanded(true);
                   setHovered(undefined);
                 }}
-                onMouseEnter={() => {
-                  setHovered(i);
-                  setLast(i);
-                }}
-                onFocus={() => {
-                  setHovered(i);
-                  setLast(i);
-                }}
+                onMouseEnter={(event) => point(i, event.currentTarget)}
+                onFocus={(event) => point(i, event.currentTarget)}
                 onBlur={() => setHovered(undefined)}
                 className="relative block cursor-pointer outline-none"
               >
-                {i === hovered && (
-                  <PixelHand className="absolute inset-y-0 -left-7 z-10 my-auto motion-safe:animate-bob" />
-                )}
                 <Thumbnail
                   project={project}
                   active={i === hovered}
@@ -283,11 +299,32 @@ export const Projects = () => {
         </ul>
       )}
 
+      {!expanded &&
+        hovered !== undefined &&
+        handAt &&
+        createPortal(
+          <span
+            aria-hidden="true"
+            className="pointer-events-none fixed z-50 flex items-center"
+            // 36px hand + 8px gap to the thumbnail's left edge.
+            style={{
+              top: handAt.top,
+              // Phones: the first column is closer than that to the screen's edge, so
+              // the hand stops 4px inside it rather than going off screen.
+              left: Math.max(4, handAt.left - 44),
+              height: handAt.height,
+            }}
+          >
+            <PixelHand className="motion-safe:animate-bob" />
+          </span>,
+          document.body,
+        )}
+
       {/* Bottom half: info window flush with the frame's sides and bottom. It fills the
           leftover space but never shrinks below its content, so on short screens the
           window grows and the column scrolls instead of cutting it off. */}
       <div className="window -mx-5 -mb-5 flex flex-1 flex-col gap-1.5 px-5 py-3.5">
-        <h3 className="font-heading text-lg font-semibold">{info.name}</h3>
+        <h3 className="font-heading text-base font-semibold">{info.name}</h3>
 
         {/* Status-card style stats, two pairs per row to fit the window. */}
         <dl className="grid grid-cols-[auto_1fr_auto_1fr] gap-x-3 font-heading text-sm">

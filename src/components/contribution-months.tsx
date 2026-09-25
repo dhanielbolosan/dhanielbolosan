@@ -45,7 +45,7 @@ export const ContributionMonths = ({
     {toMonths(calendar).map((month) => (
       <li
         key={month.key}
-        className="flex flex-col gap-1 rounded-[3px] bg-black/20 p-1.5"
+        className="flex flex-col gap-1 rounded-[4px] bg-black/20 p-1.5"
       >
         <div className="flex items-baseline justify-between px-0.5 font-heading text-xs">
           <span className="text-label">{month.name}</span>

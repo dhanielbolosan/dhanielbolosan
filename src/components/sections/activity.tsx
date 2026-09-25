@@ -165,7 +165,7 @@ export const Activity = () => {
 
       {/* Yearly total on the left, legend for the day colors on the right. */}
       {/* The caption never wraps; on narrow screens the legend drops below it instead. */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-heading text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-heading text-sm">
         <span className="whitespace-nowrap">
           {calendar.totalContributions.toLocaleString()} contributions in the
           last year
