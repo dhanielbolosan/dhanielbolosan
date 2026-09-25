@@ -35,7 +35,7 @@ const columns = [
     ],
   },
   {
-    label: "Config",
+    label: "Extras",
     split: true,
     windows: [
       { title: "Activity", Section: Activity },

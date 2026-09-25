@@ -6,12 +6,14 @@ import { Choices, type Choice } from "../choices";
 import { useTypewriter } from "@/lib/use-typewriter";
 
 // What the NPC still needs, per field; joined into one line by `missingLine`.
+// "a" is joined to its word with a non-breaking space (\u00a0) so balanced wrapping
+// never leaves it alone at the end of a line.
 const errors = {
   name: "your name",
-  email: "a valid email",
+  email: "a\u00a0valid email",
   // Short on purpose: the all-errors line must wrap no taller than the form's line,
   // or it leaves a gap above the form (the dialogue reserves its longest line).
-  message: "a longer message",
+  message: "a\u00a0longer message",
 };
 
 const contactSchema = z.object({
@@ -22,17 +24,16 @@ const contactSchema = z.object({
 
 // "your name" / "your name and a valid email" / "your name, a valid email, and a message…"
 const missingLine = (parts: string[]) =>
-  `Hold on! I still need ${
-    parts.length < 3
-      ? parts.join(" and ")
-      : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
-  }.`;
+  `Hold on, I still need ${parts.length < 3
+    ? parts.join(" and ")
+    : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
+  }!`;
 
 type ContactForm = z.infer<typeof contactSchema>;
 
 const lines = {
   menu: "I'm always open to discussing new projects, opportunities, or just talking. How would you like to reach out?",
-  form: "Leave your name, email, and a message. I'll get back to you ASAP!",
+  form: "Leave your name, email, and a\u00a0message. I'll get back to you ASAP!",
   sending: "Sending…",
   sent: "Message sent, I'll get back to you soon!",
   failed: "Something went wrong. Try again?",
@@ -131,11 +132,16 @@ export const Contact = () => {
         ? [{ label: "Back", onSelect: () => go("menu") }]
         : undefined;
 
-  const reserved = {
-    menu: [lines.menu, lines.redirect],
-    form: [lines.form, lines.sending, lines.failed, lines.allErrors],
-    sent: [lines.sent],
-  };
+  // What each screen reserves room for. The redirect line gets its own, so once the
+  // question erases the box shrinks to it and the choices move up, like the form does.
+  const reserved =
+    line === lines.redirect
+      ? [lines.redirect]
+      : {
+        menu: [lines.menu],
+        form: [lines.form, lines.sending, lines.failed, lines.allErrors],
+        sent: [lines.sent],
+      }[mode];
 
   // Top-right corner, FF7-style: the title box, which the command box temporarily
   // replaces while there are commands. Flush with the frame, in its own column: the
@@ -164,7 +170,7 @@ export const Contact = () => {
   const typed = shown ? shown.length + 1 + (shown === typingLine ? 1 : 0) : 0;
 
   const dialogue =
-    "col-start-1 row-start-1 pl-[0.4em] -indent-[0.4em] font-heading text-lg leading-snug text-balance";
+    "col-start-1 row-start-1 pl-[0.4em] -indent-[0.4em] font-heading text-lg leading-snug";
 
   return (
     <section className="flex grow flex-col">
@@ -173,7 +179,7 @@ export const Contact = () => {
           so the box is as tall as its longest line and typing never shifts what's
           below. */}
         <div className="grid min-w-0 flex-1">
-          {reserved[mode].map((text) => (
+          {reserved.map((text) => (
             <div
               key={text}
               aria-hidden="true"

@@ -15,7 +15,7 @@ const stats = [
   ["Device", "ROG Zephyrus G16"],
   ["GPU", "RTX 5070 Ti"],
   ["OS", "CachyOS"],
-  ["Status", "Open to Work"],
+  ["Avail", "Open to Work"],
 ];
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -68,10 +68,23 @@ const useLastSaved = () => {
   return saved;
 };
 
+// FF7-style clock: zero-padded 24-hour HH:MM:SS in a fixed time zone (never the
+// visitor's), with dates like the rest of the site ("Sep 24", no comma).
+const hst = "Pacific/Honolulu";
+const clock = (date: Date, timeZone: string) =>
+  date.toLocaleTimeString("en-GB", { timeZone, hour12: false });
+const day = (date: Date, timeZone: string) =>
+  date.toLocaleDateString("en-US", {
+    timeZone,
+    month: "short",
+    day: "2-digit",
+  });
+
+// Ticks every second so the clock's seconds count up like FF7's.
 const useNow = () => {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60000);
+    const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
   return now;
@@ -152,29 +165,19 @@ export const Hero = () => {
       </p>
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 font-heading text-sm">
-        {/* Always Hawaiʻi time, not the visitor's; refreshes with useNow each minute. */}
         <dt className="text-label">Local time</dt>
-        <dd className="text-right tabular-nums">
-          {now.toLocaleTimeString("en-US", {
-            timeZone: "Pacific/Honolulu",
-            hour: "numeric",
-            minute: "2-digit",
-          })}{" "}
-          HST
-        </dd>
+        <dd className="text-right tabular-nums">{clock(now, hst)} HST</dd>
         <dt className="text-label">Last saved</dt>
         <dd
-          className="text-right"
+          className="text-right tabular-nums"
           title={saved?.repo}
         >
+          {/* Hawaiʻi time like the row above (GitHub reports UTC; this converts). A
+              fixed placeholder until (or unless) the latest push loads. */}
           {saved
-            ? saved.at.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })
-            : "—"}
+            ? `${day(saved.at, hst)} ${clock(saved.at, hst)}`
+            : "Jan 01 00:00:00"}{" "}
+          HST
         </dd>
       </dl>
     </section>
