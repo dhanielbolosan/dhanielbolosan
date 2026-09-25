@@ -1,21 +1,9 @@
 import { useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
-import { PixelHand } from "../pixel-hand";
-import { experience } from "./experience";
-import { education } from "./education";
-
-export type Entry = {
-  name: string;
-  subtitle: string;
-  date: string;
-  description: string[];
-};
-
-const groups = [
-  { label: "Experience", entries: experience },
-  { label: "Education", entries: education },
-];
+import { canHoverQuery, useMedia } from "@/lib/use-media";
+import { RowHand } from "../pixel-hand";
+import { groups } from "./history.data";
 
 // FF7 Materia-menu style: a details window opens over the list below the entry without
 // moving anything. Hover previews it only while the pointer is on the entry; a click (or
@@ -24,19 +12,22 @@ export const History = () => {
   const [hovered, setHovered] = useState<string>();
   const [pinned, setPinned] = useState<string>();
   const open = pinned ?? hovered;
+  // On touch screens, a cursor rests on the first entry until one is opened, bobbing to
+  // show the list is waiting for a tap.
+  const canHover = useMedia(canHoverQuery);
+  const resting =
+    !canHover && open === undefined ? groups[0].entries[0].name : undefined;
 
   return (
     <section className="flow-root">
-      <h2 className="window-title float-right -mt-5 mb-1 ml-3">History</h2>
+      <h2 className="window-title-float">History</h2>
 
       {groups.map((group) => (
         <div
           key={group.label}
           className="not-first-of-type:pt-5"
         >
-          <h3 className="mb-2 font-heading text-base text-label">
-            {group.label}
-          </h3>
+          <h3 className="group-heading">{group.label}</h3>
           <ul className="flex flex-col gap-2">
             {group.entries.map((entry) => (
               <li key={entry.name}>
@@ -60,15 +51,18 @@ export const History = () => {
                         current === entry.name ? undefined : entry.name,
                       );
                     }}
-                    className="group relative flex w-full cursor-pointer items-start py-1.5 pl-11 text-left font-heading outline-none"
+                    className="group relative flex w-full cursor-pointer items-start py-1.5 pl-7 text-left font-heading outline-none"
                   >
                     {/* Shown for the open entry, and for keyboard focus so Tab users see
                         where Enter will act. Centered on the whole entry, like the others. */}
-                    <PixelHand
-                      className={cn(
-                        "absolute inset-y-0 left-0 my-auto group-focus-visible:visible",
-                        open !== entry.name && "invisible",
-                      )}
+                    <RowHand
+                      show={open === entry.name || resting === entry.name}
+                      // Bobs while pointed at or resting; a pinned entry's hand holds still.
+                      bob={
+                        (hovered === entry.name && pinned !== entry.name) ||
+                        resting === entry.name
+                      }
+                      className="group-focus-visible:visible"
                     />
                     <span className="flex min-w-0 flex-col">
                       <span className="text-base font-semibold">

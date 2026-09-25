@@ -24,9 +24,10 @@ const contactSchema = z.object({
 
 // "your name" / "your name and a valid email" / "your name, a valid email, and a message…"
 const missingLine = (parts: string[]) =>
-  `Hold on, I still need ${parts.length < 3
-    ? parts.join(" and ")
-    : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
+  `Hold on, I still need ${
+    parts.length < 3
+      ? parts.join(" and ")
+      : `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
   }!`;
 
 type ContactForm = z.infer<typeof contactSchema>;
@@ -138,17 +139,17 @@ export const Contact = () => {
     line === lines.redirect
       ? [lines.redirect]
       : {
-        menu: [lines.menu],
-        form: [lines.form, lines.sending, lines.failed, lines.allErrors],
-        sent: [lines.sent],
-      }[mode];
+          menu: [lines.menu],
+          form: [lines.form, lines.sending, lines.failed, lines.allErrors],
+          sent: [lines.sent],
+        }[mode];
 
   // Top-right corner, FF7-style: the title box, which the command box temporarily
   // replaces while there are commands. Flush with the frame, in its own column: the
   // dialogue stays beside it and never wraps underneath.
   const cornerFor = (items?: Choice[]) => (
     // The command box's hand points in from its left, so leave room for it there.
-    <div className={`-mt-5 shrink-0 ${items ? "ml-11" : "ml-3"}`}>
+    <div className={`-mt-5 shrink-0 ${items ? "ml-7" : "ml-3"}`}>
       {items ? (
         <>
           <h2 className="sr-only">Contact</h2>

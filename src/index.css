@@ -181,6 +181,21 @@
   }
 }
 
+/* The windows' beveled frame on a small box: swatches, the portrait, thumbnails. */
+@utility bevel {
+  border-radius: 4px;
+  box-shadow: var(--frame-bevel);
+}
+
+/* A teal heading over a group of items (History's Experience, Skills' Languages). */
+@utility group-heading {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  color: var(--label);
+}
+
 /* FF-style menu window: corner gradient, bright frame, dark inner line, hard text shadow. */
 @utility window {
   @apply window-bg;
@@ -207,6 +222,12 @@
   font-size: var(--text-base);
   font-weight: 600;
   color: var(--foreground);
+}
+
+/* A title box floated into the window's top-right corner, so the window's first
+   lines of content wrap beside it (Status, History, Skills). */
+@utility window-title-float {
+  @apply window-title float-right -mt-5 mb-1 ml-3;
 }
 
 * {

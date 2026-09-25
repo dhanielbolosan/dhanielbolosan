@@ -1,13 +1,14 @@
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { Tabs } from "radix-ui";
-import { Hero } from "./components/sections/hero";
-import { Activity } from "./components/sections/activity";
-import { History } from "./components/sections/history";
-import { Config } from "./components/sections/config";
-import { Projects } from "./components/sections/projects";
-import { Skills } from "./components/sections/skills";
-import { Contact } from "./components/sections/contact";
+import { Status } from "./components/windows/status";
+import { Activity } from "./components/windows/activity";
+import { History } from "./components/windows/history";
+import { Config } from "./components/windows/config";
+import { Projects } from "./components/windows/projects";
+import { Skills } from "./components/windows/skills";
+import { Contact } from "./components/windows/contact";
 import { PixelHand } from "./components/pixel-hand";
+import { useMedia } from "./lib/use-media";
 import { cn } from "./lib/utils";
 
 // title: omitted when the section floats its own title so content can wrap around it.
@@ -18,7 +19,7 @@ const columns = [
     label: "Status",
     split: true,
     windows: [
-      { title: undefined, Section: Hero },
+      { title: undefined, Section: Status },
       { title: undefined, Section: Contact },
     ],
   },
@@ -44,15 +45,9 @@ const columns = [
   },
 ];
 
-// Matches Tailwind's md breakpoint, where About is pinned left and the tabs pick the right column.
-const twoColumns = window.matchMedia("(min-width: 48rem)");
-const subscribe = (onChange: () => void) => {
-  twoColumns.addEventListener("change", onChange);
-  return () => twoColumns.removeEventListener("change", onChange);
-};
-
 function App() {
-  const wide = useSyncExternalStore(subscribe, () => twoColumns.matches);
+  // Tailwind's md breakpoint, where Status is pinned left and the tabs pick the right column.
+  const wide = useMedia("(min-width: 48rem)");
   const [active, setActive] = useState(0);
   // The nav hand only shows while a tab is hovered or focused; text color marks the active tab.
   const [pointed, setPointed] = useState<number>();
@@ -68,7 +63,7 @@ function App() {
         className="window shrink-0 xl:hidden"
       >
         <Tabs.List
-          className="flex h-12 -translate-x-3.5 items-stretch justify-center gap-2 md:-translate-x-[1.375rem] md:gap-10"
+          className="flex h-12 -translate-x-3.5 items-stretch justify-center gap-2 md:gap-10"
           onMouseLeave={() => setPointed(undefined)}
         >
           {columns.map((column, i) => (
@@ -79,19 +74,18 @@ function App() {
               onFocus={() => setPointed(i)}
               onBlur={() => setPointed(undefined)}
               className={cn(
-                "relative flex cursor-pointer items-center pl-7 font-heading text-xs font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:pl-11 md:text-base",
+                "relative flex cursor-pointer items-center pl-7 font-heading text-xs font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:text-base",
                 i === 0 && "md:hidden",
               )}
             >
-              {/* Each tab reserves its hand's space plus the 8px gap: 28px on phones
-                  (20px hand), 44px from md up (36px hand), like the menus. That space
-                  sits left of every label, so the row shifts left by half of it
-                  (the translate on the list) to center the labels themselves. Phone
-                  labels are 12px and tabs 8px apart, so all four fit with every hand
-                  clear of the label before it and inside the frame. */}
+              {/* Each tab reserves its hand's space plus the 8px gap (28px), like the
+                  menus. That space sits left of every label, so the row shifts left by
+                  half of it (the translate on the list) to center the labels themselves.
+                  Phone labels are 12px and tabs 8px apart, so all four fit with every
+                  hand clear of the label before it and inside the frame. */}
               {i === pointed && (
                 <span className="absolute inset-y-0 left-0 flex items-center">
-                  <PixelHand className="w-5 motion-safe:animate-bob md:w-9" />
+                  <PixelHand className="motion-safe:animate-bob" />
                 </span>
               )}
               {column.label}

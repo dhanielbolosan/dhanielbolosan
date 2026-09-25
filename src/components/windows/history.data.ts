@@ -1,4 +1,11 @@
-import type { Entry } from "./history";
+// History window entries, newest first within each group.
+
+export type Entry = {
+  name: string;
+  subtitle: string;
+  date: string;
+  description: string[];
+};
 
 export const experience: Entry[] = [
   {
@@ -51,4 +58,24 @@ export const experience: Entry[] = [
       "Integrated an AI-powered bill summarization and comparison tool directly into the office's internal website, reducing the time staff spent parsing legislative documents.",
     ],
   },
+];
+
+export const education: Entry[] = [
+  {
+    name: "University of Hawaiʻi at Mānoa",
+    subtitle: "Computer Science, B.S.",
+    date: "Aug. 2024 - May 2026",
+    description: ["Cumulative GPA: 3.31/4.00", "Dean's List (Spring 2025)"],
+  },
+  {
+    name: "University of Hawaiʻi Maui College",
+    subtitle: "Natural Science - Information and Computer Sciences, A.S",
+    date: "Aug. 2022 - May 2024",
+    description: ["Cumulative GPA: 3.10/4.00", "Dean's List (Fall 2022)"],
+  },
+];
+
+export const groups = [
+  { label: "Experience", entries: experience },
+  { label: "Education", entries: education },
 ];

@@ -3,141 +3,12 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { Bar } from "../bar";
 import { Choices } from "../choices";
-import { orbs, type MateriaType } from "./skill-groups";
+import { orbs } from "@/lib/materia";
+import { canHoverQuery, useMedia } from "@/lib/use-media";
+import { IconItem } from "../icon-item";
 import { PixelHand } from "../pixel-hand";
-
-type ProjectData = {
-  name: string;
-  images: string[];
-  description: string;
-  stack: { name: string; type: MateriaType }[];
-  type?: string;
-  date?: string;
-  /** 0-100; a full bar flashes like FF7's Limit bar. */
-  progress?: number;
-  link?: { label: string; href: string };
-};
-
-const projects: ProjectData[] = [
-  {
-    name: "Kumu",
-    images: [],
-    description:
-      "Human-in-the-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions and music.",
-    stack: [
-      { name: "Claude Code", type: "tool" },
-      { name: "HyperFrames", type: "library" },
-      { name: "HTML/CSS", type: "language" },
-      { name: "FFmpeg", type: "tool" },
-      { name: "Kokoro TTS", type: "library" },
-      { name: "whisper.cpp", type: "tool" },
-    ],
-    type: "Personal",
-    date: "Sep 2026",
-    progress: 75,
-    link: {
-      label: "Repo",
-      href: "https://github.com/blockchain-in-paradise/kumu",
-    },
-  },
-  {
-    name: "Geospatial Mobile Dashboard",
-    images: [],
-    description:
-      "Capacitor mobile app for SENTINEL, pairing a Cesium 3D globe of live wildfire, seismic, weather, and aviation feeds with Starlink orbits and a FastAPI backend.",
-    stack: [
-      { name: "Capacitor", type: "framework" },
-      { name: "React", type: "framework" },
-      { name: "TypeScript", type: "language" },
-      { name: "Cesium", type: "library" },
-      { name: "FastAPI", type: "framework" },
-      { name: "TanStack Query", type: "library" },
-    ],
-    type: "Internship",
-    date: "June - July 2026",
-    progress: 100,
-  },
-  {
-    name: "KopeChain",
-    images: [
-      "/projects/kopechain1.png",
-      "/projects/kopechain2.png",
-      "/projects/kopechain3.png",
-    ],
-    description:
-      "Decentralized supply chain tracker on Base Sepolia Testnet to verify the origin of local Hawaiian coffee, with QR codes, 3D mapping, and NFT minting.",
-    stack: [
-      { name: "Scaffold-ETH 2", type: "framework" },
-      { name: "Solidity", type: "language" },
-      { name: "Hardhat", type: "framework" },
-      { name: "Pinata", type: "tool" },
-      { name: "DaisyUI", type: "library" },
-      { name: "Next.js", type: "framework" },
-    ],
-    type: "Internship",
-    date: "Jan – May 2026",
-    progress: 100,
-    link: { label: "Site", href: "https://kope-chain.vercel.app/" },
-  },
-  {
-    name: "Legislative Cloud Platform",
-    images: ["/projects/uhgro1.png", "/projects/uhgro2.png"],
-    description:
-      "Backend service powering AI bill summarization and automated notifications for university officials, helping UH staff track legislation that affects the university.",
-    stack: [
-      { name: "FastAPI", type: "framework" },
-      { name: "Google Cloud", type: "tool" },
-      { name: "Docker", type: "tool" },
-      { name: "Apify", type: "tool" },
-      { name: "SMTP", type: "tool" },
-      { name: "Python", type: "language" },
-    ],
-    type: "Internship",
-    date: "Aug – Dec 2025",
-    progress: 100,
-    link: {
-      label: "Org",
-      href: "https://github.com/orgs/engr401-groot-ai/repositories",
-    },
-  },
-  {
-    name: "VENOM-RAG",
-    images: ["/projects/venomrag1.png", "/projects/venomrag2.png"],
-    description:
-      "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines through vector manipulation and PDF font poisoning.",
-    stack: [
-      { name: "Python", type: "language" },
-      { name: "Jupyter Notebook", type: "tool" },
-      { name: "LangChain", type: "library" },
-      { name: "FAISS", type: "library" },
-      { name: "Ollama", type: "tool" },
-      { name: "FastAPI", type: "framework" },
-    ],
-    type: "Research",
-    date: "Jan – May 2026",
-    progress: 100,
-  },
-  {
-    name: "Pathfinity",
-    images: ["/projects/pathfinity1.png", "/projects/pathfinity2.png"],
-    description:
-      "Full-stack semantic search interface enabling students to query university course data via natural language, with GitHub and Google sign-in.",
-    stack: [
-      { name: "Next.js", type: "framework" },
-      { name: "OpenAI", type: "tool" },
-      { name: "Shadcn UI", type: "library" },
-      { name: "Neon Postgres", type: "database" },
-      { name: "TypeScript", type: "language" },
-      { name: "Drizzle ORM", type: "library" },
-    ],
-    type: "Hackathon",
-    date: "Oct – Nov 2025",
-    progress: 100,
-    link: { label: "Repo", href: "https://github.com/HACC25/Pathfinity" },
-  },
-];
-
-type Project = ProjectData;
+import { Stats } from "../stats";
+import { projects, type Project } from "./projects.data";
 
 // Cycles a project's screenshots while `active`; resets to the first otherwise.
 const useSlideshow = (count: number, active: boolean) => {
@@ -166,12 +37,7 @@ const Thumbnail = ({
 }) => {
   const index = useSlideshow(project.images.length, active);
   return (
-    <div
-      className={cn(
-        "rounded-[4px] p-1.5 [box-shadow:var(--frame-bevel)]",
-        className,
-      )}
-    >
+    <div className={cn("bevel p-1.5", className)}>
       <div className="relative size-full overflow-hidden rounded-[2px] bg-black/30">
         {project.images.length === 0 && (
           <span className="absolute inset-0 grid place-items-center p-1 text-center font-heading text-xs">
@@ -211,8 +77,12 @@ export const Projects = () => {
   // The hand sits 8px left of the pointed thumbnail like every other hand, but there's
   // no room for it between thumbnails (or before the first column), so it's drawn on
   // top of the page instead: a fixed layer placed from the thumbnail's position, which
-  // the column's scroll edge can't clip. Scrolling or resizing moves it along.
+  // the column's scroll edge can't clip. Scrolling or resizing moves it along. On touch
+  // screens, with nothing pointed at, it rests on the first thumbnail, waiting for a tap.
+  const canHover = useMedia(canHoverQuery);
+  const resting = !canHover && hovered === undefined && !expanded;
   const pointed = useRef<HTMLElement>(null);
+  const first = useRef<HTMLButtonElement>(null);
   const [handAt, setHandAt] = useState<DOMRect>();
   const point = (i: number, element: HTMLElement) => {
     setHovered(i);
@@ -221,16 +91,26 @@ export const Projects = () => {
     setHandAt(element.getBoundingClientRect());
   };
   useEffect(() => {
-    if (hovered === undefined) return;
-    const follow = () =>
-      pointed.current && setHandAt(pointed.current.getBoundingClientRect());
+    const target =
+      hovered !== undefined ? pointed.current : resting ? first.current : null;
+    if (!target) return;
+    // A thumbnail that isn't laid out (its tab is hidden) has an empty box: no hand.
+    const follow = () => {
+      const rect = target.getBoundingClientRect();
+      setHandAt(rect.width ? rect : undefined);
+    };
+    // The observer also fires when a hidden tab's grid appears, which no scroll or
+    // resize event reports, and once on start (placing the resting hand).
+    const observer = new ResizeObserver(follow);
+    observer.observe(target);
     window.addEventListener("scroll", follow, true);
     window.addEventListener("resize", follow);
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", follow, true);
       window.removeEventListener("resize", follow);
     };
-  }, [hovered]);
+  }, [hovered, resting]);
 
   return (
     <section
@@ -275,6 +155,7 @@ export const Projects = () => {
           {projects.map((project, i) => (
             <li key={project.name}>
               <button
+                ref={i === 0 ? first : undefined}
                 type="button"
                 aria-label={project.name}
                 aria-pressed={i === selected}
@@ -300,18 +181,18 @@ export const Projects = () => {
       )}
 
       {!expanded &&
-        hovered !== undefined &&
+        (hovered !== undefined || resting) &&
         handAt &&
         createPortal(
           <span
             aria-hidden="true"
             className="pointer-events-none fixed z-50 flex items-center"
-            // 36px hand + 8px gap to the thumbnail's left edge.
+            // 20px hand + 8px gap to the thumbnail's left edge.
             style={{
               top: handAt.top,
               // Phones: the first column is closer than that to the screen's edge, so
               // the hand stops 4px inside it rather than going off screen.
-              left: Math.max(4, handAt.left - 44),
+              left: Math.max(4, handAt.left - 28),
               height: handAt.height,
             }}
           >
@@ -326,54 +207,58 @@ export const Projects = () => {
       <div className="window -mx-5 -mb-5 flex flex-1 flex-col gap-1.5 px-5 py-3.5">
         <h3 className="font-heading text-base font-semibold">{info.name}</h3>
 
-        {/* Status-card style stats, two pairs per row to fit the window. */}
-        <dl className="grid grid-cols-[auto_1fr_auto_1fr] gap-x-3 font-heading text-sm">
-          <dt className="text-label">Type</dt>
-          <dd>{info.type ?? "—"}</dd>
-          <dt className="text-label">Date</dt>
-          <dd>{info.date ?? "—"}</dd>
-          <dt className="text-label">Progress</dt>
-          <dd className="flex items-center">
-            <Bar
-              value={(info.progress ?? 0) / 100}
-              label="Progress"
-              className="h-2.5 w-full"
-            />
-          </dd>
-          {/* Link row only appears when the project has one. */}
-          {info.link?.href && (
-            <>
-              <dt className="text-label">Link</dt>
-              <dd>
-                <a
-                  href={info.link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-gold underline underline-offset-2 hover:text-foreground"
-                >
-                  {info.link.label}
-                </a>
-              </dd>
-            </>
-          )}
-        </dl>
+        {/* Status-card style stats, two pairs per row to fit the window. The Link row
+            only appears when the project has one. */}
+        <Stats
+          columns={4}
+          pairs={[
+            ["Type", info.type ?? "—"],
+            ["Date", info.date ?? "—"],
+            [
+              "Progress",
+              <span className="flex h-full items-center">
+                <Bar
+                  value={(info.progress ?? 0) / 100}
+                  label="Progress"
+                  className="h-2.5 w-full"
+                />
+              </span>,
+            ],
+            ...(info.link?.href
+              ? ([
+                  [
+                    "Link",
+                    <a
+                      href={info.link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-gold underline underline-offset-2 hover:text-foreground"
+                    >
+                      {info.link.label}
+                    </a>,
+                  ],
+                ] as const)
+              : []),
+          ]}
+        />
 
         <p className="text-sm leading-relaxed">{info.description}</p>
 
         {/* Stack as materia, right under the description: each tech wears its type's orb. */}
         <ul className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
           {info.stack.map(({ name: tech, type }) => (
-            <li
+            <IconItem
               key={tech}
-              className="flex min-w-0 items-center gap-1.5"
+              icon={
+                <img
+                  src={orbs[type]}
+                  alt=""
+                  className="size-4 shrink-0 [image-rendering:pixelated]"
+                />
+              }
             >
-              <img
-                src={orbs[type]}
-                alt=""
-                className="size-4 shrink-0 [image-rendering:pixelated]"
-              />
-              <span className="truncate">{tech}</span>
-            </li>
+              {tech}
+            </IconItem>
           ))}
         </ul>
       </div>

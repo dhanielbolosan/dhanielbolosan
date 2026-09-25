@@ -1,4 +1,5 @@
-import { groups } from "./skill-groups";
+import { IconItem } from "../icon-item";
+import { groups } from "./skills.data";
 import {
   siBootstrap,
   siClaude,
@@ -81,7 +82,7 @@ const logos: Record<string, Icon> = {
 // FF7 Materia list: each category header carries its materia orb; skills are logo + name.
 export const Skills = () => (
   <section className="flow-root">
-    <h2 className="window-title float-right -mt-5 mb-1 ml-3">Skills</h2>
+    <h2 className="window-title-float">Skills</h2>
 
     {groups.map((group) => (
       <div
@@ -89,7 +90,7 @@ export const Skills = () => (
         className="not-first-of-type:pt-5"
       >
         {/* One orb per category: the group is the materia type. 8px sprite at 2x. */}
-        <h3 className="mb-2 flex items-center gap-2 font-heading text-base text-label">
+        <h3 className="group-heading flex items-center gap-2">
           <img
             src={group.orb}
             alt=""
@@ -101,24 +102,24 @@ export const Skills = () => (
           {group.skills.map((skill) => {
             const Logo = logos[skill];
             return (
-              <li
+              <IconItem
                 key={skill}
-                className="flex min-w-0 items-center gap-1.5"
+                icon={
+                  Logo ? (
+                    <svg
+                      viewBox={Logo.viewBox ?? "0 0 24 24"}
+                      aria-hidden="true"
+                      className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
+                    >
+                      <path d={Logo.path} />
+                    </svg>
+                  ) : (
+                    <span className="size-4 shrink-0" />
+                  )
+                }
               >
-                {Logo ? (
-                  <svg
-                    viewBox={Logo.viewBox ?? "0 0 24 24"}
-                    aria-hidden="true"
-                    className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
-                  >
-                    <path d={Logo.path} />
-                  </svg>
-                ) : (
-                  <span className="size-4 shrink-0" />
-                )}
-                {/* One line; names too long for the column end in "…", like the Projects stack. */}
-                <span className="truncate">{skill}</span>
-              </li>
+                {skill}
+              </IconItem>
             );
           })}
         </ul>

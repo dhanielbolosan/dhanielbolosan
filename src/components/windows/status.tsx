@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
+import { clock, shortDate } from "@/lib/dates";
+import { useLastSaved } from "@/lib/github";
+import { avatarUrl, name, timeZone } from "@/lib/site";
 import { useTypewriter } from "@/lib/use-typewriter";
 import { Bar } from "../bar";
+import { Stats } from "../stats";
 
 // LV and the EXP bar are derived from this.
 const birthday = { year: 2004, month: 3, day: 26 };
 
-const name = "Dhaniel Bolosan";
-
-const githubUsername = "dhanielbolosan";
-
-const stats = [
+const stats: [string, string][] = [
   ["Role", "Full-Stack Engineer"],
   ["Origin", "Bacarra, Philippines"],
   ["Device", "ROG Zephyrus G16"],
@@ -20,15 +20,20 @@ const stats = [
 
 const DAY = 24 * 60 * 60 * 1000;
 
-// LV is your age; EXP is how far you are from your last birthday to your next.
+// LV is your age; EXP is how far you are from your last birthday to your next. On
+// the birthday itself the bar stays full all day, so its Limit Break plays.
 const getLevel = (today = new Date()) => {
   const at = (year: number) => new Date(year, birthday.month - 1, birthday.day);
   const passed = at(today.getFullYear()) <= today;
   const last = at(today.getFullYear() - (passed ? 0 : 1));
   const next = at(last.getFullYear() + 1);
+  const isBirthday =
+    today.getMonth() === birthday.month - 1 && today.getDate() === birthday.day;
   return {
     level: last.getFullYear() - birthday.year,
-    exp: (today.getTime() - last.getTime()) / (next.getTime() - last.getTime()),
+    exp: isBirthday
+      ? 1
+      : (today.getTime() - last.getTime()) / (next.getTime() - last.getTime()),
     daysLeft: Math.ceil((next.getTime() - today.getTime()) / DAY),
     // Total EXP: days lived.
     daysLived: Math.floor(
@@ -36,49 +41,6 @@ const getLevel = (today = new Date()) => {
     ),
   };
 };
-
-// Latest public push, from GitHub's events feed (no token needed, CORS allowed).
-const useLastSaved = () => {
-  const [saved, setSaved] = useState<{ at: Date; repo: string }>();
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetch(
-      `https://api.github.com/users/${githubUsername}/events/public?per_page=30`,
-      { signal: controller.signal },
-    )
-      .then((response) => (response.ok ? response.json() : []))
-      .then(
-        (
-          events: {
-            type: string;
-            created_at: string;
-            repo: { name: string };
-          }[],
-        ) => {
-          const push = events.find((event) => event.type === "PushEvent");
-          if (push)
-            setSaved({ at: new Date(push.created_at), repo: push.repo.name });
-        },
-      )
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, []);
-
-  return saved;
-};
-
-// FF7-style clock: zero-padded 24-hour HH:MM:SS in a fixed time zone (never the
-// visitor's), with dates like the rest of the site ("Sep 24", no comma).
-const hst = "Pacific/Honolulu";
-const clock = (date: Date, timeZone: string) =>
-  date.toLocaleTimeString("en-GB", { timeZone, hour12: false });
-const day = (date: Date, timeZone: string) =>
-  date.toLocaleDateString("en-US", {
-    timeZone,
-    month: "short",
-    day: "2-digit",
-  });
 
 // Ticks every second so the clock's seconds count up like FF7's.
 const useNow = () => {
@@ -90,7 +52,7 @@ const useNow = () => {
   return now;
 };
 
-export const Hero = () => {
+export const Status = () => {
   const now = useNow();
   const { level, exp, daysLeft, daysLived } = getLevel(now);
   const saved = useLastSaved();
@@ -100,9 +62,9 @@ export const Hero = () => {
     <section className="flex grow flex-col justify-between gap-3">
       <div className="flex items-start gap-3">
         {/* Same bevel as the windows; an img can't show inset shadows, so it gets a wrapper. */}
-        <div className="shrink-0 rounded-[4px] p-1.5 [box-shadow:var(--frame-bevel)]">
+        <div className="bevel shrink-0 p-1.5">
           <img
-            src="https://github.com/dhanielbolosan.png"
+            src={avatarUrl}
             alt="Dhaniel"
             className="size-24 rounded-[2px] object-cover"
           />
@@ -110,7 +72,7 @@ export const Hero = () => {
         {/* Block (not flex) so the floated title wraps this column's content: the name
             flows around it, and anything past its bottom edge gets the full width. */}
         <div className="flow-root min-w-0 grow space-y-1.5 font-heading">
-          <h2 className="window-title float-right -mt-5 mb-1 ml-3">Status</h2>
+          <h2 className="window-title-float">Status</h2>
           {/* The untyped rest stays in place invisibly, so the name keeps its final
               width and wrapping while it types. */}
           <h1 className="text-2xl leading-tight font-semibold tracking-wide">
@@ -146,17 +108,11 @@ export const Hero = () => {
         </div>
       </div>
 
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 font-heading text-base">
-        {stats.map(([label, value]) => (
-          <div
-            key={label}
-            className="contents"
-          >
-            <dt className="text-label">{label}</dt>
-            <dd className="text-right font-semibold">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      <Stats
+        pairs={stats}
+        className="text-base"
+        valueClassName="text-right font-semibold"
+      />
 
       <p className="text-base leading-relaxed">
         Aloha! I'm a full-stack software engineer based in Maui, Hawaiʻi with a
@@ -164,22 +120,23 @@ export const Hero = () => {
         technologies across AI, Cloud, and Web3.
       </p>
 
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 font-heading text-sm">
-        <dt className="text-label">Local time</dt>
-        <dd className="text-right tabular-nums">{clock(now, hst)} HST</dd>
-        <dt className="text-label">Last saved</dt>
-        <dd
-          className="text-right tabular-nums"
-          title={saved?.repo}
-        >
-          {/* Hawaiʻi time like the row above (GitHub reports UTC; this converts). A
-              fixed placeholder until (or unless) the latest push loads. */}
-          {saved
-            ? `${day(saved.at, hst)} ${clock(saved.at, hst)}`
-            : "Jan 01 00:00:00"}{" "}
-          HST
-        </dd>
-      </dl>
+      <Stats
+        pairs={[
+          ["Local time", `${clock(now, timeZone)} HST`],
+          [
+            "Last saved",
+            // Hawaiʻi time like the row above (GitHub reports UTC; this converts). A
+            // fixed placeholder until (or unless) the latest push loads.
+            <span title={saved?.repo}>
+              {saved
+                ? `${shortDate(saved.at, timeZone)} ${clock(saved.at, timeZone)}`
+                : "Jan 01 00:00:00"}{" "}
+              HST
+            </span>,
+          ],
+        ]}
+        valueClassName="text-right tabular-nums"
+      />
     </section>
   );
 };

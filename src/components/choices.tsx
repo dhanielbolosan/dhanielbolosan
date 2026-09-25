@@ -1,5 +1,5 @@
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
-import { PixelHand } from "./pixel-hand";
+import { PixelHand, RowHand } from "./pixel-hand";
 
 export type Choice = {
   label: string;
@@ -10,6 +10,7 @@ export type Choice = {
 };
 
 // FF7 dialogue choices: the hand marks the hovered or focused option; arrow keys move it.
+// The menu is always waiting for input, so its hand always bobs.
 // Rows use the dialogue's own line spacing, so choices read as its continuation.
 // `boxed` renders them as a small FF7 command window (positioned by the caller via
 // `className`), with the hand pointing in from outside its left edge.
@@ -50,13 +51,18 @@ export const Choices = ({
         const props = {
           onMouseEnter: () => setActive(i),
           onFocus: () => setActive(i),
-          className: `relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none ${boxed ? "" : "pl-11"}`,
+          className: `relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none ${boxed ? "" : "pl-7"}`,
         };
         const body = (
           <>
-            {i === active && (
-              <PixelHand
-                className={`absolute motion-safe:animate-bob ${boxed ? "right-full mr-2" : "left-0"}`}
+            {boxed ? (
+              i === active && (
+                <PixelHand className="absolute right-full mr-2 motion-safe:animate-bob" />
+              )
+            ) : (
+              <RowHand
+                show={i === active}
+                bob
               />
             )}
             {item.label}

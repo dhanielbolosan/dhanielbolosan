@@ -1,8 +1,9 @@
+import { localDate } from "@/lib/dates";
 import type {
   ContributionCalendarData,
   ContributionDay,
   ContributionLevel,
-} from "@/lib/contributions";
+} from "@/lib/github";
 
 const levelIndex: Record<ContributionLevel, number> = {
   NONE: 0,
@@ -11,9 +12,6 @@ const levelIndex: Record<ContributionLevel, number> = {
   THIRD_QUARTILE: 3,
   FOURTH_QUARTILE: 4,
 };
-
-// Parse YYYY-MM-DD as a local date so labels don't shift a day in negative UTC offsets.
-const localDate = (date: string) => new Date(`${date}T00:00`);
 
 // Group the calendar's days into its last 12 calendar months, oldest first.
 const toMonths = (calendar: ContributionCalendarData) => {
@@ -36,7 +34,7 @@ const toMonths = (calendar: ContributionCalendarData) => {
 
 // A year of contributions as a wall calendar: 12 month tiles in a 4 x 3 grid,
 // each a small Sun-Sat day grid colored by contribution level.
-export const ContributionMonths = ({
+export const ActivityCalendar = ({
   calendar,
 }: {
   calendar: ContributionCalendarData;

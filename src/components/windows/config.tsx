@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
-import { PixelHand } from "../pixel-hand";
+import { PixelHand, RowHand } from "../pixel-hand";
 
 // FF7 colors each window corner separately. Each corner is a CSS custom property every
 // window reads (see the window-bg utility).
@@ -106,8 +106,8 @@ const labelFor = (key: ColorKey) =>
 //    swatch beside the rectangle).
 // 3. A popover opens with only the R/G/B sliders, where another hand follows the
 //    channel being edited.
-// Hands left behind at earlier steps idle-bob; the active one holds still. Escape (or
-// clicking away) steps back. Everything recolors live. Reset to default restores all.
+// A hand bobs while it's the cursor waiting for input (or pointing at something new) and
+// holds still once its step is done. Escape (or clicking away) steps back. Everything recolors live. Reset to default restores all.
 export const Config = () => {
   const [colors, setColors] = useState(load);
   const [hovered, setHovered] = useState<Setting>();
@@ -183,7 +183,8 @@ export const Config = () => {
         className="relative grid grid-cols-[1rem_2.25rem_1fr] items-center gap-2 text-sm"
       >
         {i === channel && (
-          <PixelHand className="absolute inset-y-0 right-full my-auto mr-2" />
+          // The sliders are waiting for input, so their hand always bobs.
+          <PixelHand className="absolute inset-y-0 right-full my-auto mr-2 motion-safe:animate-bob" />
         )}
         <span className={cn("font-semibold", c.className)}>{c.name}</span>
         <span className="text-right tabular-nums">
@@ -224,22 +225,24 @@ export const Config = () => {
     />
   );
 
-  // The step-2 hand: bobs once its pick is made, holds still while pointing.
+  // The step-2 hand: bobs while waiting for a pick or pointing at another part; holds
+  // still resting on the picked one (the sliders' hand is then the one waiting).
   const partHand = (className: string) => (
     <PixelHand
       className={cn(
         "pointer-events-none absolute z-10",
         className,
-        part && !pointedPart && "motion-safe:animate-bob",
+        (!part || (pointedPart && pointedPart !== part)) &&
+          "motion-safe:animate-bob",
       )}
     />
   );
 
   // What sits after each label, on one grid of 36px columns. Where the window is wide
-  // enough (23rem of content), that's one row 12px apart: the four text color swatches
+  // enough (21rem of content), that's one row 12px apart: the four text color swatches
   // in a row, the window rectangle spanning the first two columns, and the picked
   // corner's swatch above the third. Narrower (1280-1680 desktops, phones), the row
-  // doesn't fit, so the palette is 2 x 2 with columns 44px apart, the rectangle spans
+  // doesn't fit, so the palette is 2 x 2 with columns 28px apart, the rectangle spans
   // both, and the corner swatch wraps below. Swatch picks put the hand 8px to the left;
   // in the one-row layout it overlaps the neighboring swatch, drawn on top.
   const preview = (id: Setting) => {
@@ -252,7 +255,7 @@ export const Config = () => {
             role={active ? "radiogroup" : undefined}
             aria-label={active ? "Window corner" : undefined}
             onMouseLeave={() => setPointedPart(undefined)}
-            className="window-bg h-9 w-29 shrink-0 rounded-[4px] @min-[23rem]:w-21 [box-shadow:var(--frame-bevel)]"
+            className="window-bg bevel h-9 w-25 shrink-0 @min-[21rem]:w-21"
           >
             {active &&
               corners.map((c) =>
@@ -271,7 +274,7 @@ export const Config = () => {
           {active && part && (
             <span
               aria-hidden="true"
-              className="size-9 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
+              className="bevel size-9 shrink-0"
               style={{ background: toHex(colors[part]) }}
             />
           )}
@@ -283,13 +286,13 @@ export const Config = () => {
         role={active ? "radiogroup" : undefined}
         aria-label={active ? "Text color" : undefined}
         onMouseLeave={() => setPointedPart(undefined)}
-        className="grid grid-cols-2 gap-x-11 gap-y-3 @min-[23rem]:grid-cols-4 @min-[23rem]:gap-x-3"
+        className="grid grid-cols-2 gap-x-7 gap-y-3 @min-[21rem]:grid-cols-4 @min-[21rem]:gap-x-3"
       >
         {textColors.map((c) => (
           <span
             key={c.key}
             title={c.label}
-            className="relative size-9 shrink-0 rounded-[4px] [box-shadow:var(--frame-bevel)]"
+            className="bevel relative size-9 shrink-0"
             style={{ background: toHex(colors[c.key]) }}
           >
             {active && pick(c.key, `${c.label} color`, "absolute inset-0")}
@@ -341,16 +344,13 @@ export const Config = () => {
             // Reset has no preview, so its label spans both columns and doesn't widen
             // the label column the previews line up against.
             className={cn(
-              "relative cursor-pointer py-0.5 pl-11 text-left text-base outline-none",
+              "relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
               id === "reset" && "col-span-2",
             )}
           >
-            <PixelHand
-              className={cn(
-                "absolute inset-y-0 left-0 my-auto",
-                !(hovered === id || open === id) && "invisible",
-                open === id && "motion-safe:animate-bob",
-              )}
+            <RowHand
+              show={hovered === id || open === id}
+              bob={hovered === id && open !== id}
             />
             <span className="text-label">{label}</span>
           </button>
@@ -360,7 +360,7 @@ export const Config = () => {
               open={open === id && part !== undefined}
               onOpenChange={(next) => !next && stepBack()}
             >
-              <Popover.Anchor className="ml-11 flex flex-wrap items-center gap-x-11 gap-y-3 @min-[23rem]:gap-x-3">
+              <Popover.Anchor className="ml-7 flex flex-wrap items-center gap-x-7 gap-y-3 @min-[21rem]:gap-x-3">
                 {preview(id)}
               </Popover.Anchor>
 
