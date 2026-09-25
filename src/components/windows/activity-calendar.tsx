@@ -57,9 +57,9 @@ export const ActivityCalendar = ({
             <span
               key={day.date}
               title={`${day.date}: ${day.contributionCount} contributions`}
-              className="aspect-square rounded-[1px]"
+              className="pixel-cell aspect-square"
               style={{
-                background: `var(--github-contribution-${levelIndex[day.contributionLevel]})`,
+                backgroundColor: `var(--github-contribution-${levelIndex[day.contributionLevel]})`,
               }}
             />
           ))}

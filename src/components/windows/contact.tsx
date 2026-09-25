@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,6 +34,10 @@ const missingLine = (parts: string[]) =>
   }!`;
 
 type ContactForm = z.infer<typeof contactSchema>;
+type ContactAction =
+  | { type: "form" }
+  | { type: "redirect"; href: string }
+  | { type: "back" };
 
 // Joins a line's last two words with a non-breaking space so it never ends on a lone
 // word ("out?”" by itself). Same length, so typing progress lines up either way.
@@ -58,6 +62,7 @@ export const Contact = () => {
   const [mode, setMode] = useState<"menu" | "form" | "sent">("menu");
   const [line, setLine] = useState(lines.menu);
   const [shown, typingLine] = useTypewriter(line, undefined, mode);
+  const [pendingChoice, setPendingChoice] = useState<ContactAction>();
   const [pendingHref, setPendingHref] = useState<string>();
 
   const form = useForm<ContactForm>({
@@ -66,17 +71,18 @@ export const Contact = () => {
   });
 
   // Changing screens fades the window out and back in (all but its corner box).
-  const { fadeTo } = useWindowFade();
-  const go = (next: typeof mode) =>
-    fadeTo(() => {
-      setMode(next);
-      setLine(lines[next]);
-    });
-
-  const redirect = (href: string) => {
-    setPendingHref(href);
-    setLine(lines.redirect);
-  };
+  const { fading, fadeTo } = useWindowFade();
+  const go = useCallback(
+    (next: typeof mode) =>
+      fadeTo(
+        () => {
+          setMode(next);
+          setLine("");
+        },
+        () => setLine(lines[next]),
+      ),
+    [fadeTo],
+  );
 
   // Once "redirecting" finishes typing: open the link, then return to the default line.
   // Chrome and Firefox allow opening a tab this long after the click; if a browser
@@ -126,21 +132,64 @@ export const Contact = () => {
       ),
     );
 
+  const choose = (choice: ContactAction) => {
+    setPendingChoice(choice);
+    if (choice.type === "back") setLine("");
+  };
+
   const link = (label: string, href: string): Choice => ({
     label,
     href,
-    onSelect: () => redirect(href),
+    onSelect: () => choose({ type: "redirect", href }),
   });
+
+  const menuChoices: Choice[] = [
+    {
+      label: "Leave a message",
+      onSelect: () => choose({ type: "form" }),
+    },
+    link("GitHub", "https://github.com/dhanielbolosan"),
+    link("LinkedIn", "https://www.linkedin.com/in/dhaniel-bolosan/"),
+    link("Email", "mailto:dhanielb808@gmail.com"),
+  ];
+  const menuReady =
+    mode === "menu" &&
+    line === lines.menu &&
+    shown === line &&
+    !pendingChoice &&
+    !fading;
+  const [typedResponses] = useTypewriter(
+    menuReady ? menuChoices.map((item) => item.label).join("\n") : "",
+  );
+  // Menu exits erase choices then the question; Back erases the question before fading.
+  useEffect(() => {
+    if (!pendingChoice || typedResponses) return;
+    if (line && pendingChoice.type !== "back") {
+      const frame = requestAnimationFrame(() => setLine(""));
+      return () => cancelAnimationFrame(frame);
+    }
+    if (shown) return;
+    const frame = requestAnimationFrame(() => {
+      setPendingChoice(undefined);
+      if (pendingChoice.type === "form") go("form");
+      else if (pendingChoice.type === "back") go("menu");
+      else {
+        setPendingHref(pendingChoice.href);
+        setLine(lines.redirect);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pendingChoice, typedResponses, shown, line, go]);
 
   const formCommands: Choice[] = [
     { label: "Send", submit: "contact-form" },
-    { label: "Back", onSelect: () => go("menu") },
+    { label: "Back", onSelect: () => choose({ type: "back" }) },
   ];
   const commands: Choice[] | undefined =
     mode === "form"
       ? formCommands
       : mode === "sent"
-        ? [{ label: "Back", onSelect: () => go("menu") }]
+        ? [{ label: "Back", onSelect: () => choose({ type: "back" }) }]
         : undefined;
 
   // What each screen reserves room for. The redirect line gets its own, so once the
@@ -171,6 +220,7 @@ export const Contact = () => {
               <Choices
                 boxed
                 items={view}
+                ready={!!line && shown === line && !pendingChoice && !fading}
               />
             </>
           ) : (
@@ -281,15 +331,9 @@ export const Contact = () => {
         {mode === "menu" && (
           <div className="mt-2">
             <Choices
-              items={[
-                { label: "Leave a message", onSelect: () => go("form") },
-                link("GitHub", "https://github.com/dhanielbolosan"),
-                link(
-                  "LinkedIn",
-                  "https://www.linkedin.com/in/dhaniel-bolosan/",
-                ),
-                link("Email", "mailto:dhanielb808@gmail.com"),
-              ]}
+              items={menuChoices}
+              ready={menuReady}
+              typedChars={typedResponses.length}
             />
           </div>
         )}

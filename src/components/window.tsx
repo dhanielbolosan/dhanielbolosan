@@ -17,14 +17,21 @@ export const Window = ({
   children: ReactNode;
 }) => {
   const [fading, setFading] = useState(false);
-  const fadeTo = (change: () => void) => {
-    if (reducedMotion.matches) return change();
+  const fadeTo = (change: () => void, after?: () => void) => {
+    if (reducedMotion.matches) {
+      change();
+      after?.();
+      return;
+    }
     setFading(true);
     setTimeout(() => {
       change();
       // One frame later, so the corner box sees its new view while the window is
       // still hidden and swaps it without a fade of its own.
-      requestAnimationFrame(() => setFading(false));
+      requestAnimationFrame(() => {
+        setFading(false);
+        if (after) setTimeout(after, fadeMs);
+      });
     }, fadeMs);
   };
 

@@ -24,7 +24,7 @@ const textColors = [
     key: "highlight",
     label: "Highlight",
     cssVar: "--gold",
-    fallback: "#f4d35e",
+    fallback: "#e0c13b",
   },
   {
     key: "shadow",
@@ -64,6 +64,13 @@ const defaults = Object.fromEntries(
 const load = (): Colors => {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
+    // Replace former defaults without changing a visitor's custom highlight.
+    if (
+      ["[244,211,94]", "[254,254,90]", "[212,175,55]"].includes(
+        JSON.stringify(saved?.highlight),
+      )
+    )
+      saved.highlight = defaults.highlight;
     return Object.fromEntries(
       all.map((c) => [
         c.key,
@@ -325,7 +332,7 @@ export const Config = () => {
     <section className="flex flex-col gap-3">
       <WindowHeader
         title="Config"
-        help={pointed ? help[pointed] : "Select config to customize site"}
+        help={pointed ? help[pointed] : "Select a config to customize site"}
       />
       {/* Labels share one column so every preview lines up. */}
       <ul className="grid grid-cols-[auto_1fr] gap-y-2 font-heading">

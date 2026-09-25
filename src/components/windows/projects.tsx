@@ -53,7 +53,7 @@ const Thumbnail = ({
             src={src}
             alt=""
             className={cn(
-              "absolute inset-0 size-full object-cover transition-opacity duration-500",
+              "absolute inset-0 size-full object-cover transition-opacity duration-[450ms]",
               i === index ? "opacity-100" : "opacity-0",
             )}
           />

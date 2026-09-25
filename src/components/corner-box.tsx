@@ -6,10 +6,8 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@/lib/utils";
-import { useSwap } from "@/lib/use-swap";
+import { fadeMs, useSwap } from "@/lib/use-swap";
 import { useWindowFade } from "@/lib/window-fade";
-
-const resizeMs = 200;
 
 // An FF7 corner window whose content swaps: a title, or a command menu that takes the
 // title's place. On a swap the old content fades out, the box resizes to fit the new
@@ -58,13 +56,12 @@ export const CornerBox = <View,>({
     return () => observer.disconnect();
   }, []);
 
-  // After a swap, the new content stays hidden until the resize is done (plus a frame
-  // for the resize to start).
+  // After a swap, the new content stays hidden for the resize phase.
   const [settledId, setSettledId] = useState(swap.shownId);
   const settled = settledId === swap.shownId;
   useEffect(() => {
     if (settled) return;
-    const timer = setTimeout(() => setSettledId(swap.shownId), resizeMs + 30);
+    const timer = setTimeout(() => setSettledId(swap.shownId), fadeMs);
     return () => clearTimeout(timer);
   }, [settled, swap.shownId]);
 
@@ -73,7 +70,7 @@ export const CornerBox = <View,>({
       className={cn(
         "window-title box-content",
         animated &&
-          "motion-safe:transition-[width,height] motion-safe:duration-200",
+          "motion-safe:transition-[width,height] motion-safe:duration-150",
         className,
       )}
       // Content-sized until measured (the title utility's fixed width would otherwise

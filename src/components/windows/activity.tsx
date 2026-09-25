@@ -5,6 +5,7 @@ import { Choices } from "../choices";
 import { CornerBox } from "../corner-box";
 import { PixelHand } from "../pixel-hand";
 import { useWindowFade } from "@/lib/window-fade";
+import { fadeMs } from "@/lib/use-swap";
 import { Faded, WindowHeader } from "../window";
 import { Stats } from "../stats";
 import { ActivityCalendar } from "./activity-calendar";
@@ -113,8 +114,8 @@ const GitHub = () => {
             <span
               key={level}
               aria-hidden="true"
-              className="size-3 rounded-[2px]"
-              style={{ background: `var(--github-contribution-${level})` }}
+              className="pixel-cell size-4"
+              style={{ backgroundColor: `var(--github-contribution-${level})` }}
             />
           ))}
           More
@@ -147,7 +148,7 @@ export const Activity = () => {
     // Keyboard users land on the first option once the menu has faded in.
     const focus = setTimeout(
       () => header.current?.querySelector<HTMLElement>("a, button")?.focus(),
-      260,
+      fadeMs * 3,
     );
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -159,7 +160,7 @@ export const Activity = () => {
   }, [menu]);
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex grow flex-col gap-3">
       <WindowHeader
         ref={header}
         help={helpText}
@@ -210,10 +211,14 @@ export const Activity = () => {
         />
       </WindowHeader>
 
-      {/* Changing screens fades the window out and back in. Music and Games are empty
-          for now. */}
-      <Faded className="flex flex-col gap-3">
+      {/* Changing screens fades the window out and back in. */}
+      <Faded className="flex flex-1 flex-col gap-3">
         {screen === "GitHub" && <GitHub />}
+        {screen !== "GitHub" && (
+          <p className="flex min-h-64 flex-1 items-center justify-center text-center font-heading text-base">
+            Currently WIP :)
+          </p>
+        )}
       </Faded>
     </section>
   );

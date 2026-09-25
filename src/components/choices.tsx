@@ -14,17 +14,26 @@ export type Choice = {
 // Rows use the dialogue's own line spacing, so choices read as its continuation.
 // `boxed` is for choices inside a command window (a CornerBox): the hand points in from
 // outside the box's left edge instead of taking room inside it. `onPoint` hears which
-// option the hand moves to (for help text).
+// option the hand moves to (for help text). `typedChars` reveals labels in order;
+// the hand and controls wait until every label is complete.
 export const Choices = ({
   items,
   boxed,
   onPoint,
+  ready = true,
+  typedChars,
 }: {
   items: Choice[];
   boxed?: boolean;
   onPoint?: (index: number) => void;
+  ready?: boolean;
+  typedChars?: number;
 }) => {
   const [active, setActive] = useState(0);
+  const available =
+    ready &&
+    (typedChars === undefined ||
+      typedChars >= items.map((item) => item.label).join("\n").length);
 
   const move = (event: KeyboardEvent<HTMLUListElement>) => {
     const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
@@ -47,8 +56,16 @@ export const Choices = ({
     <ul
       className="flex flex-col"
       onKeyDown={move}
+      inert={!available}
     >
       {items.map((item, i) => {
+        const start = items
+          .slice(0, i)
+          .reduce((count, prior) => count + prior.label.length + 1, 0);
+        const visible =
+          typedChars === undefined
+            ? item.label.length
+            : Math.max(0, Math.min(item.label.length, typedChars - start));
         const props = {
           onMouseEnter: () => {
             setActive(i);
@@ -63,16 +80,20 @@ export const Choices = ({
         const body = (
           <>
             {boxed ? (
+              available &&
               i === active && (
                 <PixelHand className="absolute right-full mr-2 motion-safe:animate-bob" />
               )
             ) : (
               <RowHand
-                show={i === active}
+                show={available && i === active}
                 bob
               />
             )}
-            {item.label}
+            {item.label.slice(0, visible)}
+            {visible < item.label.length && (
+              <span className="invisible">{item.label.slice(visible)}</span>
+            )}
           </>
         );
         return (

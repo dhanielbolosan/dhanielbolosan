@@ -18,7 +18,7 @@ export const projects: Project[] = [
     name: "Kumu",
     images: [],
     description:
-      "Human-in-the-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions and music.",
+      "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions and music.",
     stack: [
       { name: "Claude Code", type: "tool" },
       { name: "HyperFrames", type: "library" },
@@ -36,10 +36,10 @@ export const projects: Project[] = [
     },
   },
   {
-    name: "Geospatial Mobile Dashboard",
+    name: "SENTINEL Mobile Application",
     images: [],
     description:
-      "Capacitor mobile app for SENTINEL, pairing a Cesium 3D globe of live wildfire, seismic, weather, and aviation feeds with Starlink orbits and a FastAPI backend.",
+      "Geospatial intelligence dashboard, using Cesium 3D globe of live wildfire, seismic, weather, and aviation feeds with Starlink orbits and a FastAPI backend.",
     stack: [
       { name: "Capacitor", type: "framework" },
       { name: "React", type: "framework" },

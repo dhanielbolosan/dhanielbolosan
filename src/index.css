@@ -21,8 +21,8 @@
   --frame: #e9e6f0;
   /* FF7-style label teal; values stay white. */
   --label: #6fd6e8;
-  /* FF7 menu gold, for links. */
-  --gold: #f4d35e;
+  /* Command Materia yellow, warmed and softened in OKLCH for menu highlights. */
+  --gold: #e0c13b;
   /* Window corner colors (FF7 Config > Window color); the Config section overrides them. */
   --window-tl: #4a3f6b;
   --window-tr: #2f284a;
@@ -34,31 +34,27 @@
   --frame-bevel:
     inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
     inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
-  /* Contribution levels, built with the dataviz method: a sequential ramp in one hue
-     (FF7 gold, warmed slightly toward amber at the dim end so it never reads olive),
-     stepped evenly in OKLCH lightness from dim to bright for the dark tiles. Level 0
-     is "no contributions", not a ramp step: a quiet neutral that still shows. */
+  /* Contribution levels step evenly in lightness toward the highlight. Level 0 is
+     "no contributions": a quiet neutral that still shows. */
   --github-contribution-0: #47474e;
-  --github-contribution-1: #7f5c1d;
-  --github-contribution-2: #ad852b;
-  --github-contribution-3: #d4b045;
-  --github-contribution-4: #fddc67;
+  --github-contribution-1: #765f2c;
+  --github-contribution-2: #9b7d2c;
+  --github-contribution-3: #bd9e33;
+  --github-contribution-4: var(--gold);
 }
 
-/* Config > Highlight color sets --gold; the ramp follows it. Level 4 is that color, and
-   each dimmer level keeps the default ramp's proportions in OKLCH: lightness 88% / 73% /
-   57% of it, chroma 93% / 82% / 65%, hue turned 3 / 10 / 15 degrees (warmer for gold, so
-   the dim end never reads olive). Browsers without relative colors keep the hex ramp. */
+/* Config > Highlight color sets --gold; the ramp follows it with evenly spaced OKLCH
+   lightness and lower chroma at dim levels. Browsers without relative colors use hex. */
 @supports (color: oklch(from red l c h)) {
   :root {
     --github-contribution-1: oklch(
-      from var(--gold) calc(l * 0.57) calc(c * 0.65) calc(h - 15)
+      from var(--gold) calc(l * 0.61) calc(c * 0.5) calc(h - 10)
     );
     --github-contribution-2: oklch(
-      from var(--gold) calc(l * 0.73) calc(c * 0.82) calc(h - 10)
+      from var(--gold) calc(l * 0.74) calc(c * 0.7) calc(h - 7)
     );
     --github-contribution-3: oklch(
-      from var(--gold) calc(l * 0.88) calc(c * 0.93) calc(h - 3)
+      from var(--gold) calc(l * 0.87) calc(c * 0.85) calc(h - 3)
     );
     --github-contribution-4: var(--gold);
   }
@@ -162,6 +158,32 @@
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .menu-enter {
+    animation: menu-enter 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .menu-enter[data-enter="left"] {
+    --entry-x: -110vw;
+  }
+  .menu-enter[data-enter="right"] {
+    --entry-x: 110vw;
+  }
+  .menu-enter[data-enter="top"] {
+    --entry-y: -110vh;
+  }
+  .menu-enter[data-enter="bottom"] {
+    --entry-y: 110vh;
+  }
+
+  @keyframes menu-enter {
+    from {
+      transform: translate(var(--entry-x, 0), var(--entry-y, 0));
+      opacity: 0;
+    }
+  }
+}
+
 /* FF7 four-corner window fill: the bottom edge's gradient, with the top edge's gradient
    over it fading out downward, so each corner shows its own color. The top layer is a
    pseudo-element (z-index -1 in its own stacking context, so under the content) inset
@@ -186,6 +208,13 @@
 @utility bevel {
   border-radius: 4px;
   box-shadow: var(--frame-bevel);
+}
+
+/* Square 8 x 8 tiles with the same pixel grid as the materia sprites. */
+@utility pixel-cell {
+  background-image: url("./assets/contribution-sqaure.svg");
+  background-size: 100% 100%;
+  image-rendering: pixelated;
 }
 
 /* A teal heading over a group of items (History's Experience, Skills' Languages). */

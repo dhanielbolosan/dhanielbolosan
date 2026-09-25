@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { clock, shortDate } from "@/lib/dates";
 import { useLastSaved } from "@/lib/github";
 import { avatarUrl, name, timeZone } from "@/lib/site";
-import { useTypewriter } from "@/lib/use-typewriter";
 import { Bar } from "../bar";
 import { Stats } from "../stats";
 
@@ -56,7 +55,6 @@ export const Status = () => {
   const now = useNow();
   const { level, exp, daysLeft, daysLived } = getLevel(now);
   const saved = useLastSaved();
-  const [typedName] = useTypewriter(name, 40);
 
   return (
     <section className="flex grow flex-col justify-between gap-3">
@@ -73,14 +71,8 @@ export const Status = () => {
             flows around it, and anything past its bottom edge gets the full width. */}
         <div className="flow-root min-w-0 grow space-y-1.5 font-heading">
           <h2 className="window-title-float">Status</h2>
-          {/* The untyped rest stays in place invisibly, so the name keeps its final
-              width and wrapping while it types. */}
           <h1 className="text-2xl leading-tight font-semibold tracking-wide">
-            <span aria-hidden="true">
-              {typedName}
-              <span className="invisible">{name.slice(typedName.length)}</span>
-            </span>
-            <span className="sr-only">{name}</span>
+            {name}
           </h1>
           <div className="flex items-baseline justify-between gap-2">
             <span className="flex items-baseline gap-2">
@@ -114,7 +106,7 @@ export const Status = () => {
         valueClassName="text-right font-semibold"
       />
 
-      <p className="text-base leading-relaxed">
+      <p className="text-lg leading-relaxed">
         Aloha! I'm a full-stack software engineer based in Maui, Hawaiʻi with a
         passion for building impactful applications and tools utilizing modern
         technologies across AI, Cloud, and Web3.

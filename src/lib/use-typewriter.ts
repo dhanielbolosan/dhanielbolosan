@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+export const TypewriterReady = createContext(true);
 
-// Types toward `target` one character every `speed` ms, first erasing whatever doesn't match,
-// so a new line reverse-types the old one away before typing itself. `speed` is ms per
-// character. Returns the typed text and the line it's part of (the old line while
-// erasing, `target` once typing), so callers can lay the whole line out and keep its
+// Types toward `target` at `speed` ms per character, first erasing unmatched text
+// 25% faster. Returns the typed text and its line (the old line while erasing, `target`
+// once typing), so callers can lay the whole line out and keep its
 // wrapping steady in both directions. A new `scene` clears the old line at once instead
 // of erasing it (a screen change: the window already faded it out).
-export const useTypewriter = (target: string, speed = 8, scene = "") => {
+export const useTypewriter = (target: string, speed = 10, scene = "") => {
+  const ready = useContext(TypewriterReady);
   const [state, setState] = useState({ text: "", line: target, scene });
+  const currentState = useRef(state);
 
   useEffect(() => {
+    if (!ready) return;
     // Done returns the same object, so React skips the re-render.
     const step = (current: typeof state) =>
       current.scene !== scene
@@ -26,23 +29,33 @@ export const useTypewriter = (target: string, speed = 8, scene = "") => {
                 scene,
               };
 
-    // Driven by animation frames rather than a timer faster than the display: each
-    // frame applies however many characters are due, so the pace stays even.
+    // Each frame applies the characters due at the current typing or erasing pace.
     let last = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
-      const due = Math.floor((now - last) / speed);
-      if (due > 0) {
-        last += due * speed;
-        setState((current) => {
-          let next = current;
-          for (let i = 0; i < due; i++) next = step(next);
-          return next;
-        });
+      let next = currentState.current;
+      while (true) {
+        const interval =
+          next.scene === scene && !target.startsWith(next.text)
+            ? speed / 1.25
+            : speed;
+        if (now - last < interval) break;
+        const stepped = step(next);
+        if (stepped === next) break;
+        last += interval;
+        next = stepped;
+      }
+      if (next !== currentState.current) {
+        currentState.current = next;
+        setState(next);
       }
       frame = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(frame);
-  }, [target, speed, scene]);
+  }, [target, speed, scene, ready]);
 
-  return reducedMotion.matches ? [target, target] : [state.text, state.line];
+  return reducedMotion.matches
+    ? [target, target]
+    : state.scene !== scene
+      ? ["", target]
+      : [state.text, state.line];
 };
