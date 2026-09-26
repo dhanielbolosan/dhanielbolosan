@@ -27,7 +27,7 @@ import {
   siSvelte,
   siTailwindcss,
   siTypescript,
-  siVercel,
+  siVite,
   type SimpleIcon,
 } from "simple-icons";
 
@@ -69,7 +69,7 @@ const logos: Record<string, Icon> = {
   "Claude Code": siClaude,
   Docker: siDocker,
   "Google Cloud": siGooglecloud,
-  Vercel: siVercel,
+  Vite: siVite,
   Cloudflare: siCloudflare,
   Ollama: siOllama,
   PostgreSQL: siPostgresql,

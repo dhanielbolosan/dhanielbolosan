@@ -42,7 +42,7 @@ export const projects: Project[] = [
     },
   },
   {
-    name: "SENTINEL Mobile Application",
+    name: "SENTINEL",
     thumbnail: "/projects/sentinel/thumbnail.png",
     images: [
       "/projects/sentinel/sentinel1.png",
@@ -50,7 +50,7 @@ export const projects: Project[] = [
       "/projects/sentinel/sentinel3.png",
     ],
     description:
-      "Geospatial intelligence dashboard, using Cesium 3D globe of live wildfire, seismic, weather, and aviation feeds with Starlink orbits and a FastAPI backend.",
+      "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch, 5G mesh network, and drone swarm simulations.",
     stack: [
       { name: "Capacitor", type: "framework" },
       { name: "React", type: "framework" },
@@ -94,7 +94,7 @@ export const projects: Project[] = [
       "/projects/legislative-cloud-platform/uhgro2.png",
     ],
     description:
-      "Backend service powering AI bill summarization and automated notifications for university officials, helping UH staff track legislation that affects the university.",
+      "Backend service powering AI bill summarization and automated notifications for UH staff and officials, helping track legislation that affects the university.",
     stack: [
       { name: "FastAPI", type: "framework" },
       { name: "Google Cloud", type: "tool" },
@@ -119,7 +119,7 @@ export const projects: Project[] = [
       "/projects/venom-rag/venomrag2.png",
     ],
     description:
-      "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines through vector manipulation and PDF font poisoning.",
+      "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines through vector manipulation and PDF text poisoning.",
     stack: [
       { name: "Python", type: "language" },
       { name: "Jupyter Notebook", type: "tool" },
@@ -141,7 +141,7 @@ export const projects: Project[] = [
       "/projects/pathfinity/pathfinity3.png",
     ],
     description:
-      "Full-stack semantic search interface enabling students to query university course data via natural language, with GitHub and Google sign-in.",
+      "Full-stack platform for exploring university courses with natural language search, text-to-speech accessibility, and AI-suggested career paths.",
     stack: [
       { name: "Next.js", type: "framework" },
       { name: "OpenAI", type: "tool" },

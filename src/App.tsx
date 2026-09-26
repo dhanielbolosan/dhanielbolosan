@@ -21,8 +21,8 @@ const entryDirections = {
   History: "top",
   Projects: "left",
   Skills: "bottom",
-  Activity: "top",
-  Config: "right",
+  Activity: "right",
+  Config: "bottom",
 } as const;
 
 // These windows pass in front of the default layer while entering.
@@ -171,8 +171,8 @@ function App() {
                     column.split && "md:basis-0 md:grow",
                     entering && "menu-enter",
                     entering &&
-                      raisedEntryWindows.has(Section) &&
-                      "relative z-10",
+                    raisedEntryWindows.has(Section) &&
+                    "relative z-10",
                   )}
                   data-enter={direction}
                   style={{ animationDelay: `${i * 45 + j * 30}ms` }}
