@@ -13,27 +13,25 @@ const levelIndex: Record<ContributionLevel, number> = {
   FOURTH_QUARTILE: 4,
 };
 
-// Group the calendar's days into its last 12 calendar months, oldest first.
 const toMonths = (calendar: ContributionCalendarData) => {
   const months = new Map<string, ContributionDay[]>();
+
   for (const day of calendar.weeks.flatMap((week) => week.contributionDays)) {
     const key = day.date.slice(0, 7);
     months.set(key, [...(months.get(key) ?? []), day]);
   }
+
   return [...months].slice(-12).map(([key, days]) => ({
     key,
     name: localDate(`${key}-01`).toLocaleDateString("en-US", {
       month: "short",
     }),
-    // Blank cells before day 1 so it lands on its weekday column (Sun first).
     offset: days[0].weekday,
     total: days.reduce((sum, day) => sum + day.contributionCount, 0),
     days,
   }));
 };
 
-// A year of contributions as a wall calendar: 12 month tiles in a 4 x 3 grid,
-// each a small Sun-Sat day grid colored by contribution level.
 export const ActivityCalendar = ({
   calendar,
 }: {

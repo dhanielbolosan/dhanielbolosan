@@ -1,6 +1,5 @@
 import { orbs } from "@/lib/materia";
 
-// Each skill category is a materia type, wearing that type's orb.
 export const groups = [
   {
     label: "Languages",

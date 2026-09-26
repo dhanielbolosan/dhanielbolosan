@@ -1,6 +1,5 @@
 import type { MateriaType } from "@/lib/materia";
 
-// Projects window entries, newest first.
 export type Project = {
   name: string;
   images: string[];
@@ -9,7 +8,6 @@ export type Project = {
   stack: { name: string; type: MateriaType }[];
   type?: string;
   date?: string;
-  /** 0-100; a full bar flashes like FF7's Limit bar. */
   progress?: number;
   link?: { label: string; href: string };
 };

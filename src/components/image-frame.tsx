@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-// Shared bevel and square image area for portraits and project previews.
 export const ImageFrame = ({
   children,
   className,

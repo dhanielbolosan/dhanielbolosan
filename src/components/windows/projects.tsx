@@ -14,7 +14,6 @@ import { PixelHand } from "../pixel-hand";
 import { Stats } from "../stats";
 import { projects, type Project } from "./projects.data";
 
-// Cycles a project's screenshots while `active`; resets to the first otherwise.
 const useSlideshow = (count: number, active: boolean) => {
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -28,7 +27,6 @@ const useSlideshow = (count: number, active: boolean) => {
   return index;
 };
 
-// The grid uses a dedicated square thumbnail; expanded views cycle through screenshots.
 const Thumbnail = ({
   project,
   active,
@@ -66,28 +64,16 @@ const Thumbnail = ({
   );
 };
 
-// FF7 party-select style: square project thumbnails fill the top half, and the info
-// window below fills the bottom half. Hovering a thumbnail shows the hand and previews
-// it in the info window. Clicking one enlarges it to fill the grid area, auto-cycling
-// its screenshots; clicking it again (or Escape) returns to the grid.
 export const Projects = () => {
   const [hovered, setHovered] = useState<number>();
   const [selected, setSelected] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  // Enlarging or closing a project is a screen change: the window fades out and back in.
   const { fading, fadeTo } = useWindowFade();
   const open = (next: boolean) => fadeTo(() => setExpanded(next));
   const current = projects[selected];
-  // The info window shows the open project while enlarged; otherwise the one under the
-  // hand, staying on the last one pointed at (the first project to start).
   const [last, setLast] = useState(0);
   const info = projects[expanded ? selected : (hovered ?? last)];
 
-  // The hand sits 8px left of the pointed thumbnail like every other hand, but there's
-  // no room for it between thumbnails (or before the first column), so it's drawn on
-  // top of the page instead: a fixed layer placed from the thumbnail's position, which
-  // the column's scroll edge can't clip. Scrolling or resizing moves it along. On touch
-  // screens, with nothing pointed at, it rests on the first thumbnail, waiting for a tap.
   const canHover = useMedia(canHoverQuery);
   const resting = !canHover && hovered === undefined && !expanded;
   const pointed = useRef<HTMLElement>(null);
@@ -102,14 +88,14 @@ export const Projects = () => {
   useEffect(() => {
     const target =
       hovered !== undefined ? pointed.current : resting ? first.current : null;
+
     if (!target) return;
-    // A thumbnail that isn't laid out (its tab is hidden) has an empty box: no hand.
+
     const follow = () => {
       const rect = target.getBoundingClientRect();
       setHandAt(rect.width ? rect : undefined);
     };
-    // The observer also fires when a hidden tab's grid appears, which no scroll or
-    // resize event reports, and once on start (placing the resting hand).
+
     const observer = new ResizeObserver(follow);
     observer.observe(target);
     window.addEventListener("scroll", follow, true);
@@ -126,7 +112,6 @@ export const Projects = () => {
       className="flex grow flex-col"
       onKeyDown={(event) => event.key === "Escape" && expanded && open(false)}
     >
-      {/* Title box, which the Back command box replaces while a project is enlarged. */}
       <WindowHeader
         help={
           expanded
@@ -213,11 +198,8 @@ export const Projects = () => {
           <span
             aria-hidden="true"
             className="pointer-events-none fixed z-50 flex items-center"
-            // 20px hand + 8px gap to the thumbnail's left edge.
             style={{
               top: handAt.top,
-              // Phones: the first column is closer than that to the screen's edge, so
-              // the hand stops 4px inside it rather than going off screen.
               left: Math.max(4, handAt.left - 28),
               height: handAt.height,
             }}
@@ -227,15 +209,9 @@ export const Projects = () => {
           document.body,
         )}
 
-      {/* Bottom half: info window flush with the frame's sides and bottom. It fills the
-          leftover space but never shrinks below its content, so on short screens the
-          window grows and the column scrolls instead of cutting it off. */}
       <Faded className="-mx-5 -mb-5 flex flex-1 flex-col">
         <div className="window flex flex-1 flex-col gap-1.5 px-5 py-3.5">
           <h3 className="font-heading text-base font-semibold">{info.name}</h3>
-
-          {/* Status-card style stats, two pairs per row to fit the window. The Link row
-            only appears when the project has one. */}
           <Stats
             columns={4}
             pairs={[
@@ -253,25 +229,24 @@ export const Projects = () => {
               ],
               ...(info.link?.href
                 ? ([
-                    [
-                      "Link",
-                      <a
-                        href={info.link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-gold underline underline-offset-2 hover:text-foreground"
-                      >
-                        {info.link.label}
-                      </a>,
-                    ],
-                  ] as const)
+                  [
+                    "Link",
+                    <a
+                      href={info.link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-gold underline underline-offset-2 hover:text-foreground"
+                    >
+                      {info.link.label}
+                    </a>,
+                  ],
+                ] as const)
                 : []),
             ]}
           />
 
           <p className="text-sm leading-relaxed">{info.description}</p>
 
-          {/* Stack as materia, right under the description: each tech wears its type's orb. */}
           <ul className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
             {info.stack.map(({ name: tech, type }) => (
               <IconItem

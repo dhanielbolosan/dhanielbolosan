@@ -1,42 +1,41 @@
 import { useEffect, useState } from "react";
-import { Tabs } from "radix-ui";
-import { Status } from "./components/windows/status";
-import { Activity } from "./components/windows/activity";
-import { History } from "./components/windows/history";
-import { Config } from "./components/windows/config";
-import { Projects } from "./components/windows/projects";
-import { Skills } from "./components/windows/skills";
-import { Contact } from "./components/windows/contact";
-import { PixelHand } from "./components/pixel-hand";
-import { Window } from "./components/window";
 import { useMedia } from "./lib/use-media";
 import { TypewriterReady } from "./lib/use-typewriter";
+import { Tabs } from "radix-ui";
+import { Window } from "./components/window";
+import { PixelHand } from "./components/pixel-hand";
+import { Status } from "./components/windows/status";
+import { Contact } from "./components/windows/contact";
+import { History } from "./components/windows/history";
+import { Projects } from "./components/windows/projects";
+import { Skills } from "./components/windows/skills";
+import { Activity } from "./components/windows/activity";
+import { Config } from "./components/windows/config";
 import { cn } from "./lib/utils";
 
-// Change these to "left", "right", "top", or "bottom" to set each entrance.
 const entryDirections = {
-  Navbar: "bottom",
+  Navbar: "top",
   Status: "left",
   Contact: "right",
-  History: "top",
+  History: "bottom",
   Projects: "left",
   Skills: "bottom",
-  Activity: "right",
-  Config: "bottom",
+  Activity: "top",
+  Config: "right",
 } as const;
 
-// These windows pass in front of the default layer while entering.
 const raisedEntryWindows = new Set([Contact, Projects]);
 
-// title: omitted when the section floats its own title so content can wrap around it.
-// split: from md up, the column's windows share its height equally when both fit;
-// otherwise each grows to its content and the column scrolls.
 const columns = [
   {
     label: "Status",
     split: true,
     windows: [
-      { title: undefined, Section: Status, direction: entryDirections.Status },
+      {
+        title: undefined,
+        Section: Status,
+        direction: entryDirections.Status
+      },
       {
         title: undefined,
         Section: Contact,
@@ -63,7 +62,11 @@ const columns = [
         Section: Projects,
         direction: entryDirections.Projects,
       },
-      { title: undefined, Section: Skills, direction: entryDirections.Skills },
+      {
+        title: undefined,
+        Section: Skills,
+        direction: entryDirections.Skills
+      },
     ],
   },
   {
@@ -75,32 +78,37 @@ const columns = [
         Section: Activity,
         direction: entryDirections.Activity,
       },
-      { title: undefined, Section: Config, direction: entryDirections.Config },
+      {
+        title: undefined,
+        Section: Config,
+        direction: entryDirections.Config
+      },
     ],
   },
 ];
 
 function App() {
-  // Tailwind's md breakpoint, where Status is pinned left and the tabs pick the right column.
   const wide = useMedia("(min-width: 48rem)");
   const [active, setActive] = useState(0);
   const [entering, setEntering] = useState(
     () => window.matchMedia("(prefers-reduced-motion: no-preference)").matches,
   );
+
+  // Setting a timeout for the animation to finish
   useEffect(() => {
     if (!entering) return;
-    // Wait for the last window visible at this breakpoint, plus a short buffer.
+
     const lastStart = window.matchMedia("(min-width: 80rem)").matches
       ? 165
       : window.matchMedia("(min-width: 48rem)").matches
         ? 45
         : 30;
+
     const timer = setTimeout(() => setEntering(false), 450 + lastStart + 40);
     return () => clearTimeout(timer);
   }, [entering]);
-  // The nav hand only shows while a tab is hovered or focused; text color marks the active tab.
+
   const [pointed, setPointed] = useState<number>();
-  // About is always visible on two columns, so the right column falls back to History.
   const right = active === 0 ? 1 : active;
   const selected = wide ? right : active;
 
@@ -135,11 +143,6 @@ function App() {
                   i === 0 && "md:hidden",
                 )}
               >
-                {/* Each tab reserves its hand's space plus the 8px gap (28px), like the
-                  menus. That space sits left of every label, so the row shifts left by
-                  half of it (the translate on the list) to center the labels themselves.
-                  Phone labels are 12px and tabs 8px apart, so all four fit with every
-                  hand clear of the label before it and inside the frame. */}
                 {i === pointed && (
                   <span className="absolute inset-y-0 left-0 flex items-center">
                     <PixelHand className="motion-safe:animate-bob" />
@@ -163,7 +166,6 @@ function App() {
               )}
             >
               {column.windows.map(({ title, Section, direction }, j) => (
-                // The last window grows so every column reaches the bottom of the screen.
                 <div
                   key={j}
                   className={cn(
@@ -179,11 +181,6 @@ function App() {
                 >
                   <Window
                     title={title}
-                    // Split columns scroll independently, so their windows can't share a
-                    // row height. A shared minimum for each split column's top window keeps
-                    // the dividing lines level on shorter tablet screens. It sits on the
-                    // window, not the wrapper, so the wrapper still grows to fit taller
-                    // content instead of clipping it.
                     className={cn(
                       column.split && j === 0 && "md:min-h-128 xl:min-h-0",
                     )}

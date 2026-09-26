@@ -1,41 +1,30 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
-/* Latin subsets only: the full import declares every Japanese subset (~300 KB of CSS). */
 @import "@fontsource/m-plus-rounded-1c/latin-500.css";
 @import "@fontsource/m-plus-rounded-1c/latin-700.css";
 @import "@fontsource/m-plus-rounded-1c/latin-ext-500.css";
 @import "@fontsource/m-plus-rounded-1c/latin-ext-700.css";
 
 :root {
-  /* Dark only. Palette is "Dusk": FF-style windows in desaturated violet. */
   color-scheme: dark;
   --background: #0c0a14;
   --foreground: #f3f1f7;
-  /* Gray for things that signal state: inactive nav tabs, placeholders. */
   --muted-foreground: #aaa3c2;
   --border: rgb(233 230 240 / 25%);
-  /* Form field fill. */
   --input: rgb(233 230 240 / 30%);
   --ring: #e9e6f0;
   --radius: 0.4375rem;
   --frame: #e9e6f0;
-  /* FF7-style label teal; values stay white. */
   --label: #6fd6e8;
-  /* Command Materia yellow, warmed and softened in OKLCH for menu highlights. */
   --gold: #e0c13b;
-  /* Window corner colors (FF7 Config > Window color); the Config section overrides them. */
   --window-tl: #4a3f6b;
   --window-tr: #2f284a;
   --window-bl: #2f284a;
   --window-br: #15112a;
   --text-shadow: #15121a;
-  /* FF7 window frame, sampled from an FF7 status screen: a 5px gray bevel (dark edge,
-     light middle) plus a dark inner line. Stacked inset rings, smallest first. */
   --frame-bevel:
     inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
     inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
-  /* Contribution levels step evenly in lightness toward the highlight. Level 0 is
-     "no contributions": a quiet neutral that still shows. */
   --github-contribution-0: #47474e;
   --github-contribution-1: #765f2c;
   --github-contribution-2: #9b7d2c;
@@ -43,19 +32,11 @@
   --github-contribution-4: var(--gold);
 }
 
-/* Config > Highlight color sets --gold; the ramp follows it with evenly spaced OKLCH
-   lightness and lower chroma at dim levels. Browsers without relative colors use hex. */
 @supports (color: oklch(from red l c h)) {
   :root {
-    --github-contribution-1: oklch(
-      from var(--gold) calc(l * 0.61) calc(c * 0.5) calc(h - 10)
-    );
-    --github-contribution-2: oklch(
-      from var(--gold) calc(l * 0.74) calc(c * 0.7) calc(h - 7)
-    );
-    --github-contribution-3: oklch(
-      from var(--gold) calc(l * 0.87) calc(c * 0.85) calc(h - 3)
-    );
+    --github-contribution-1: oklch(from var(--gold) calc(l * 0.61) calc(c * 0.5) calc(h - 10));
+    --github-contribution-2: oklch(from var(--gold) calc(l * 0.74) calc(c * 0.7) calc(h - 7));
+    --github-contribution-3: oklch(from var(--gold) calc(l * 0.87) calc(c * 0.85) calc(h - 3));
     --github-contribution-4: var(--gold);
   }
 }
@@ -73,62 +54,52 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --animate-bob: bob 0.9s steps(1) infinite;
-
-  /* FF7's full Limit bar, sampled from gameplay: it cycles five pastel colors (peach,
-     yellow-green, cyan, blue, lavender) about every 0.33s. Same colors and shine here,
-     looped every 0.4s. */
   --animate-limit: limit 0.4s steps(1) infinite;
 
   @keyframes limit {
     0% {
-      background-image: linear-gradient(
-        to bottom,
-        #a88c78 0%,
-        #d8c0a8 30%,
-        #fdfbf5 52%,
-        #d8c0a8 70%,
-        #a88c78 100%
-      );
+      background-image: linear-gradient(to bottom,
+          #a88c78 0%,
+          #d8c0a8 30%,
+          #fdfbf5 52%,
+          #d8c0a8 70%,
+          #a88c78 100%);
     }
+
     20% {
-      background-image: linear-gradient(
-        to bottom,
-        #a0a070 0%,
-        #d8d8a8 30%,
-        #fdfbf5 52%,
-        #d8d8a8 70%,
-        #a0a070 100%
-      );
+      background-image: linear-gradient(to bottom,
+          #a0a070 0%,
+          #d8d8a8 30%,
+          #fdfbf5 52%,
+          #d8d8a8 70%,
+          #a0a070 100%);
     }
+
     40% {
-      background-image: linear-gradient(
-        to bottom,
-        #6f9fb8 0%,
-        #a8d8f0 30%,
-        #fdfbf5 52%,
-        #a8d8f0 70%,
-        #6f9fb8 100%
-      );
+      background-image: linear-gradient(to bottom,
+          #6f9fb8 0%,
+          #a8d8f0 30%,
+          #fdfbf5 52%,
+          #a8d8f0 70%,
+          #6f9fb8 100%);
     }
+
     60% {
-      background-image: linear-gradient(
-        to bottom,
-        #7088a4 0%,
-        #a8c0d8 30%,
-        #fdfbf5 52%,
-        #a8c0d8 70%,
-        #7088a4 100%
-      );
+      background-image: linear-gradient(to bottom,
+          #7088a4 0%,
+          #a8c0d8 30%,
+          #fdfbf5 52%,
+          #a8c0d8 70%,
+          #7088a4 100%);
     }
+
     80% {
-      background-image: linear-gradient(
-        to bottom,
-        #8888a8 0%,
-        #c0c0d8 30%,
-        #fdfbf5 52%,
-        #c0c0d8 70%,
-        #8888a8 100%
-      );
+      background-image: linear-gradient(to bottom,
+          #8888a8 0%,
+          #c0c0d8 30%,
+          #fdfbf5 52%,
+          #c0c0d8 70%,
+          #8888a8 100%);
     }
   }
 
@@ -152,7 +123,6 @@
     @apply font-sans;
   }
 
-  /* Browsers default buttons to text-shadow: none; keep the window's hard shadow. */
   button {
     text-shadow: inherit;
   }
@@ -166,12 +136,15 @@
   .menu-enter[data-enter="left"] {
     --entry-x: -110vw;
   }
+
   .menu-enter[data-enter="right"] {
     --entry-x: 110vw;
   }
+
   .menu-enter[data-enter="top"] {
     --entry-y: -110vh;
   }
+
   .menu-enter[data-enter="bottom"] {
     --entry-y: 110vh;
   }
@@ -184,14 +157,11 @@
   }
 }
 
-/* FF7 four-corner window fill: the bottom edge's gradient, with the top edge's gradient
-   over it fading out downward, so each corner shows its own color. The top layer is a
-   pseudo-element (z-index -1 in its own stacking context, so under the content) inset
-   past the 6px frame bevel, which it would otherwise paint over. */
 @utility window-bg {
   position: relative;
   isolation: isolate;
   background: linear-gradient(to right, var(--window-bl), var(--window-br));
+
   &::before {
     content: "";
     position: absolute;
@@ -204,20 +174,17 @@
   }
 }
 
-/* The windows' beveled frame on a small box: swatches, the portrait, thumbnails. */
 @utility bevel {
   border-radius: 4px;
   box-shadow: var(--frame-bevel);
 }
 
-/* Square 8 x 8 tiles with the same pixel grid as the materia sprites. */
 @utility pixel-cell {
   background-image: url("./assets/contribution-sqaure.svg");
   background-size: 100% 100%;
   image-rendering: pixelated;
 }
 
-/* A teal heading over a group of items (History's Experience, Skills' Languages). */
 @utility group-heading {
   margin-bottom: 0.5rem;
   font-family: var(--font-heading);
@@ -226,7 +193,6 @@
   color: var(--label);
 }
 
-/* FF-style menu window: corner gradient, bright frame, dark inner line, hard text shadow. */
 @utility window {
   @apply window-bg;
   border-radius: var(--radius);
@@ -236,11 +202,6 @@
   text-shadow: 2px 2px 0 var(--text-shadow);
 }
 
-/* FF7-style title box: its own small window in the parent's top-right corner,
-   sharing the parent's frame. In flow, so content starts below it.
-   Assumes the parent window is a flex column with px-5 and no top padding. */
-/* Every title box is the same width with its text left-aligned, like FF7's menu
-   headers; 7rem fits the longest title ("Projects"). */
 @utility window-title {
   align-self: flex-end;
   margin-right: -1.25rem;
@@ -258,8 +219,6 @@
   color: var(--foreground);
 }
 
-/* A title box (or CornerBox) placed in a WindowHeader's top-right corner, over the help
-   bar's right end. */
 @utility window-corner {
   position: absolute;
   top: 0;
@@ -268,8 +227,6 @@
   margin-right: 0 !important;
 }
 
-/* A title box floated into the window's top-right corner, so the window's first
-   lines of content wrap beside it (Status, History, Skills). */
 @utility window-title-float {
   @apply window-title float-right -mt-5 mb-1 ml-3;
 }
@@ -279,7 +236,6 @@
   scrollbar-color: var(--frame) transparent;
 }
 
-/* FF7 Config slider: a flat dark track in a light frame with a gray block thumb. */
 .ff7-slider {
   appearance: none;
   width: 100%;
@@ -290,6 +246,7 @@
   box-shadow: 0 0 0 1px #15121a;
   cursor: pointer;
 }
+
 .ff7-slider::-webkit-slider-thumb {
   appearance: none;
   width: 0.75rem;
@@ -298,6 +255,7 @@
   border: 1px solid #15121a;
   border-radius: 1px;
 }
+
 .ff7-slider::-moz-range-thumb {
   width: 0.75rem;
   height: 1.25rem;
@@ -305,6 +263,7 @@
   border: 1px solid #15121a;
   border-radius: 1px;
 }
+
 .ff7-slider:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;

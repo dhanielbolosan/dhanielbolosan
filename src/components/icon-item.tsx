@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
 
-// One entry in an icon list (Skills, a project's stack): a 16px icon and a one-line
-// name that ends in "…" when it's too long for its column.
 export const IconItem = ({
   icon,
   children,

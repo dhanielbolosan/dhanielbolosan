@@ -5,16 +5,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { cn } from "@/lib/utils";
 import { fadeMs, useSwap } from "@/lib/use-swap";
 import { useWindowFade } from "@/lib/window-fade";
+import { cn } from "@/lib/utils";
 
-// An FF7 corner window whose content swaps: a title, or a command menu that takes the
-// title's place. On a swap the old content fades out, the box resizes to fit the new
-// content (growing for a bigger menu, shrinking back for the title), and only once it
-// has finished resizing does the new content fade in. The first render just appears.
-//
-// `view` is what to show and `id` names it; `render` draws a view.
 export const CornerBox = <View,>({
   view,
   id,
@@ -26,29 +20,28 @@ export const CornerBox = <View,>({
   render: (view: View) => ReactNode;
   className?: string;
 }) => {
-  // While its window fades between screens, the box hides its text too, and then
-  // swaps without fading it again.
   const { fading: windowFading } = useWindowFade();
   const swap = useSwap(id, view, windowFading);
-
-  // The box follows its content's size. Transitions only switch on after the first
-  // measurement, so the box's initial size isn't animated.
   const content = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ width: number; height: number }>();
   const [animated, setAnimated] = useState(false);
+
   useLayoutEffect(() => {
     const element = content.current;
+
     if (!element) return;
-    // A box in a hidden tab (phones) measures 0x0. Ignore that, and when it next shows
-    // up, snap to its size before animating, instead of growing from nothing.
+
     let wasShown = false;
+
     const observer = new ResizeObserver(() => {
       if (!element.offsetWidth) {
         wasShown = false;
         setAnimated(false);
         return;
       }
+
       setSize({ width: element.offsetWidth, height: element.offsetHeight });
+
       if (!wasShown) requestAnimationFrame(() => setAnimated(true));
       wasShown = true;
     });
@@ -56,12 +49,14 @@ export const CornerBox = <View,>({
     return () => observer.disconnect();
   }, []);
 
-  // After a swap, the new content stays hidden for the resize phase.
   const [settledId, setSettledId] = useState(swap.shownId);
   const settled = settledId === swap.shownId;
+
   useEffect(() => {
     if (settled) return;
+
     const timer = setTimeout(() => setSettledId(swap.shownId), fadeMs);
+
     return () => clearTimeout(timer);
   }, [settled, swap.shownId]);
 
@@ -70,11 +65,9 @@ export const CornerBox = <View,>({
       className={cn(
         "window-title box-content",
         animated &&
-          "motion-safe:transition-[width,height] motion-safe:duration-150",
+        "motion-safe:transition-[width,height] motion-safe:duration-150",
         className,
       )}
-      // Content-sized until measured (the title utility's fixed width would otherwise
-      // show for a frame).
       style={
         size ? { width: size.width, height: size.height } : { width: "auto" }
       }

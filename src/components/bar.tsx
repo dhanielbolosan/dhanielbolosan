@@ -1,13 +1,10 @@
 import { cn } from "@/lib/utils";
 
-// FF7-style gauge: light frame, dark track, red-pink fill with a vertical shine.
-// A full gauge cycles colors like FF7's Limit bar when a Limit Break is ready.
 export const Bar = ({
   value,
   label,
   className,
 }: {
-  /** 0 to 1. */
   value: number;
   label: string;
   className?: string;

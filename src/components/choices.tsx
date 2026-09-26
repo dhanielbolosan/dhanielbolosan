@@ -5,17 +5,9 @@ export type Choice = {
   label: string;
   href?: string;
   onSelect?: () => void;
-  /** Id of the form this option submits. */
   submit?: string;
 };
 
-// FF7 dialogue choices: the hand marks the hovered or focused option; arrow keys move it.
-// The menu is always waiting for input, so its hand always bobs.
-// Rows use the dialogue's own line spacing, so choices read as its continuation.
-// `boxed` is for choices inside a command window (a CornerBox): the hand points in from
-// outside the box's left edge instead of taking room inside it. `onPoint` hears which
-// option the hand moves to (for help text). `typedChars` reveals labels in order;
-// the hand and controls wait until every label is complete.
 export const Choices = ({
   items,
   boxed,
@@ -44,10 +36,10 @@ export const Choices = ({
     options[(active + step + options.length) % options.length]?.focus();
   };
 
-  // Plain left clicks go through onSelect; modified clicks keep normal link behavior.
   const onLinkClick = (event: MouseEvent, item: Choice) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)
       return;
+
     event.preventDefault();
     item.onSelect?.();
   };
@@ -62,10 +54,12 @@ export const Choices = ({
         const start = items
           .slice(0, i)
           .reduce((count, prior) => count + prior.label.length + 1, 0);
+
         const visible =
           typedChars === undefined
             ? item.label.length
             : Math.max(0, Math.min(item.label.length, typedChars - start));
+
         const props = {
           onMouseEnter: () => {
             setActive(i);
@@ -77,6 +71,7 @@ export const Choices = ({
           },
           className: `relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none ${boxed ? "" : "pl-7"}`,
         };
+
         const body = (
           <>
             {boxed ? (
@@ -96,6 +91,7 @@ export const Choices = ({
             )}
           </>
         );
+
         return (
           <li key={item.label}>
             {item.href ? (

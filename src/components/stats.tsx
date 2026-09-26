@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-// FF7 status-card stats: teal labels, white values. Two columns (label, value) or four
-// (two pairs per row, filling row by row).
 export const Stats = ({
   pairs,
   columns = 2,

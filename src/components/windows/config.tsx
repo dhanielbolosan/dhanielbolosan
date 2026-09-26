@@ -5,8 +5,6 @@ import { PixelHand, RowHand } from "../pixel-hand";
 import { canHoverQuery, useMedia } from "@/lib/use-media";
 import { WindowHeader } from "../window";
 
-// FF7 colors each window corner separately. Each corner is a CSS custom property every
-// window reads (see the window-bg utility).
 const corners = [
   { key: "tl", label: "Top left", fallback: "#4a3f6b" },
   { key: "tr", label: "Top right", fallback: "#2f284a" },
@@ -14,9 +12,6 @@ const corners = [
   { key: "br", label: "Bottom right", fallback: "#15112a" },
 ] as const;
 
-// The site keeps text to a small palette so it can all be customized: primary text
-// (--foreground), the teal accent (--label), the highlight (--gold: links, and the
-// Activity graph's ramp is derived from it, see index.css), and the hard text shadow.
 const textColors = [
   { key: "text", label: "Text", cssVar: "--foreground", fallback: "#f3f1f7" },
   { key: "accent", label: "Accent", cssVar: "--label", fallback: "#6fd6e8" },
@@ -59,31 +54,29 @@ const defaults = Object.fromEntries(
   all.map((c) => [c.key, toRgb(c.fallback)]),
 ) as Colors;
 
-// Saved choices for this visitor, key by key; storage can be blocked or hold junk (or
-// an older format missing some keys), so each missing key falls back to its default.
 const load = (): Colors => {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
-    // Replace former defaults without changing a visitor's custom highlight.
+
     if (
       ["[244,211,94]", "[254,254,90]", "[212,175,55]"].includes(
         JSON.stringify(saved?.highlight),
       )
     )
       saved.highlight = defaults.highlight;
+
     return Object.fromEntries(
       all.map((c) => [
         c.key,
         saved?.[c.key]?.length === 3 ? saved[c.key] : defaults[c.key],
       ]),
     ) as Colors;
+
   } catch {
     return defaults;
   }
 };
 
-// Where the hand sits for each corner, 8px from the corner like every other hand and
-// its target: left corners point in from outside the box, right corners from inside.
 const handPosition: Record<Corner, string> = {
   tl: "top-0 right-full mr-2",
   tr: "top-0 right-2",
@@ -105,8 +98,6 @@ const settings = [
 
 type Setting = (typeof settings)[number]["id"];
 
-// Help bar text, like FF7's (no periods): what the pointed or open setting does, or
-// else the window's instruction.
 const help: Record<Setting, string> = {
   window: "Select colors for each corner of the window",
   text: "Select colors for each text type",
@@ -116,23 +107,12 @@ const help: Record<Setting, string> = {
 const labelFor = (key: ColorKey) =>
   all.find((c) => c.key === key)!.label.toLowerCase();
 
-// FF7 Config menu, step by step like the game:
-// 1. Hover a setting to show the hand; click it to pin the hand there.
-// 2. A second hand appears on its preview: a corner of the window rectangle, or one of
-//    the text color swatches. Point at one and click it (a picked corner also gets its
-//    swatch beside the rectangle).
-// 3. A popover opens with only the R/G/B sliders, where another hand follows the
-//    channel being edited.
-// A hand bobs while it's the cursor waiting for input (or pointing at something new) and
-// holds still once its step is done. Escape (or clicking away) steps back. Everything recolors live. Reset to default restores all.
 export const Config = () => {
   const [colors, setColors] = useState(load);
   const [hovered, setHovered] = useState<Setting>();
   const [open, setOpen] = useState<Setting>();
-  // The corner or swatch picked in step 2, and the one under the pointer.
   const [part, setPart] = useState<ColorKey>();
   const [pointedPart, setPointedPart] = useState<ColorKey>();
-  // Each row's last pick; the hand returns there when the row reopens.
   const [lastPart, setLastPart] = useState<Record<string, ColorKey>>({
     window: "tl",
     text: "text",
@@ -145,10 +125,10 @@ export const Config = () => {
         c.cssVar,
         toHex(colors[c.key]),
       );
+
     try {
       localStorage.setItem(storageKey, JSON.stringify(colors));
     } catch {
-      // Storage unavailable: the colors still apply for this visit.
     }
   }, [colors]);
 
@@ -169,25 +149,25 @@ export const Config = () => {
     else close();
   };
 
-  // Escape steps back one step at a time, wherever focus is. The popover's own Escape
-  // is turned off, since it would close first and this would then step back twice.
   useEffect(() => {
     if (!open) return;
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") stepBack();
     };
+
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  // While picking a part, pressing anywhere outside the row steps back, like the
-  // popover does one step later. (With the popover open, Radix handles that press.)
   useEffect(() => {
     if (!open || part) return;
+
     const onPointerDown = (event: PointerEvent) => {
       if (!(event.target as Element).closest(`[data-setting="${open}"]`))
         close();
     };
+
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open, part]);
@@ -200,7 +180,6 @@ export const Config = () => {
         className="relative grid grid-cols-[1rem_2.25rem_1fr] items-center gap-2 text-sm"
       >
         {i === channel && (
-          // The sliders are waiting for input, so their hand always bobs.
           <PixelHand className="absolute inset-y-0 right-full my-auto mr-2 motion-safe:animate-bob" />
         )}
         <span className={cn("font-semibold", c.className)}>{c.name}</span>
@@ -220,7 +199,6 @@ export const Config = () => {
       </label>
     ));
 
-  // A step-2 pick target: a corner quadrant of the rectangle, or a whole swatch.
   const pick = (key: ColorKey, label: string, className: string) => (
     <button
       key={key}
@@ -242,8 +220,6 @@ export const Config = () => {
     />
   );
 
-  // The step-2 hand: bobs while waiting for a pick or pointing at another part; holds
-  // still resting on the picked one (the sliders' hand is then the one waiting).
   const partHand = (className: string) => (
     <PixelHand
       className={cn(
@@ -255,16 +231,10 @@ export const Config = () => {
     />
   );
 
-  // What sits after each label, on one grid of 36px columns. Where the window is wide
-  // enough (21rem of content), that's one row 12px apart: the four text color swatches
-  // in a row, the window rectangle spanning the first two columns, and the picked
-  // corner's swatch above the third. Narrower (1280-1680 desktops, phones), the row
-  // doesn't fit, so the palette is 2 x 2 with columns 28px apart, the rectangle spans
-  // both, and the corner swatch wraps below. Swatch picks put the hand 8px to the left;
-  // in the one-row layout it overlaps the neighboring swatch, drawn on top.
   const preview = (id: Setting) => {
     const active = open === id;
     const handAt = pointedPart ?? part ?? lastPart[id];
+
     if (id === "window")
       return (
         <>
@@ -297,7 +267,9 @@ export const Config = () => {
           )}
         </>
       );
+
     if (id === "reset") return null;
+
     return (
       <div
         role={active ? "radiogroup" : undefined}
@@ -322,8 +294,6 @@ export const Config = () => {
     );
   };
 
-  // On touch screens a cursor rests on the first setting until one is used, since
-  // there's no hover to discover them; the help bar keeps the window's instruction.
   const canHover = useMedia(canHoverQuery);
   const resting = !canHover && !hovered && !open ? "window" : undefined;
   const pointed = hovered ?? open;
@@ -334,11 +304,8 @@ export const Config = () => {
         title="Config"
         help={pointed ? help[pointed] : "Select option to customize site"}
       />
-      {/* Labels share one column so every preview lines up. */}
       <ul className="grid grid-cols-[auto_1fr] gap-y-2 font-heading">
         {settings.map(({ id, label }) => (
-          // The whole row points and clicks, like a History entry. The label button
-          // stays for keyboard use; its click bubbles up here.
           <li
             key={id}
             data-setting={id}
@@ -346,8 +313,6 @@ export const Config = () => {
             onMouseLeave={() => setHovered(undefined)}
             onClick={(event) => {
               const target = event.target as Element;
-              // Picks belong to the picker, and popover clicks bubble here through the
-              // React portal without being inside the row.
               if (
                 !event.currentTarget.contains(target) ||
                 target.closest('[role="radio"]')
@@ -369,8 +334,6 @@ export const Config = () => {
               aria-expanded={id === "reset" ? undefined : open === id}
               onFocus={() => setHovered(id)}
               onBlur={() => setHovered(undefined)}
-              // Reset has no preview, so its label spans both columns and doesn't widen
-              // the label column the previews line up against.
               className={cn(
                 "relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
                 id === "reset" && "col-span-2",
@@ -398,8 +361,6 @@ export const Config = () => {
                     align="start"
                     sideOffset={6}
                     collisionPadding={12}
-                    // Presses inside this row are the row's (switching picks, or
-                    // toggling it closed); they must not also dismiss the popover.
                     onEscapeKeyDown={(event) => event.preventDefault()}
                     onInteractOutside={(event) =>
                       (event.target as Element).closest(

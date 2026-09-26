@@ -1,5 +1,3 @@
-// History window entries, newest first within each group.
-
 export type Entry = {
   name: string;
   subtitle: string;

@@ -31,15 +31,11 @@ import {
   type SimpleIcon,
 } from "simple-icons";
 
-// Brand icons from Simple Icons (CC0): one monochrome style on a shared 24x24 grid.
-// Codex and Apify aren't in Simple Icons; theirs come from Devicon Plain (MIT), the
-// same flat single-color style, drawn on a 128x128 grid.
 const devicon = (path: string) => ({ path, viewBox: "0 0 128 128" });
 
 type Icon = Pick<SimpleIcon, "path"> & { viewBox?: string };
 
 const logos: Record<string, Icon> = {
-  // HyperFrames symbol from its repo (docs/logo/symbol-light.svg), gradient dropped.
   HyperFrames: {
     path: "M10.1851 57.8021L33.1145 73.8313C36.2202 75.9978 41.5173 73.5433 42.4816 69.4984L51.7611 30.4271C52.7253 26.3822 48.5802 23.9277 44.4602 26.0942L13.917 42.1235C6.96677 45.7676 4.97564 54.1579 10.1851 57.8021Z M87.5129 57.5141L56.9696 73.5433C52.8371 75.7098 48.7046 73.2553 49.6688 69.2104L58.9483 30.1391C59.9125 26.0942 65.2097 23.6397 68.3154 25.8062L91.2447 41.8354C96.4668 45.4796 94.4631 53.8699 87.5129 57.5141Z",
     viewBox: "0 0 100 100",
@@ -79,7 +75,6 @@ const logos: Record<string, Icon> = {
   "Drizzle ORM": siDrizzle,
 };
 
-// FF7 Materia list: each category header carries its materia orb; skills are logo + name.
 export const Skills = () => (
   <section className="flow-root">
     <h2 className="window-title-float">Skills</h2>
@@ -89,7 +84,6 @@ export const Skills = () => (
         key={group.label}
         className="not-first-of-type:pt-5"
       >
-        {/* One orb per category: the group is the materia type. 8px sprite at 2x. */}
         <h3 className="group-heading flex items-center gap-2">
           <img
             src={group.orb}
