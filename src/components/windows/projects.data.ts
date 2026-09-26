@@ -4,6 +4,7 @@ import type { MateriaType } from "@/lib/materia";
 export type Project = {
   name: string;
   images: string[];
+  thumbnail?: string;
   description: string;
   stack: { name: string; type: MateriaType }[];
   type?: string;
@@ -16,7 +17,12 @@ export type Project = {
 export const projects: Project[] = [
   {
     name: "Kumu",
-    images: [],
+    thumbnail: "/projects/kumu/thumbnail.png",
+    images: [
+      "/projects/kumu/kumu1.jpg",
+      "/projects/kumu/kumu2.png",
+      "/projects/kumu/kumu3.png",
+    ],
     description:
       "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions and music.",
     stack: [
@@ -37,7 +43,12 @@ export const projects: Project[] = [
   },
   {
     name: "SENTINEL Mobile Application",
-    images: [],
+    thumbnail: "/projects/sentinel/thumbnail.png",
+    images: [
+      "/projects/sentinel/sentinel1.png",
+      "/projects/sentinel/sentinel2.png",
+      "/projects/sentinel/sentinel3.png",
+    ],
     description:
       "Geospatial intelligence dashboard, using Cesium 3D globe of live wildfire, seismic, weather, and aviation feeds with Starlink orbits and a FastAPI backend.",
     stack: [
@@ -54,10 +65,11 @@ export const projects: Project[] = [
   },
   {
     name: "KopeChain",
+    thumbnail: "/projects/kopechain/thumbnail.png",
     images: [
-      "/projects/kopechain1.png",
-      "/projects/kopechain2.png",
-      "/projects/kopechain3.png",
+      "/projects/kopechain/kopechain1.png",
+      "/projects/kopechain/kopechain2.png",
+      "/projects/kopechain/kopechain3.png",
     ],
     description:
       "Decentralized supply chain tracker on Base Sepolia Testnet to verify the origin of local Hawaiian coffee, with QR codes, 3D mapping, and NFT minting.",
@@ -76,7 +88,11 @@ export const projects: Project[] = [
   },
   {
     name: "Legislative Cloud Platform",
-    images: ["/projects/uhgro1.png", "/projects/uhgro2.png"],
+    thumbnail: "/projects/legislative-cloud-platform/thumbnail.png",
+    images: [
+      "/projects/legislative-cloud-platform/uhgro1.png",
+      "/projects/legislative-cloud-platform/uhgro2.png",
+    ],
     description:
       "Backend service powering AI bill summarization and automated notifications for university officials, helping UH staff track legislation that affects the university.",
     stack: [
@@ -97,7 +113,11 @@ export const projects: Project[] = [
   },
   {
     name: "VENOM-RAG",
-    images: ["/projects/venomrag1.png", "/projects/venomrag2.png"],
+    thumbnail: "/projects/venom-rag/thumbnail.png",
+    images: [
+      "/projects/venom-rag/venomrag1.png",
+      "/projects/venom-rag/venomrag2.png",
+    ],
     description:
       "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines through vector manipulation and PDF font poisoning.",
     stack: [
@@ -114,7 +134,12 @@ export const projects: Project[] = [
   },
   {
     name: "Pathfinity",
-    images: ["/projects/pathfinity1.png", "/projects/pathfinity2.png"],
+    thumbnail: "/projects/pathfinity/thumbnail.png",
+    images: [
+      "/projects/pathfinity/pathfinity1.png",
+      "/projects/pathfinity/pathfinity2.png",
+      "/projects/pathfinity/pathfinity3.png",
+    ],
     description:
       "Full-stack semantic search interface enabling students to query university course data via natural language, with GitHub and Google sign-in.",
     stack: [

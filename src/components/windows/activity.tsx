@@ -63,9 +63,9 @@ const getStats = (days: ContributionDay[]) => {
       none || !busiest
         ? "Jan 01"
         : localDate(`${busiest}-01`).toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          }),
+          month: "short",
+          year: "numeric",
+        }),
     ],
   ];
   return pairs;
@@ -184,9 +184,9 @@ export const Activity = () => {
                       label === screen
                         ? setMenu(false)
                         : fadeTo(() => {
-                            setScreen(label);
-                            setMenu(false);
-                          }),
+                          setScreen(label);
+                          setMenu(false);
+                        }),
                   }))}
                 />
               </>
@@ -216,7 +216,7 @@ export const Activity = () => {
         {screen === "GitHub" && <GitHub />}
         {screen !== "GitHub" && (
           <p className="flex min-h-64 flex-1 items-center justify-center text-center font-heading text-base">
-            Currently WIP :)
+            WIP :)
           </p>
         )}
       </Faded>

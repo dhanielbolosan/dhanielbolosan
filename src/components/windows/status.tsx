@@ -3,6 +3,7 @@ import { clock, shortDate } from "@/lib/dates";
 import { useLastSaved } from "@/lib/github";
 import { avatarUrl, name, timeZone } from "@/lib/site";
 import { Bar } from "../bar";
+import { ImageFrame } from "../image-frame";
 import { Stats } from "../stats";
 
 // LV and the EXP bar are derived from this.
@@ -59,14 +60,13 @@ export const Status = () => {
   return (
     <section className="flex grow flex-col justify-between gap-3">
       <div className="flex items-start gap-3">
-        {/* Same bevel as the windows; an img can't show inset shadows, so it gets a wrapper. */}
-        <div className="bevel shrink-0 p-1.5">
+        <ImageFrame className="size-27 shrink-0">
           <img
             src={avatarUrl}
             alt="Dhaniel"
-            className="size-24 rounded-[2px] object-cover"
+            className="size-full object-cover"
           />
-        </div>
+        </ImageFrame>
         {/* Block (not flex) so the floated title wraps this column's content: the name
             flows around it, and anything past its bottom edge gets the full width. */}
         <div className="flow-root min-w-0 grow space-y-1.5 font-heading">

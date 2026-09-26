@@ -9,6 +9,7 @@ import { Faded, WindowHeader } from "../window";
 import { orbs } from "@/lib/materia";
 import { canHoverQuery, useMedia } from "@/lib/use-media";
 import { IconItem } from "../icon-item";
+import { ImageFrame } from "../image-frame";
 import { PixelHand } from "../pixel-hand";
 import { Stats } from "../stats";
 import { projects, type Project } from "./projects.data";
@@ -27,39 +28,41 @@ const useSlideshow = (count: number, active: boolean) => {
   return index;
 };
 
-// Thumbnail framed like the Status portrait (6px bevel around the image); cycles through
-// the project's screenshots while `active`.
+// The grid uses a dedicated square thumbnail; expanded views cycle through screenshots.
 const Thumbnail = ({
   project,
   active,
   className,
+  expanded = false,
 }: {
   project: Project;
   active: boolean;
   className: string;
+  expanded?: boolean;
 }) => {
-  const index = useSlideshow(project.images.length, active);
+  const images =
+    !expanded && project.thumbnail ? [project.thumbnail] : project.images;
+  const index = useSlideshow(images.length, active);
   return (
-    <div className={cn("bevel p-1.5", className)}>
-      <div className="relative size-full overflow-hidden rounded-[2px] bg-black/30">
-        {project.images.length === 0 && (
-          <span className="absolute inset-0 grid place-items-center p-1 text-center font-heading text-xs">
-            {project.name}
-          </span>
-        )}
-        {project.images.map((src, i) => (
-          <img
-            key={src}
-            src={src}
-            alt=""
-            className={cn(
-              "absolute inset-0 size-full object-cover transition-opacity duration-[450ms]",
-              i === index ? "opacity-100" : "opacity-0",
-            )}
-          />
-        ))}
-      </div>
-    </div>
+    <ImageFrame className={className}>
+      {images.length === 0 && (
+        <span className="absolute inset-0 grid place-items-center p-1 text-center font-heading text-xs">
+          {project.name}
+        </span>
+      )}
+      {images.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          className={cn(
+            "absolute inset-0 size-full transition-opacity duration-[450ms]",
+            expanded ? "object-contain" : "object-cover",
+            i === index ? "opacity-100" : "opacity-0",
+          )}
+        />
+      ))}
+    </ImageFrame>
   );
 };
 
@@ -128,7 +131,7 @@ export const Projects = () => {
         help={
           expanded
             ? "Select Back to return to projects"
-            : "Select project to view more info"
+            : "Select entry to view more info"
         }
       >
         <CornerBox
@@ -163,6 +166,7 @@ export const Projects = () => {
               <Thumbnail
                 project={current}
                 active
+                expanded
                 className="size-full"
               />
             </button>

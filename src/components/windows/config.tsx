@@ -250,7 +250,7 @@ export const Config = () => {
         "pointer-events-none absolute z-10",
         className,
         (!part || (pointedPart && pointedPart !== part)) &&
-          "motion-safe:animate-bob",
+        "motion-safe:animate-bob",
       )}
     />
   );
@@ -332,7 +332,7 @@ export const Config = () => {
     <section className="flex flex-col gap-3">
       <WindowHeader
         title="Config"
-        help={pointed ? help[pointed] : "Select a config to customize site"}
+        help={pointed ? help[pointed] : "Select option to customize site"}
       />
       {/* Labels share one column so every preview lines up. */}
       <ul className="grid grid-cols-[auto_1fr] gap-y-2 font-heading">
