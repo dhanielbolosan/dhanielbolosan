@@ -1,3 +1,9 @@
+import {
+  isCalendarDate,
+  getRangeFromDates,
+  getContributionRange,
+} from "../lib/github-dates";
+
 interface Env {
   GITHUB_TOKEN: string;
 }
@@ -34,54 +40,19 @@ const contributionQuery = `
   }
 `;
 
-function toDateString(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function isCalendarDate(value: string) {
-  return (
-    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
-    toDateString(new Date(`${value}T00:00:00.000Z`)) === value
-  );
-}
-
-function getRangeFromDates(from: string, to: string, now: Date) {
-  const asOf = toDateString(now);
-
-  return {
-    asOf,
-    from,
-    queryFrom: `${from}T00:00:00.000Z`,
-    queryTo: to < asOf ? `${to}T23:59:59.999Z` : now.toISOString(),
-    to,
-  };
-}
-
-function getContributionRange(preset: "current-year" | "rolling-year") {
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const asOf = toDateString(now);
-  const from =
-    preset === "current-year"
-      ? `${year}-01-01`
-      : toDateString(
-        new Date(Date.UTC(year, now.getUTCMonth(), now.getUTCDate() - 364)),
-      );
-  const to = preset === "current-year" ? `${year}-12-31` : asOf;
-
-  return getRangeFromDates(from, to, now);
-}
-
+// Cache successful JSON for one browser hour and 12 edge hours; never cache errors.
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
-      "Cache-Control": "public, max-age=3600, s-maxage=43200",
+      "Cache-Control":
+        status === 200 ? "public, max-age=3600, s-maxage=43200" : "no-store",
       "Content-Type": "application/json; charset=utf-8",
     },
   });
 }
 
+// Fetch contribution calendars with a server-only token and reuse cached responses.
 export const onRequestGet: PagesFunction<Env> = async ({
   request,
   env,
@@ -99,10 +70,12 @@ export const onRequestGet: PagesFunction<Env> = async ({
   const rangePreset =
     requestedRange === "current-year" ? "current-year" : "rolling-year";
 
+  // Require a username with valid characters, length, and non-hyphen ends.
   if (!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(username)) {
     return json({ error: "A valid GitHub username is required." }, 400);
   }
 
+  // Custom ranges need both real calendar dates in chronological order.
   if (
     (customFrom || customTo) &&
     (!customFrom ||
@@ -121,6 +94,7 @@ export const onRequestGet: PagesFunction<Env> = async ({
   if (cachedResponse) return cachedResponse;
 
   try {
+    // Use explicit dates when supplied, otherwise resolve the requested preset.
     const range =
       customFrom && customTo
         ? getRangeFromDates(customFrom, customTo, new Date())
@@ -146,8 +120,10 @@ export const onRequestGet: PagesFunction<Env> = async ({
 
     const result = (await response.json()) as GithubGraphqlResponse;
 
+    // GraphQL can return errors even when the HTTP request succeeds.
     if (!response.ok || result.errors?.length || !result.data?.user) {
       console.error("GitHub GraphQL error", response.status, result.errors);
+
       return json({ error: "Unable to load GitHub contributions." }, 502);
     }
 
@@ -164,10 +140,13 @@ export const onRequestGet: PagesFunction<Env> = async ({
       username,
     });
 
+    // Write the cache in the background without delaying the response.
     waitUntil(caches.default.put(request, calendarResponse.clone()));
+
     return calendarResponse;
   } catch (error) {
     console.error("GitHub contributions function error", error);
+
     return json({ error: "Unable to load GitHub contributions." }, 502);
   }
 };
