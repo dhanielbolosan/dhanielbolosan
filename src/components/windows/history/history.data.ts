@@ -16,6 +16,7 @@ export const experience: Entry[] = [
       "Collaborated with the engineering team through daily syncs, translating open-ended defense technology concepts into scoped prototypes and functional software.",
     ],
   },
+
   {
     name: "Penn State University",
     subtitle: "AI Cybersecurity Training Program Participant",
@@ -26,6 +27,7 @@ export const experience: Entry[] = [
       "Executed red-team attack strategies, evaluating their effectiveness against LLM guardrails.",
     ],
   },
+
   {
     name: "Naval Information Warfare Center",
     subtitle: "Undergraduate AI Security Researcher",
@@ -36,6 +38,7 @@ export const experience: Entry[] = [
       "Designed an interactive demonstration UI to showcase attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.",
     ],
   },
+
   {
     name: "Blockchain in Paradise",
     subtitle: "Full-Stack Software Developer Intern",
@@ -46,6 +49,7 @@ export const experience: Entry[] = [
       "Implemented IPFS-based asset storage to enable immutable data persistence across the supply chain.",
     ],
   },
+
   {
     name: "University of Hawaiʻi Office of Government Relations",
     subtitle: "Backend Cloud Developer Intern",
@@ -65,6 +69,7 @@ export const education: Entry[] = [
     date: "Aug. 2024 - May 2026",
     description: ["Cumulative GPA: 3.31/4.00", "Dean's List (Spring 2025)"],
   },
+
   {
     name: "University of Hawaiʻi Maui College",
     subtitle: "Natural Science - Information and Computer Sciences, A.S",

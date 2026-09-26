@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { githubUsername } from "./site";
 
 export type ContributionLevel =
@@ -32,100 +31,43 @@ export interface ContributionCalendarData {
   weeks: ContributionWeek[];
 }
 
-const toLocalDateString = (date: Date) => date.toLocaleDateString("en-CA");
+// Fetch through the server endpoint so the GitHub token stays private.
+export const fetchContributionCalendar = async (
+  range: Pick<ContributionRange, "from" | "to">,
+  signal: AbortSignal,
+) => {
+  const params = new URLSearchParams({ ...range, username: githubUsername });
+  const response = await fetch(`/api/github-contributions?${params}`, {
+    signal,
+  });
 
-const emptyCalendar = (): ContributionCalendarData => {
-  const to = new Date();
-  const from = new Date(to);
-  from.setDate(from.getDate() - 364);
+  // Return no data on an HTTP failure so the caller keeps its fallback calendar.
+  if (!response.ok) return;
 
-  const weeks: ContributionCalendarData["weeks"] = [];
-  const day = new Date(from);
-  day.setDate(day.getDate() - day.getDay());
-
-  while (day <= to) {
-    const contributionDays: ContributionDay[] = [];
-
-    for (let i = 0; i < 7; i++, day.setDate(day.getDate() + 1)) {
-      if (day < from || day > to) continue;
-
-      contributionDays.push({
-        date: toLocalDateString(day),
-        weekday: day.getDay(),
-        contributionCount: 0,
-        contributionLevel: "NONE",
-      });
-    }
-    weeks.push({ contributionDays, firstDay: contributionDays[0].date });
-  }
-
-  const range = { from: toLocalDateString(from), to: toLocalDateString(to) };
-
-  return {
-    range: { ...range, asOf: range.to },
-    totalContributions: 0,
-    weeks,
+  const result = (await response.json()) as {
+    calendar?: ContributionCalendarData;
   };
+
+  return result.calendar;
 };
 
-export const useContributions = () => {
-  const [calendar, setCalendar] = useState(emptyCalendar);
+// Fetch recent public events to find the latest available push.
+export const fetchLatestPush = async (signal: AbortSignal) => {
+  const response = await fetch(
+    `https://api.github.com/users/${githubUsername}/events/public?per_page=30`,
+    { signal },
+  );
 
-  useEffect(() => {
-    const controller = new AbortController();
+  // Return no data on an HTTP failure so the caller keeps its last-save placeholder.
+  if (!response.ok) return;
 
-    const params = new URLSearchParams({
-      from: calendar.range.from,
-      to: calendar.range.to,
-      username: githubUsername,
-    });
+  const events = (await response.json()) as {
+    type: string;
+    created_at: string;
+    repo: { name: string };
+  }[];
 
-    void fetch(`/api/github-contributions?${params}`, {
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        const result = (await response.json()) as {
-          calendar?: ContributionCalendarData;
-        };
-        if (response.ok && result.calendar) setCalendar(result.calendar);
-      })
-      .catch(() => undefined);
-
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return calendar;
-};
-
-export const useLastSaved = () => {
-  const [saved, setSaved] = useState<{ at: Date; repo: string }>();
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    void fetch(
-      `https://api.github.com/users/${githubUsername}/events/public?per_page=30`,
-      { signal: controller.signal },
-    )
-      .then((response) => (response.ok ? response.json() : []))
-      .then(
-        (
-          events: {
-            type: string;
-            created_at: string;
-            repo: { name: string };
-          }[],
-        ) => {
-          const push = events.find((event) => event.type === "PushEvent");
-
-          if (push)
-            setSaved({ at: new Date(push.created_at), repo: push.repo.name });
-        },
-      )
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, []);
-
-  return saved;
+  // Use a recent public push as the portfolio's last-save timestamp.
+  const push = events.find((event) => event.type === "PushEvent");
+  if (push) return { at: new Date(push.created_at), repo: push.repo.name };
 };

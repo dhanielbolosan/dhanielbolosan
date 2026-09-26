@@ -8,6 +8,7 @@
     "dev:pages": "npm run build && wrangler pages dev dist --compatibility-date=2026-08-08",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "node --test --test-isolation=none tests/*.test.mjs",
     "preview": "vite preview",
     "format": "prettier --write ."
   },

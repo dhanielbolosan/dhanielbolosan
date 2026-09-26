@@ -10,6 +10,7 @@ export const Bar = ({
   className?: string;
 }) => {
   const full = value >= 1;
+
   return (
     <span
       role="meter"
@@ -22,6 +23,7 @@ export const Bar = ({
         className,
       )}
     >
+      {/* A full bar cycles the FF7 limit colors; cap its fill at 100%. */}
       <span
         className={cn(
           "block h-full bg-[linear-gradient(to_bottom,#da9b99_0%,#964746_15%,#ba8889_38%,#ecc3c5_52%,#d18a8b_64%,#bf7f81_82%,#b49797_100%)]",

@@ -3,16 +3,17 @@ import { useLayoutEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export const PixelHand = ({ className }: { className?: string }) => {
-  const img = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useLayoutEffect(() => {
-    for (const animation of img.current?.getAnimations() ?? [])
+    // Keep all pointer animations in phase.
+    for (const animation of imageRef.current?.getAnimations() ?? [])
       animation.startTime = 0;
   }, [className]);
 
   return (
     <img
-      ref={img}
+      ref={imageRef}
       src={hand}
       alt=""
       aria-hidden="true"

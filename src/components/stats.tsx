@@ -21,12 +21,14 @@ export const Stats = ({
       className,
     )}
   >
+    {/* Let each label and value occupy grid cells without a wrapper column. */}
     {pairs.map(([label, value]) => (
       <div
         key={label}
         className="contents"
       >
         <dt className="text-label">{label}</dt>
+
         <dd className={valueClassName}>{value}</dd>
       </div>
     ))}

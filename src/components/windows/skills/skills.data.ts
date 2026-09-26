@@ -6,6 +6,7 @@ export const groups = [
     orb: orbs.language,
     skills: ["Python", "TypeScript", "Java", "HTML", "CSS", "Solidity"],
   },
+
   {
     label: "Frameworks",
     orb: orbs.framework,
@@ -18,6 +19,7 @@ export const groups = [
       "Bootstrap",
     ],
   },
+
   {
     label: "Libraries",
     orb: orbs.library,
@@ -30,6 +32,7 @@ export const groups = [
       "HyperFrames",
     ],
   },
+
   {
     label: "Tools",
     orb: orbs.tool,
@@ -45,6 +48,7 @@ export const groups = [
       "Apify",
     ],
   },
+
   {
     label: "Databases",
     orb: orbs.database,

@@ -9,6 +9,7 @@ export const IconItem = ({
 }) => (
   <li className="flex min-w-0 items-center gap-1.5">
     {icon}
+
     <span className="truncate">{children}</span>
   </li>
 );

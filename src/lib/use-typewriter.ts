@@ -1,61 +1,53 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+import { useMedia } from "./use-media";
+import { typingIntervalMs } from "./motion";
+import { advanceTypewriter } from "./typewriter";
 
 export const TypewriterReady = createContext(true);
 
-export const useTypewriter = (target: string, speed = 10, scene = "") => {
+export const useTypewriter = (
+  target: string,
+  speed = typingIntervalMs,
+  scene = "",
+) => {
   const ready = useContext(TypewriterReady);
+  const reducedMotion = useMedia("(prefers-reduced-motion: reduce)");
+
   const [state, setState] = useState({ text: "", line: target, scene });
   const currentState = useRef(state);
 
   useEffect(() => {
-    if (!ready) return;
+    // Wait for the entrance animation; reduced motion shows text immediately.
+    if (!ready || reducedMotion) return;
 
-    const step = (current: typeof state) =>
-      current.scene !== scene
-        ? { text: "", line: target, scene }
-        : current.text === target
-          ? current
-          : !target.startsWith(current.text)
-            ? { text: current.text.slice(0, -1), line: current.line, scene }
-            : {
-              text: target.slice(0, current.text.length + 1),
-              line: target,
-              scene,
-            };
-
-    let last = performance.now();
+    let lastUpdateMs = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
-      let next = currentState.current;
+      const { state: next, consumedMs } = advanceTypewriter(
+        currentState.current,
+        target,
+        scene,
+        now - lastUpdateMs,
+        speed,
+      );
 
-      while (true) {
-        const interval =
-          next.scene === scene && !target.startsWith(next.text)
-            ? speed / 1.25
-            : speed;
-
-        if (now - last < interval) break;
-
-        const stepped = step(next);
-
-        if (stepped === next) break;
-        last += interval;
-        next = stepped;
-      }
+      // Preserve unused time so character timing stays consistent between frames.
+      lastUpdateMs += consumedMs;
 
       if (next !== currentState.current) {
         currentState.current = next;
         setState(next);
       }
 
-      frame = requestAnimationFrame(tick);
+      // Stop requesting frames once the text and scene match.
+      if (next.text !== target || next.scene !== scene)
+        frame = requestAnimationFrame(tick);
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [target, speed, scene, ready]);
+  }, [target, speed, scene, ready, reducedMotion]);
 
-  return reducedMotion.matches
+  // Return visible text and the full line used to reserve layout space.
+  return reducedMotion
     ? [target, target]
     : state.scene !== scene
       ? ["", target]
