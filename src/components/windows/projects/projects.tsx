@@ -24,12 +24,7 @@ export const Projects = () => {
   } = useProjects();
 
   return (
-    <section
-      className="flex grow flex-col"
-      onKeyDown={(event) =>
-        event.key === "Escape" && isExpanded && setExpandedView(false)
-      }
-    >
+    <section className="flex grow flex-col">
       <WindowHeader
         help={isExpanded ? "Select Back to return" : "Select entry to focus"}
       >
@@ -45,7 +40,11 @@ export const Projects = () => {
                 <Choices
                   boxed
                   items={[
-                    { label: "Back", onSelect: () => setExpandedView(false) },
+                    {
+                      label: "Back",
+                      sound: "select",
+                      onSelect: () => setExpandedView(false),
+                    },
                   ]}
                 />
               </>
@@ -59,20 +58,17 @@ export const Projects = () => {
       {/* Switch between thumbnails and the expanded gallery. */}
       <Faded className="shrink-0">
         {isExpanded ? (
-          <div className="h-63 shrink-0 py-3">
-            <button
-              type="button"
-              aria-label={`Close ${selectedProject.name}`}
-              onClick={() => setExpandedView(false)}
-              className="block size-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <ProjectPreview
-                project={selectedProject}
-                active
-                expanded
-                className="size-full"
-              />
-            </button>
+          <div
+            role="img"
+            aria-label={`${selectedProject.name} screenshots`}
+            className="h-63 shrink-0 py-3"
+          >
+            <ProjectPreview
+              project={selectedProject}
+              active
+              expanded
+              className="size-full"
+            />
           </div>
         ) : (
           <ul

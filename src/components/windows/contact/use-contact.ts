@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { contactSchema, type ContactFields } from "@/lib/contact";
+import { playSound } from "@/lib/audio";
 import type { Choice } from "../../choices";
 import { useWindowFade } from "@/lib/window-fade";
 import { useTypewriter } from "@/lib/use-typewriter";
@@ -82,6 +83,7 @@ export const useContact = () => {
 
   // Submit the validated message, then show confirmation or retry dialogue.
   async function submitMessage(data: ContactFields) {
+    playSound("select");
     setDialogueText(dialogueLines.sending);
     try {
       const response = await fetch("/api/contact", {
@@ -91,15 +93,20 @@ export const useContact = () => {
       });
       if (!response.ok) throw new Error();
 
+      playSound("fanfare");
       form.reset();
       transitionToMode("sent");
     } catch {
+      playSound("error");
       setDialogueText(dialogueLines.failed);
     }
   }
 
   // Turn field errors into one dialogue line.
-  const handleValidationErrors = (fieldErrors: typeof form.formState.errors) =>
+  const handleValidationErrors = (
+    fieldErrors: typeof form.formState.errors,
+  ) => {
+    playSound("error");
     setDialogueText(
       formatMissingFields(
         Object.values(fieldErrors).flatMap((error) =>
@@ -107,6 +114,7 @@ export const useContact = () => {
         ),
       ),
     );
+  };
 
   // Queue navigation; Back starts erasing immediately because it has no menu choices.
   const queueAction = (action: ContactAction) => {
@@ -182,13 +190,23 @@ export const useContact = () => {
 
   const formCommands: Choice[] = [
     { label: "Send", submit: "contact-form" },
-    { label: "Back", onSelect: () => queueAction({ type: "back" }) },
+    {
+      label: "Back",
+      sound: "select",
+      onSelect: () => queueAction({ type: "back" }),
+    },
   ];
   const commands: Choice[] | undefined =
     mode === "form"
       ? formCommands
       : mode === "sent"
-        ? [{ label: "Back", onSelect: () => queueAction({ type: "back" }) }]
+        ? [
+            {
+              label: "Back",
+              sound: "select",
+              onSelect: () => queueAction({ type: "back" }),
+            },
+          ]
         : undefined;
 
   // Reserve space for every message that can appear in the current screen.

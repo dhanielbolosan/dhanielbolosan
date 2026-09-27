@@ -4,10 +4,12 @@ export const Bar = ({
   value,
   label,
   className,
+  fillClassName,
 }: {
   value: number;
   label: string;
   className?: string;
+  fillClassName?: string;
 }) => {
   const full = value >= 1;
 
@@ -27,7 +29,8 @@ export const Bar = ({
       <span
         className={cn(
           "block h-full bg-[linear-gradient(to_bottom,#da9b99_0%,#964746_15%,#ba8889_38%,#ecc3c5_52%,#d18a8b_64%,#bf7f81_82%,#b49797_100%)]",
-          full && "motion-safe:animate-limit",
+          fillClassName,
+          full && !fillClassName && "motion-safe:animate-limit",
         )}
         style={{ width: `${Math.min(value, 1) * 100}%` }}
       />

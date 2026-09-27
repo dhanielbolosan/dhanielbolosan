@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { attachMenuSounds } from "./lib/audio";
 import { useMedia } from "./lib/use-media";
 import { TypewriterReady } from "./lib/use-typewriter";
 import { Window } from "./components/window";
@@ -7,11 +8,14 @@ import { columns } from "./app/layout";
 import { Navbar } from "./app/navbar";
 import { getEntryDelay } from "./app/entrance";
 import { useMenuEntrance } from "./app/use-menu-entrance";
+import { ScrollHint } from "./app/scroll-hint";
 
 function App() {
+  useEffect(attachMenuSounds, []);
   const isTabletOrWider = useMedia("(min-width: 48rem)");
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const activeColumnRef = useRef<HTMLDivElement>(null);
 
   // Tablet keeps Status visible while tabs select the right column.
   const rightColumnIndex = activeTabIndex === 0 ? 1 : activeTabIndex;
@@ -35,10 +39,11 @@ function App() {
         />
 
         {/* One column on mobile, two on tablet, four on desktop. */}
-        <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <main className="relative grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {columns.map((column, columnIndex) => (
             <div
               key={column.label}
+              ref={columnIndex === activeTabIndex ? activeColumnRef : undefined}
               className={cn(
                 columnIndex === activeTabIndex ? "flex" : "hidden",
                 columnIndex === 0 || columnIndex === rightColumnIndex
@@ -77,6 +82,15 @@ function App() {
               )}
             </div>
           ))}
+          <ScrollHint
+            columnRef={activeColumnRef}
+            columnIndex={activeTabIndex}
+            enabled={
+              !isTabletOrWider &&
+              !entering &&
+              columns[activeTabIndex].windows.length > 1
+            }
+          />
         </main>
       </div>
     </TypewriterReady.Provider>

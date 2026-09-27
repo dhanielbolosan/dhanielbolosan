@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useWindowFade } from "@/lib/window-fade";
 import { cornerTransitionMs } from "@/lib/motion";
+import { playSound } from "@/lib/audio";
 import {
   screens,
   activityInstruction,
@@ -36,7 +37,10 @@ export const useActivity = () => {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        playSound("select");
+        setMenuOpen(false);
+      }
     };
 
     // Focus the current screen's choice after the corner menu finishes opening.

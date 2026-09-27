@@ -7,7 +7,8 @@ import {
   type ColorKey,
   type Rgb,
 } from "./config.data";
-import { loadSavedColors, rgbToHex } from "./config.utils";
+import { getMutedCreditColor, loadSavedColors, rgbToHex } from "./config.utils";
+import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
 
 export const useConfig = () => {
   // Restore the saved palette once when Config mounts.
@@ -31,6 +32,10 @@ export const useConfig = () => {
         definition.cssVar,
         rgbToHex(colors[definition.key]),
       );
+    document.documentElement.style.setProperty(
+      "--muted-credit",
+      getMutedCreditColor(colors.br),
+    );
 
     const saveColors = () => {
       try {
@@ -71,6 +76,7 @@ export const useConfig = () => {
 
   // Close the sliders first, then the setting on the next Back action.
   const stepBack = () => {
+    playSound("select");
     if (selectedColorKey) setSelectedColorKey(undefined);
     else closeSetting();
   };
@@ -81,6 +87,7 @@ export const useConfig = () => {
     // Escape follows the same two-step path as Back.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        playSound("select");
         if (selectedColorKey) setSelectedColorKey(undefined);
         else {
           setOpenSetting(undefined);
@@ -119,6 +126,7 @@ export const useConfig = () => {
   const selectSetting = (setting: Setting) => {
     if (setting === "reset") {
       setColors(defaultColors);
+      setSoundSettings(defaultSoundSettings);
       closeSetting();
     } else if (openSetting === setting) closeSetting();
     else {

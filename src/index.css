@@ -55,6 +55,7 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --animate-bob: bob 0.9s steps(1) infinite;
+  --animate-scroll-hint: scroll-hint var(--scroll-hint-bob-duration) steps(1) infinite;
   --animate-limit: limit 0.4s steps(1) infinite;
 
   @keyframes limit {
@@ -109,6 +110,12 @@
       transform: translateX(-3px);
     }
   }
+
+  @keyframes scroll-hint {
+    50% {
+      transform: translateY(-3px);
+    }
+  }
 }
 
 @layer base {
@@ -130,6 +137,27 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .portrait-hit {
+    animation: portrait-hit 220ms steps(1) both;
+  }
+
+  .damage-number {
+    animation: damage-number 650ms ease-out both;
+  }
+
+  @keyframes portrait-hit {
+    0%, 50% { transform: translateX(-2px); filter: brightness(1.7); }
+    25%, 75% { transform: translateX(2px); }
+    100% { transform: none; filter: none; }
+  }
+
+  @keyframes damage-number {
+    0% { transform: translateY(0); }
+    40% { transform: translateY(-24px); }
+    65% { transform: translateY(-16px); opacity: 1; }
+    100% { transform: translateY(-18px); opacity: 0; }
+  }
+
   .menu-enter {
     animation: menu-enter var(--window-entry-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
   }

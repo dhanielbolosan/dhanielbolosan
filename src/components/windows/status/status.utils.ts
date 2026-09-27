@@ -1,6 +1,25 @@
-import { birthday } from "./status.data";
+import { birthday } from "./status.data.ts";
 
-const DAY = 24 * 60 * 60 * 1000;
+// ponytail: fixed attack power and 5% critical chance; add combat stats only for a full battle.
+export const calculateHit = (
+  health: number,
+  variation = Math.random(),
+  criticalRoll = Math.random(),
+) => {
+  const critical = criticalRoll < 0.05;
+  // Original FF7 varies damage by 3841..4096 / 4096, after the critical multiplier.
+  const damage = Math.floor(
+    (150 * (critical ? 2 : 1) * (3841 + Math.floor(variation * 256))) / 4096,
+  );
+  return { damage, critical, health: Math.max(0, health - damage) };
+};
+
+export const healthStatus = (health: number, maximum: number) =>
+  health === 0 ? "ko" : health <= maximum / 4 ? "critical" : "normal";
+
+// Aerith's level-one Limit: 255 units, with the game's two rounding steps.
+export const limitGain = (damage: number, maximum: number) =>
+  Math.floor((Math.floor((300 * damage) / maximum) * 256) / 200);
 
 // Use age as level and time between birthdays as EXP.
 export const calculateLevelProgress = (today = new Date()) => {
@@ -23,10 +42,5 @@ export const calculateLevelProgress = (today = new Date()) => {
       ? 1
       : (today.getTime() - previousBirthday.getTime()) /
         (nextBirthday.getTime() - previousBirthday.getTime()),
-    // Count partial remaining days, but only completed days lived.
-    daysLeft: Math.ceil((nextBirthday.getTime() - today.getTime()) / DAY),
-    daysLived: Math.floor(
-      (today.getTime() - birthdayInYear(birthday.year).getTime()) / DAY,
-    ),
   };
 };

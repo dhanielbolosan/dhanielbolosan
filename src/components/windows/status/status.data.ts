@@ -1,5 +1,8 @@
 export const birthday = { year: 2004, month: 3, day: 26 };
 
+export const maxHealth = 2200;
+export const maxMana = 220;
+
 export const profileStats: [string, string][] = [
   ["Role", "Full-Stack Engineer"],
 
