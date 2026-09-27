@@ -25,6 +25,7 @@ const luminance = (rgb: Rgb) =>
 // Use the faintest light or dark tint that keeps small text readable.
 export const getMutedCreditColor = (background: Rgb) => {
   const backgroundLuminance = luminance(background);
+  // Start with whichever of white or black has the greater contrast.
   const foreground = backgroundLuminance < Math.sqrt(0.0525) - 0.05 ? 255 : 0;
 
   for (let percent = 50; percent <= 100; percent += 5) {
@@ -41,6 +42,10 @@ export const getMutedCreditColor = (background: Rgb) => {
 
   return foreground === 255 ? "#ffffff" : "#000000";
 };
+
+// Contrast the outline with the text so mixed backgrounds cannot hide the letters.
+export const getMutedCreditOutline = (color: string) =>
+  luminance(hexToRgb(color)) < Math.sqrt(0.0525) - 0.05 ? "#ffffff" : "#000000";
 
 // Accept exactly three integer channels in the 0–255 range.
 const isRgb = (value: unknown): value is Rgb =>

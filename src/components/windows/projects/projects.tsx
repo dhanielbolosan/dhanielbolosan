@@ -42,7 +42,6 @@ export const Projects = () => {
                   items={[
                     {
                       label: "Back",
-                      sound: "select",
                       onSelect: () => setExpandedView(false),
                     },
                   ]}

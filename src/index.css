@@ -9,7 +9,7 @@
   color-scheme: dark;
   --background: #0c0a14;
   --foreground: #f3f1f7;
-  --muted-foreground: #aaa3c2;
+  --muted-foreground: #8a8895;
   --border: rgb(233 230 240 / 25%);
   --input: rgb(233 230 240 / 30%);
   --ring: #e9e6f0;
@@ -22,6 +22,8 @@
   --window-bl: #2f284a;
   --window-br: #15112a;
   --text-shadow: #15121a;
+  --muted-credit: #8a8895;
+  --muted-credit-outline: #000000;
   --frame-bevel:
     inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
     inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
@@ -35,9 +37,15 @@
 /* Derive contribution shades from the editable gold while retaining hex fallbacks. */
 @supports (color: oklch(from red l c h)) {
   :root {
-    --github-contribution-1: oklch(from var(--gold) calc(l * 0.61) calc(c * 0.5) calc(h - 10));
-    --github-contribution-2: oklch(from var(--gold) calc(l * 0.74) calc(c * 0.7) calc(h - 7));
-    --github-contribution-3: oklch(from var(--gold) calc(l * 0.87) calc(c * 0.85) calc(h - 3));
+    --github-contribution-1: oklch(
+      from var(--gold) calc(l * 0.61) calc(c * 0.5) calc(h - 10)
+    );
+    --github-contribution-2: oklch(
+      from var(--gold) calc(l * 0.74) calc(c * 0.7) calc(h - 7)
+    );
+    --github-contribution-3: oklch(
+      from var(--gold) calc(l * 0.87) calc(c * 0.85) calc(h - 3)
+    );
     --github-contribution-4: var(--gold);
   }
 }
@@ -54,54 +62,65 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --animate-bob: bob 0.9s steps(1) infinite;
-  --animate-scroll-hint: scroll-hint var(--scroll-hint-bob-duration) steps(1) infinite;
+  --animate-bob: bob var(--pointer-bob-duration) steps(1) infinite;
+  --animate-scroll-hint: scroll-hint var(--pointer-bob-duration) steps(1)
+    infinite;
   --animate-limit: limit 0.4s steps(1) infinite;
 
   @keyframes limit {
     0% {
-      background-image: linear-gradient(to bottom,
-          #a88c78 0%,
-          #d8c0a8 30%,
-          #fdfbf5 52%,
-          #d8c0a8 70%,
-          #a88c78 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #a88c78 0%,
+        #d8c0a8 30%,
+        #fdfbf5 52%,
+        #d8c0a8 70%,
+        #a88c78 100%
+      );
     }
 
     20% {
-      background-image: linear-gradient(to bottom,
-          #a0a070 0%,
-          #d8d8a8 30%,
-          #fdfbf5 52%,
-          #d8d8a8 70%,
-          #a0a070 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #a0a070 0%,
+        #d8d8a8 30%,
+        #fdfbf5 52%,
+        #d8d8a8 70%,
+        #a0a070 100%
+      );
     }
 
     40% {
-      background-image: linear-gradient(to bottom,
-          #6f9fb8 0%,
-          #a8d8f0 30%,
-          #fdfbf5 52%,
-          #a8d8f0 70%,
-          #6f9fb8 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #6f9fb8 0%,
+        #a8d8f0 30%,
+        #fdfbf5 52%,
+        #a8d8f0 70%,
+        #6f9fb8 100%
+      );
     }
 
     60% {
-      background-image: linear-gradient(to bottom,
-          #7088a4 0%,
-          #a8c0d8 30%,
-          #fdfbf5 52%,
-          #a8c0d8 70%,
-          #7088a4 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #7088a4 0%,
+        #a8c0d8 30%,
+        #fdfbf5 52%,
+        #a8c0d8 70%,
+        #7088a4 100%
+      );
     }
 
     80% {
-      background-image: linear-gradient(to bottom,
-          #8888a8 0%,
-          #c0c0d8 30%,
-          #fdfbf5 52%,
-          #c0c0d8 70%,
-          #8888a8 100%);
+      background-image: linear-gradient(
+        to bottom,
+        #8888a8 0%,
+        #c0c0d8 30%,
+        #fdfbf5 52%,
+        #c0c0d8 70%,
+        #8888a8 100%
+      );
     }
   }
 
@@ -138,28 +157,49 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .portrait-hit {
-    animation: portrait-hit 220ms steps(1) both;
+    animation: portrait-hit var(--portrait-hit-duration) steps(1) both;
   }
 
   .damage-number {
-    animation: damage-number 650ms ease-out both;
+    animation: damage-number var(--damage-number-duration) ease-out both;
   }
 
   @keyframes portrait-hit {
-    0%, 50% { transform: translateX(-2px); filter: brightness(1.7); }
-    25%, 75% { transform: translateX(2px); }
-    100% { transform: none; filter: none; }
+    0%,
+    50% {
+      transform: translateX(-2px);
+      filter: brightness(1.7);
+    }
+    25%,
+    75% {
+      transform: translateX(2px);
+    }
+    100% {
+      transform: none;
+      filter: none;
+    }
   }
 
   @keyframes damage-number {
-    0% { transform: translateY(0); }
-    40% { transform: translateY(-24px); }
-    65% { transform: translateY(-16px); opacity: 1; }
-    100% { transform: translateY(-18px); opacity: 0; }
+    0% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-24px);
+    }
+    65% {
+      transform: translateY(-16px);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-18px);
+      opacity: 0;
+    }
   }
 
   .menu-enter {
-    animation: menu-enter var(--window-entry-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: menu-enter var(--window-entry-duration)
+      cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .menu-enter[data-enter="left"] {
@@ -222,6 +262,20 @@
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
   color: var(--label);
+}
+
+/* Protect small muted text with a one-pixel outline over gradients and images. */
+@utility muted-credit {
+  color: var(--muted-credit);
+  text-shadow:
+    -1px -1px 0 var(--muted-credit-outline),
+    0 -1px 0 var(--muted-credit-outline),
+    1px -1px 0 var(--muted-credit-outline),
+    -1px 0 0 var(--muted-credit-outline),
+    1px 0 0 var(--muted-credit-outline),
+    -1px 1px 0 var(--muted-credit-outline),
+    0 1px 0 var(--muted-credit-outline),
+    1px 1px 0 var(--muted-credit-outline);
 }
 
 @utility window {

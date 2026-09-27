@@ -1,13 +1,11 @@
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
 import { PixelHand, RowHand } from "./pixel-hand";
-import type { Sound } from "@/lib/audio";
 
 export type Choice = {
   label: string;
   href?: string;
   onSelect?: () => void;
   submit?: string;
-  sound?: Sound;
 };
 
 export const Choices = ({
@@ -78,7 +76,7 @@ export const Choices = ({
               );
 
         const props = {
-          "data-sound": item.submit ? "none" : (item.sound ?? "select"),
+          "data-sound": item.submit ? "none" : undefined,
           onMouseEnter: () => {
             setActiveChoiceIndex(choiceIndex);
             onPoint?.(choiceIndex);

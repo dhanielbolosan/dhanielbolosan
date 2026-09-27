@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
 import {
   colorDefinitions,
   defaultColors,
@@ -7,8 +8,12 @@ import {
   type ColorKey,
   type Rgb,
 } from "./config.data";
-import { getMutedCreditColor, loadSavedColors, rgbToHex } from "./config.utils";
-import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
+import {
+  getMutedCreditColor,
+  getMutedCreditOutline,
+  loadSavedColors,
+  rgbToHex,
+} from "./config.utils";
 
 export const useConfig = () => {
   // Restore the saved palette once when Config mounts.
@@ -32,9 +37,12 @@ export const useConfig = () => {
         definition.cssVar,
         rgbToHex(colors[definition.key]),
       );
+    // Keep muted text and its outline readable over every window corner.
+    const mutedCredit = getMutedCreditColor(colors.br);
+    document.documentElement.style.setProperty("--muted-credit", mutedCredit);
     document.documentElement.style.setProperty(
-      "--muted-credit",
-      getMutedCreditColor(colors.br),
+      "--muted-credit-outline",
+      getMutedCreditOutline(mutedCredit),
     );
 
     const saveColors = () => {
@@ -122,7 +130,7 @@ export const useConfig = () => {
   // Hover takes priority over the open setting for the header hint.
   const pointedSetting = hoveredSetting ?? openSetting;
 
-  // Toggle the chosen setting, or restore the default palette for Reset.
+  // Toggle the chosen setting, or restore the default palette and volume.
   const selectSetting = (setting: Setting) => {
     if (setting === "reset") {
       setColors(defaultColors);

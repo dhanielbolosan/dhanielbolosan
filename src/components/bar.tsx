@@ -11,13 +11,14 @@ export const Bar = ({
   className?: string;
   fillClassName?: string;
 }) => {
-  const full = value >= 1;
+  const progress = Number.isFinite(value) ? Math.max(0, Math.min(value, 1)) : 0;
+  const full = progress === 1;
 
   return (
     <span
       role="meter"
       aria-label={label}
-      aria-valuenow={Math.round(value * 100)}
+      aria-valuenow={Math.round(progress * 100)}
       aria-valuemin={0}
       aria-valuemax={100}
       className={cn(
@@ -32,7 +33,7 @@ export const Bar = ({
           fillClassName,
           full && !fillClassName && "motion-safe:animate-limit",
         )}
-        style={{ width: `${Math.min(value, 1) * 100}%` }}
+        style={{ width: `${progress * 100}%` }}
       />
     </span>
   );

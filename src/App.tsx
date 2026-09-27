@@ -4,13 +4,14 @@ import { useMedia } from "./lib/use-media";
 import { TypewriterReady } from "./lib/use-typewriter";
 import { Window } from "./components/window";
 import { cn } from "./lib/utils";
-import { columns } from "./app/layout";
-import { Navbar } from "./app/navbar";
-import { getEntryDelay } from "./app/entrance";
-import { useMenuEntrance } from "./app/use-menu-entrance";
-import { ScrollHint } from "./app/scroll-hint";
+import { columns } from "./lib/layout";
+import { Navbar } from "./components/navbar";
+import { getEntryDelay } from "./lib/entrance";
+import { useMenuEntrance } from "./lib/use-menu-entrance";
+import { ScrollHint } from "./components/scroll-hint";
 
 function App() {
+  // Listen once for menu interaction sounds, including controls in portals.
   useEffect(attachMenuSounds, []);
   const isTabletOrWider = useMedia("(min-width: 48rem)");
 
@@ -83,8 +84,8 @@ function App() {
             </div>
           ))}
           <ScrollHint
+            key={activeTabIndex}
             columnRef={activeColumnRef}
-            columnIndex={activeTabIndex}
             enabled={
               !isTabletOrWider &&
               !entering &&

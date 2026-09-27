@@ -1,4 +1,22 @@
-import { birthday } from "./status.data.ts";
+import { aerithGrowth, birthday } from "./status.data.ts";
+
+// ponytail: use Aerith's growth baselines; simulate level-up rolls only for save-file stats.
+export const calculatePortraitResources = (level: number) => {
+  // Bound age to the growth curves; their first baseline matches her starting HP/MP.
+  const growthLevel = Math.min(99, Math.max(2, Math.floor(level)));
+  const curve = aerithGrowth.find(({ maxLevel }) => growthLevel <= maxLevel)!;
+
+  return {
+    maxHealth: Math.min(
+      9999,
+      curve.health[0] + (growthLevel - 1) * curve.health[1],
+    ),
+    maxMana: Math.min(
+      999,
+      curve.mana[0] + Math.floor(((growthLevel - 1) * curve.mana[1]) / 10),
+    ),
+  };
+};
 
 // ponytail: fixed attack power and 5% critical chance; add combat stats only for a full battle.
 export const calculateHit = (
@@ -14,6 +32,7 @@ export const calculateHit = (
   return { damage, critical, health: Math.max(0, health - damage) };
 };
 
+// Mark KO at zero HP and near-death status at one-quarter of the maximum.
 export const healthStatus = (health: number, maximum: number) =>
   health === 0 ? "ko" : health <= maximum / 4 ? "critical" : "normal";
 
@@ -23,8 +42,9 @@ export const limitGain = (damage: number, maximum: number) =>
 
 // Use age as level and time between birthdays as EXP.
 export const calculateLevelProgress = (today = new Date()) => {
+  // Midnight in Hawaiʻi is 10:00 UTC throughout the year.
   const birthdayInYear = (year: number) =>
-    new Date(year, birthday.month - 1, birthday.day);
+    new Date(Date.UTC(year, birthday.month - 1, birthday.day, 10));
 
   // Find the birthdays surrounding today to measure this level's progress.
   const hasBirthdayOccurred = birthdayInYear(today.getFullYear()) <= today;
@@ -32,15 +52,14 @@ export const calculateLevelProgress = (today = new Date()) => {
     today.getFullYear() - (hasBirthdayOccurred ? 0 : 1),
   );
   const nextBirthday = birthdayInYear(previousBirthday.getFullYear() + 1);
-  const isBirthday =
-    today.getMonth() === birthday.month - 1 && today.getDate() === birthday.day;
+  const elapsed = today.getTime() - previousBirthday.getTime();
+  const isBirthday = elapsed < 24 * 60 * 60 * 1000;
 
   return {
     level: previousBirthday.getFullYear() - birthday.year,
     // Keep the EXP bar full for the entire birthday.
     experienceProgress: isBirthday
       ? 1
-      : (today.getTime() - previousBirthday.getTime()) /
-        (nextBirthday.getTime() - previousBirthday.getTime()),
+      : elapsed / (nextBirthday.getTime() - previousBirthday.getTime()),
   };
 };

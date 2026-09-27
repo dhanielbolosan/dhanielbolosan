@@ -42,7 +42,6 @@ export const History = () => {
                     }}
                   >
                     <Popover.Trigger
-                      data-sound={"select"}
                       onMouseEnter={() => setHoveredEntryName(entry.name)}
                       onMouseLeave={() => setHoveredEntryName(undefined)}
                       onClick={(event) => {

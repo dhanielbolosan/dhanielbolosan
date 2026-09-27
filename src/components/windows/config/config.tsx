@@ -1,12 +1,4 @@
-import { useSyncExternalStore } from "react";
 import { Popover } from "radix-ui";
-import {
-  getSoundSettings,
-  subscribeSound,
-  setSoundSettings,
-  playSound,
-  defaultSoundSettings,
-} from "@/lib/audio";
 import { cn } from "@/lib/utils";
 import { RowHand } from "../../pixel-hand";
 import { WindowHeader } from "../../window";
@@ -14,14 +6,10 @@ import { settings, settingHelp } from "./config.data";
 import { useConfig } from "./use-config";
 import { ColorPreview } from "./color-preview";
 import { RgbSliders } from "./rgb-sliders";
+import { VolumeSlider } from "./volume-slider";
 
 export const Config = () => {
   const config = useConfig();
-  const sound = useSyncExternalStore(
-    subscribeSound,
-    getSoundSettings,
-    () => defaultSoundSettings,
-  );
   const {
     hoveredSetting,
     setHoveredSetting,
@@ -43,6 +31,7 @@ export const Config = () => {
         }
       />
 
+      {/* Settings share label and preview columns; Reset remains the final row. */}
       <ul className="grid grid-cols-[auto_1fr] items-start gap-y-2 font-heading">
         {settings.map(({ id, label }) =>
           id === "volume" ? (
@@ -54,54 +43,10 @@ export const Config = () => {
               onMouseLeave={() => setHoveredSetting(undefined)}
               className="col-span-2 grid min-h-9 grid-cols-subgrid items-center @max-[18rem]:mt-6"
             >
-              <label
-                htmlFor="sound-volume"
-                className="relative py-0.5 pl-7 text-base"
-              >
-                <RowHand
-                  show={hoveredSetting === id}
-                  bob
-                />
-                <span className="text-label">{label}</span>
-              </label>
-              <div className="relative ml-7 grid grid-cols-[6.25rem_auto] items-center gap-x-1 text-base @min-[21rem]:grid-cols-[11.25rem_auto]">
-                <span
-                  aria-hidden="true"
-                  className="absolute right-full mr-1 @max-[18rem]:right-auto @max-[18rem]:bottom-full @max-[18rem]:left-0 @max-[18rem]:mb-1 @max-[18rem]:mr-0"
-                >
-                  Low
-                </span>
-                <input
-                  id="sound-volume"
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={sound.volume}
-                  aria-label="Sound volume"
-                  aria-valuetext={sound.volume ? `${sound.volume}%` : "Muted"}
-                  onFocus={() => setHoveredSetting(id)}
-                  onBlur={() => setHoveredSetting(undefined)}
-                  onChange={(event) =>
-                    setSoundSettings({ volume: Number(event.target.value) })
-                  }
-                  onPointerUp={() => playSound("select")}
-                  onKeyUp={(event) => {
-                    if (
-                      event.key.startsWith("Arrow") ||
-                      event.key === "Home" ||
-                      event.key === "End"
-                    )
-                      playSound("select");
-                  }}
-                  className="ff7-slider min-w-0"
-                />
-                <span
-                  aria-hidden="true"
-                  className="@max-[18rem]:absolute @max-[18rem]:bottom-full @max-[18rem]:left-25 @max-[18rem]:mb-1 @max-[18rem]:-translate-x-full"
-                >
-                  High
-                </span>
-              </div>
+              <VolumeSlider
+                label={label}
+                config={config}
+              />
             </li>
           ) : (
             <li
@@ -184,11 +129,8 @@ export const Config = () => {
         )}
       </ul>
 
-      {/* ponytail: use the bottom-right color; sample the rendered gradient if mixed palettes need exact contrast. */}
-      <footer
-        className="mt-auto pt-3 text-right font-heading text-xs leading-relaxed [text-shadow:none]"
-        style={{ color: "var(--muted-credit)" }}
-      >
+      {/* Keep the credit muted and readable as the window palette changes. */}
+      <footer className="muted-credit mt-auto pt-3 text-right font-heading text-xs leading-relaxed">
         <span className="inline-block">still leveling up /</span>{" "}
         <span className="inline-block">
           inspired by{" "}

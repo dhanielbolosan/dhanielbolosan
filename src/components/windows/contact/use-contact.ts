@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { contactSchema, type ContactFields } from "@/lib/contact";
@@ -35,6 +41,7 @@ export const useContact = () => {
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
+  const submitting = useRef(false);
 
   const { fading, fadeTo } = useWindowFade();
 
@@ -116,6 +123,18 @@ export const useContact = () => {
     );
   };
 
+  // Block repeat submits, including implicit Enter, until validation and sending finish.
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
+    try {
+      await form.handleSubmit(submitMessage, handleValidationErrors)(event);
+    } finally {
+      submitting.current = false;
+    }
+  };
+
   // Queue navigation; Back starts erasing immediately because it has no menu choices.
   const queueAction = (action: ContactAction) => {
     setPendingAction(action);
@@ -192,7 +211,6 @@ export const useContact = () => {
     { label: "Send", submit: "contact-form" },
     {
       label: "Back",
-      sound: "select",
       onSelect: () => queueAction({ type: "back" }),
     },
   ];
@@ -203,7 +221,6 @@ export const useContact = () => {
         ? [
             {
               label: "Back",
-              sound: "select",
               onSelect: () => queueAction({ type: "back" }),
             },
           ]
@@ -229,6 +246,7 @@ export const useContact = () => {
     !!dialogueText &&
     visibleDialogue === dialogueText &&
     !pendingAction &&
+    !form.formState.isSubmitting &&
     !fading;
 
   return {
@@ -238,7 +256,7 @@ export const useContact = () => {
     fullDialogue,
     reservedDialogueLines,
     form,
-    handleFormSubmit: form.handleSubmit(submitMessage, handleValidationErrors),
+    handleFormSubmit,
     commands,
     choicesReady,
     menuChoices,

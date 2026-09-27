@@ -1,13 +1,18 @@
-export type Sound =
-  | "select"
-  | "error"
-  | "slash"
-  | "crit"
-  | "heal"
-  | "delete"
-  | "limit"
-  | "fanfare";
+// Keep the clip names and their shared type in one place.
+const sounds = [
+  "select",
+  "error",
+  "slash",
+  "crit",
+  "heal",
+  "delete",
+  "limit",
+  "fanfare",
+] as const;
 
+export type Sound = (typeof sounds)[number];
+
+// Restore volume once, preserving the previous setting format's mute preference.
 export const defaultSoundSettings = { volume: 20 };
 const storageKey = "sound-settings";
 let settings = defaultSoundSettings;
@@ -22,6 +27,7 @@ try {
   // Sound remains usable when storage is unavailable.
 }
 
+// Give React a stable snapshot and subscription for the shared volume setting.
 const listeners = new Set<() => void>();
 export const getSoundSettings = () => settings;
 export const subscribeSound = (listener: () => void) => {
@@ -31,40 +37,36 @@ export const subscribeSound = (listener: () => void) => {
   };
 };
 
+// Share one audio context and bounded caches across all mounted windows.
 let context: AudioContext | undefined;
 let gain: GainNode | undefined;
 const buffers = new Map<Sound, AudioBuffer>();
 const loading = new Map<Sound, Promise<AudioBuffer>>();
 const requests = new Map<Sound, number>();
 const lastPlayed = new Map<Sound, number>();
-const sounds: Sound[] = [
-  "select",
-  "error",
-  "slash",
-  "crit",
-  "heal",
-  "delete",
-  "limit",
-  "fanfare",
-];
 
-export const setSoundSettings = (next: Partial<typeof settings>) => {
-  settings = { ...settings, ...next };
-  settings.volume = Number.isFinite(settings.volume)
-    ? Math.max(0, Math.min(100, settings.volume))
-    : 20;
+// Clamp volume, apply it immediately, and invalidate pending playback when muted.
+export const setSoundSettings = (next: typeof settings) => {
+  const volume = Number.isFinite(next.volume)
+    ? Math.max(0, Math.min(100, next.volume))
+    : defaultSoundSettings.volume;
+  if (volume === settings.volume) return;
+  settings = { volume };
   if (!settings.volume)
     requests.forEach((request, sound) => requests.set(sound, request + 1));
   if (gain) gain.gain.value = settings.volume / 100;
   try {
     localStorage.setItem(storageKey, JSON.stringify(settings));
   } catch {
-    /* Keep the current setting in memory. */
+    // Keep the current setting in memory when storage is unavailable.
   }
   listeners.forEach((listener) => listener());
 };
 
+// Reuse decoded clips and in-flight loads instead of fetching again.
 const loadSound = (sound: Sound) => {
+  const buffer = buffers.get(sound);
+  if (buffer) return Promise.resolve(buffer);
   let pending = loading.get(sound);
   if (!pending) {
     pending = fetch(`/audio/${sound}.mp3`)
@@ -83,7 +85,7 @@ const loadSound = (sound: Sound) => {
   return pending;
 };
 
-// Called from an actual press, never from hover or page load.
+// Lazily create and resume one context, preloading the shared effect set.
 const unlockAudio = () => {
   if (!settings.volume) return;
   try {
@@ -102,6 +104,7 @@ const unlockAudio = () => {
   }
 };
 
+// Coalesce duplicate events and drop superseded or delayed playback requests.
 export const playSound = (sound: Sound) => {
   if (!settings.volume || document.hidden) return;
   const now = performance.now();
@@ -116,6 +119,7 @@ export const playSound = (sound: Sound) => {
       if (
         !settings.volume ||
         document.hidden ||
+        performance.now() - now > 1000 ||
         context?.state !== "running" ||
         requests.get(sound) !== request
       )
@@ -172,8 +176,7 @@ export const attachMenuSounds = () => {
   const onClick = (event: MouseEvent) => {
     const element = control(event.target);
     if (!element || element.matches("input, textarea")) return;
-    const sound = element.closest<HTMLElement>("[data-sound]")?.dataset.sound;
-    playSound(sounds.includes(sound as Sound) ? (sound as Sound) : "select");
+    playSound("select");
   };
   const onChange = (event: Event) => {
     if (control(event.target)?.matches('input[type="range"]'))
