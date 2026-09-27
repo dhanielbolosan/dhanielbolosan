@@ -24,6 +24,7 @@ import {
   getContactTransitionPhase,
 } from "./contact.utils";
 
+// Coordinate form submission, dialogue, and faded screen changes.
 export const useContact = () => {
   const [mode, setMode] = useState<ContactMode>("menu");
   const [dialogueText, setDialogueText] = useState(dialogueLines.menu);
@@ -58,6 +59,7 @@ export const useContact = () => {
     [fadeTo],
   );
 
+  // Open queued links after the redirect dialogue, then restore the menu.
   useEffect(() => {
     const href = pendingHref;
 
@@ -92,6 +94,7 @@ export const useContact = () => {
   async function submitMessage(data: ContactFields) {
     playSound("select");
     setDialogueText(dialogueLines.sending);
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
@@ -128,6 +131,7 @@ export const useContact = () => {
     event.preventDefault();
     if (submitting.current) return;
     submitting.current = true;
+
     try {
       await form.handleSubmit(submitMessage, handleValidationErrors)(event);
     } finally {
@@ -172,6 +176,7 @@ export const useContact = () => {
     menuReady ? menuChoices.map((item) => item.label).join("\n") : "",
   );
 
+  // Advance queued actions through choice erasure, dialogue erasure, and navigation.
   useEffect(() => {
     // Erase choices before dialogue, then fade to the next screen.
     const phase = getContactTransitionPhase(
@@ -180,6 +185,7 @@ export const useContact = () => {
       dialogueText,
       visibleDialogue,
     );
+
     if (!phase || !pendingAction) return;
 
     if (phase === "erase-dialogue") {

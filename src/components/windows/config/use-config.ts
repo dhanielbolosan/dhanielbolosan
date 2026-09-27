@@ -20,6 +20,7 @@ export const useConfig = () => {
   const [colors, setColors] = useState(() =>
     loadSavedColors(storageKey, defaultColors),
   );
+
   const [hoveredSetting, setHoveredSetting] = useState<Setting>();
   const [openSetting, setOpenSetting] = useState<Setting>();
   const [selectedColorKey, setSelectedColorKey] = useState<ColorKey>();
@@ -29,10 +30,12 @@ export const useConfig = () => {
     text: "text",
   });
   const [activeChannelIndex, setActiveChannelIndex] = useState(0);
+
   // Return keyboard focus to the color opener, then its setting label.
   const settingButtonRef = useRef<HTMLButtonElement>(null);
   const colorButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Apply and persist palette changes, including adaptive credit colors.
   useEffect(() => {
     // Apply color changes immediately through the shared CSS variables.
     for (const definition of colorDefinitions)
@@ -40,6 +43,7 @@ export const useConfig = () => {
         definition.cssVar,
         rgbToHex(colors[definition.key]),
       );
+
     // Keep muted text and its outline readable over every window corner.
     const mutedCredit = getMutedCreditColor(colors.br);
     document.documentElement.style.setProperty("--muted-credit", mutedCredit);
@@ -92,6 +96,7 @@ export const useConfig = () => {
     else closeSetting();
   };
 
+  // Listen for Escape while a setting is open and restore focus on close.
   useEffect(() => {
     if (!openSetting) return;
 
@@ -113,6 +118,7 @@ export const useConfig = () => {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [openSetting, selectedColorKey]);
 
+  // Close an expanded setting on outside presses after its sliders close.
   useEffect(() => {
     // Dismiss outside clicks only when the sliders are closed.
     if (!openSetting || selectedColorKey) return;

@@ -32,8 +32,8 @@ export const StatusProfile = ({
 
   return (
     <div className="flow-root font-heading">
-      {/* Keep the square portrait beside the name and paired resource rows. */}
       <div className="grid grid-cols-[6.75rem_minmax(0,1fr)] items-start gap-x-2 gap-y-1 @min-[22rem]:gap-x-3">
+        {/* Portrait */}
         <div className="row-span-2 flex flex-col items-center gap-1">
           <button
             type="button"
@@ -66,6 +66,8 @@ export const StatusProfile = ({
                 />
               </ImageFrame>
             </div>
+
+            {/* Damage and recovery numbers */}
             {hit && (
               <span
                 key={hit.id}
@@ -81,6 +83,7 @@ export const StatusProfile = ({
           </button>
         </div>
 
+        {/* Header */}
         <div className="flow-root min-w-0">
           <h2 className="window-title-float">Status</h2>
           <h1 className="text-xl leading-tight font-semibold tracking-wide">
@@ -88,13 +91,17 @@ export const StatusProfile = ({
           </h1>
         </div>
 
+        {/* Combat stats and progression */}
         <div className="col-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-end gap-x-1 gap-y-0.5 self-end text-sm leading-4 @min-[22rem]:grid-cols-[minmax(7rem,1fr)_minmax(0,1.2fr)] @min-[22rem]:gap-x-2">
-          {/* Compact totals visually on narrow windows while retaining accessible maxima. */}
+          {/* LV, HP, and MP */}
           <div className="row-span-3 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] grid-rows-subgrid items-end gap-x-1 self-stretch">
+            {/* Age level */}
             <span className="text-label leading-none">LV</span>
             <span className="text-lg leading-none font-semibold tabular-nums">
               {level}
             </span>
+
+            {/* Health total and meter */}
             <span className="text-label leading-none">HP</span>
             <span className="block text-right leading-4 font-semibold whitespace-nowrap tabular-nums">
               <span
@@ -113,6 +120,8 @@ export const StatusProfile = ({
                 fillClassName="bg-[linear-gradient(to_right,#4f8fd4,#c6cded)]"
               />
             </span>
+
+            {/* Magic total and meter */}
             <span className="text-label leading-none">MP</span>
             <span className="block text-right leading-4 font-semibold whitespace-nowrap tabular-nums">
               <span>
@@ -128,8 +137,9 @@ export const StatusProfile = ({
             </span>
           </div>
 
+          {/* Shared grid rows align birthday and Limit bars with HP and MP. */}
           <div className="col-start-2 row-span-2 row-start-2 ml-7 grid min-w-0 grid-rows-subgrid items-end self-stretch">
-            {/* Shared grid rows align birthday and Limit bars with HP and MP. */}
+            {/* Birthday progress */}
             <div className="min-w-0 space-y-1">
               <span className="block text-xs leading-none">next level</span>
               <Bar
@@ -138,6 +148,8 @@ export const StatusProfile = ({
                 className="h-2.5"
               />
             </div>
+
+            {/* Full-heal Limit */}
             <button
               type="button"
               data-sound="none"
@@ -163,6 +175,8 @@ export const StatusProfile = ({
                   label="Limit gauge"
                   className="h-2.5"
                 />
+
+                {/* Full Limit pointer */}
                 {limit === maxLimit && (
                   <PixelHand className="pointer-events-none absolute top-1/2 right-full mr-2 -translate-y-1/2 motion-safe:animate-bob" />
                 )}
@@ -171,6 +185,7 @@ export const StatusProfile = ({
           </div>
         </div>
       </div>
+
       {/* Announce health and Limit readiness without reading each animation frame. */}
       <p
         role="status"

@@ -1,6 +1,6 @@
 import { aerithGrowth, birthday } from "./status.data.ts";
 
-// ponytail: use Aerith's growth baselines; simulate level-up rolls only for save-file stats.
+// Derive deterministic HP and MP totals from Aerith's growth brackets.
 export const calculatePortraitResources = (level: number) => {
   // Bound age to the growth curves; their first baseline matches her starting HP/MP.
   const growthLevel = Math.min(99, Math.max(2, Math.floor(level)));
@@ -18,7 +18,7 @@ export const calculatePortraitResources = (level: number) => {
   };
 };
 
-// ponytail: fixed attack power and 5% critical chance; add combat stats only for a full battle.
+// Apply a portrait hit with damage variation and a five-percent critical chance.
 export const calculateHit = (
   health: number,
   variation = Math.random(),

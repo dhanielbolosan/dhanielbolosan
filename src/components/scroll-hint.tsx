@@ -11,10 +11,12 @@ export const ScrollHint = ({
 }) => {
   const [visible, setVisible] = useState(false);
 
+  // Measure the active column until the hint first appears.
   useEffect(() => {
-    // Measure only the active mobile column and its window wrappers.
     const column = columnRef.current;
     let timer: ReturnType<typeof setTimeout> | undefined;
+
+    // Show the hint for overflow and keep its first display on one timer.
     const update = () => {
       if (timer !== undefined) return;
       const overflowing =
@@ -28,10 +30,12 @@ export const ScrollHint = ({
       }
     };
 
+    // Observe size changes only while the mobile hint is eligible.
     const observer = enabled && column ? new ResizeObserver(update) : undefined;
     const frame = requestAnimationFrame(update);
     if (!observer || !column) return () => cancelAnimationFrame(frame);
 
+    // Watch column and window heights so late content can reveal overflow.
     observer.observe(column);
     for (const child of Array.from(column.children)) observer.observe(child);
 

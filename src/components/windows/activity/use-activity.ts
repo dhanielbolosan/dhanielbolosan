@@ -11,13 +11,9 @@ import {
 
 export const useActivity = () => {
   const [activeScreen, setActiveScreen] = useState<ActivityScreen>("GitHub");
-
   const activeScreenIndex = screens.indexOf(activeScreen);
-
   const [isMenuOpen, setMenuOpen] = useState(false);
-
   const { fadeTo } = useWindowFade();
-
   const [pointedOption, setPointedOption] = useState(0);
 
   // Show help for the pointed option while the menu is open.
@@ -27,6 +23,7 @@ export const useActivity = () => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
+  // Manage dismissal and delayed focus while the screen menu is open.
   useEffect(() => {
     if (!isMenuOpen) return;
 

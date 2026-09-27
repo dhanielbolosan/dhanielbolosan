@@ -5,9 +5,7 @@ import { calculateHit, limitGain } from "./status.utils";
 import { maxLimit } from "./status.data";
 
 export const usePortrait = (maxHealth: number) => {
-  // Keep combat state separate from the Status clock and GitHub data.
   const [currentHealth, setHealth] = useState(maxHealth);
-  // Preserve current HP and KO when LV changes, while respecting the new maximum.
   const health = Math.min(currentHealth, maxHealth);
   const [limit, setLimit] = useState(0);
   const [hit, setHit] = useState<{
@@ -30,6 +28,7 @@ export const usePortrait = (maxHealth: number) => {
       playSound("error");
       return;
     }
+
     const id = performance.now();
     if (id < nextAttackAt.current) return;
     nextAttackAt.current = id + portraitAttackCooldownMs;
@@ -38,6 +37,7 @@ export const usePortrait = (maxHealth: number) => {
       maxLimit,
       limit + limitGain(health - result.health, maxHealth),
     );
+
     setHealth(result.health);
     setLimit(nextLimit);
     setHit({ id, amount: result.damage, recovery: false });
@@ -51,8 +51,10 @@ export const usePortrait = (maxHealth: number) => {
       playSound("error");
       return;
     }
+
     const id = performance.now();
     nextAttackAt.current = id + portraitAttackCooldownMs;
+
     setHealth(maxHealth);
     setLimit(0);
     setHit({ id, amount: maxHealth - health, recovery: true });

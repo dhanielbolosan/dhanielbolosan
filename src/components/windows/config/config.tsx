@@ -139,20 +139,11 @@ export const Config = () => {
         )}
       </ul>
 
-      {/* Keep the credit muted and readable as the window palette changes. */}
       <footer className="muted-credit mt-auto pt-3 text-right font-heading text-xs leading-relaxed">
-        <span className="inline-block">still leveling up /</span>{" "}
         <span className="inline-block">
-          inspired by{" "}
-          <a
-            href="https://finalfantasy.fandom.com/wiki/Menu_(Final_Fantasy_VII)"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:decoration-2 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current"
-          >
-            FINAL FANTASY VII
-          </a>
-        </span>
+          <span className="text-[10px]">☻</span> db /
+        </span>{" "}
+        <span className="inline-block">inspired by FINAL FANTASY VII</span>
       </footer>
     </section>
   );
