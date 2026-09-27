@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
+import { playSound } from "@/lib/audio";
 import { RowHand } from "../../pixel-hand";
 import { WindowHeader } from "../../window";
 import { groups } from "./history.data";
@@ -8,8 +9,7 @@ import { groups } from "./history.data";
 export const History = () => {
   const [hoveredEntryName, setHoveredEntryName] = useState<string>();
   const [pinnedEntryName, setPinnedEntryName] = useState<string>();
-
-  // A clicked entry stays open and takes priority over hover previews.
+  const focusedEntryNameRef = useRef<string | undefined>(undefined);
   const openEntryName = pinnedEntryName ?? hoveredEntryName;
 
   return (
@@ -34,6 +34,7 @@ export const History = () => {
                     open={openEntryName === entry.name}
                     onOpenChange={(isOpen) => {
                       if (!isOpen) {
+                        if (pinnedEntryName === entry.name) playSound("select");
                         setPinnedEntryName(undefined);
                         setHoveredEntryName(undefined);
                       }
@@ -76,12 +77,23 @@ export const History = () => {
                         align="start"
                         sideOffset={2}
                         collisionPadding={12}
-                        onOpenAutoFocus={(event) => event.preventDefault()}
-                        onCloseAutoFocus={(event) => event.preventDefault()}
+                        onOpenAutoFocus={(event) => {
+                          if (pinnedEntryName !== entry.name)
+                            event.preventDefault();
+                        }}
+                        onFocusCapture={() => {
+                          focusedEntryNameRef.current = entry.name;
+                        }}
+                        onCloseAutoFocus={(event) => {
+                          if (focusedEntryNameRef.current !== entry.name)
+                            event.preventDefault();
+                          else focusedEntryNameRef.current = undefined;
+                        }}
+                        aria-label={`${entry.name} details`}
                         className={cn(
-                          "window z-50 w-(--radix-popover-trigger-width) max-w-[calc(100vw-24px)] p-4",
+                          "window z-50 max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) max-w-[calc(100vw-24px)] overflow-y-auto overscroll-contain p-4",
                           pinnedEntryName !== entry.name &&
-                            "pointer-events-none",
+                          "pointer-events-none",
                         )}
                       >
                         <ul className="flex list-disc flex-col gap-1.5 pl-5 marker:text-frame">

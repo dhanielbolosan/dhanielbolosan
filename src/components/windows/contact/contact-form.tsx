@@ -16,9 +16,11 @@ export const ContactForm = ({
   <form
     id="contact-form"
     noValidate
+    aria-busy={form.formState.isSubmitting}
     onSubmit={onSubmit}
     className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
   >
+    {/* Keep the submitted fields unchanged while the request is pending. */}
     <label
       htmlFor="contact-name"
       className="text-label"
@@ -29,6 +31,7 @@ export const ContactForm = ({
     <input
       id="contact-name"
       autoComplete="name"
+      readOnly={form.formState.isSubmitting}
       placeholder="John Doe"
       className={`h-10 py-0.5 ${field}`}
       {...form.register("name")}
@@ -45,6 +48,7 @@ export const ContactForm = ({
       id="contact-email"
       type="email"
       autoComplete="email"
+      readOnly={form.formState.isSubmitting}
       placeholder="example@gmail.com"
       className={`h-10 py-0.5 ${field}`}
       {...form.register("email")}
@@ -59,6 +63,7 @@ export const ContactForm = ({
 
     <textarea
       id="contact-message"
+      readOnly={form.formState.isSubmitting}
       placeholder="Enter your message here"
       className={`max-h-76 min-h-24 resize-none self-start overflow-y-auto py-2 field-sizing-content ${field}`}
       {...form.register("message")}

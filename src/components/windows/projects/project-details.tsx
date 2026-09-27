@@ -13,9 +13,9 @@ export const ProjectDetails = ({ project }: { project: Project }) => (
       <Stats
         columns={4}
         pairs={[
-          ["Type", project.type ?? "—"],
+          ["Type", project.type ?? ""],
 
-          ["Date", project.date ?? "—"],
+          ["Date", project.date ?? ""],
 
           [
             "Progress",
@@ -29,18 +29,18 @@ export const ProjectDetails = ({ project }: { project: Project }) => (
           ],
           ...(project.link?.href
             ? ([
-                [
-                  "Link",
-                  <a
-                    href={project.link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-gold underline underline-offset-2 hover:text-foreground"
-                  >
-                    {project.link.label}
-                  </a>,
-                ],
-              ] as const)
+              [
+                "Link",
+                <a
+                  href={project.link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-gold underline underline-offset-2 hover:text-foreground"
+                >
+                  {project.link.label}
+                </a>,
+              ],
+            ] as const)
             : []),
         ]}
       />

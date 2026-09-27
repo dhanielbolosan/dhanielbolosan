@@ -11,17 +11,15 @@ export const useProjects = () => {
 
   // Fade between the thumbnail grid and expanded gallery.
   const setExpandedView = (next: boolean) => fadeTo(() => setExpanded(next));
-
   const selectedProject = projects[selectedProjectIndex];
-
   const [lastPreviewedIndex, setLastPreviewedIndex] = useState(0);
 
   // Show the selected gallery, otherwise keep the last preview after hover ends.
   const previewedProject =
     projects[
-      isExpanded
-        ? selectedProjectIndex
-        : (hoveredProjectIndex ?? lastPreviewedIndex)
+    isExpanded
+      ? selectedProjectIndex
+      : (hoveredProjectIndex ?? lastPreviewedIndex)
     ];
 
   const pointedElementRef = useRef<HTMLElement>(null);

@@ -28,5 +28,9 @@ export const useStatus = () => {
     return () => controller.abort();
   }, []);
 
-  return { now, latestPush, ...calculateLevelProgress(now) };
+  return {
+    now,
+    latestPush,
+    ...calculateLevelProgress(now),
+  };
 };

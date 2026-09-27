@@ -76,6 +76,7 @@ export const Choices = ({
               );
 
         const props = {
+          "data-sound": item.submit ? "none" : undefined,
           onMouseEnter: () => {
             setActiveChoiceIndex(choiceIndex);
             onPoint?.(choiceIndex);

@@ -1,6 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 export const useMedia = (query: string) => {
+  // Subscribe to the query's change events and release the listener on cleanup.
   const subscribe = useCallback(
     (onChange: () => void) => {
       const list = window.matchMedia(query);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs } from "radix-ui";
 import { PixelHand } from "@/components/pixel-hand";
 import { cn } from "@/lib/utils";
-import { columns, entryDirections } from "./layout";
+import { columns, entryDirections } from "@/lib/layout";
 
 export const Navbar = ({
   selectedTabIndex,

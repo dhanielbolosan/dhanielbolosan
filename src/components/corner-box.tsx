@@ -30,6 +30,7 @@ export const CornerBox = <View,>({
   const [size, setSize] = useState<{ width: number; height: number }>();
   const [animated, setAnimated] = useState(false);
 
+  // Measure visible content to animate the corner box dimensions.
   useLayoutEffect(() => {
     const element = content.current;
 

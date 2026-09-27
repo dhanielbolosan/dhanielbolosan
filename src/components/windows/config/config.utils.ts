@@ -11,6 +11,42 @@ export const hexToRgb = (hex: string): Rgb => [
 export const rgbToHex = (rgb: Rgb) =>
   `#${rgb.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 
+const luminance = (rgb: Rgb) =>
+  rgb.reduce((sum, channel, index) => {
+    const value = channel / 255;
+
+    return (
+      sum +
+      [0.2126, 0.7152, 0.0722][index] *
+        (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+    );
+  }, 0);
+
+// Use the faintest light or dark tint that keeps small text readable.
+export const getMutedCreditColor = (background: Rgb) => {
+  const backgroundLuminance = luminance(background);
+  // Start with whichever of white or black has the greater contrast.
+  const foreground = backgroundLuminance < Math.sqrt(0.0525) - 0.05 ? 255 : 0;
+
+  for (let percent = 50; percent <= 100; percent += 5) {
+    const color = background.map((channel) =>
+      Math.round(channel + (foreground - channel) * (percent / 100)),
+    ) as Rgb;
+    const textLuminance = luminance(color);
+    const contrast =
+      (Math.max(textLuminance, backgroundLuminance) + 0.05) /
+      (Math.min(textLuminance, backgroundLuminance) + 0.05);
+
+    if (contrast >= 4.5) return rgbToHex(color);
+  }
+
+  return foreground === 255 ? "#ffffff" : "#000000";
+};
+
+// Contrast the outline with the text so mixed backgrounds cannot hide the letters.
+export const getMutedCreditOutline = (color: string) =>
+  luminance(hexToRgb(color)) < Math.sqrt(0.0525) - 0.05 ? "#ffffff" : "#000000";
+
 // Accept exactly three integer channels in the 0–255 range.
 const isRgb = (value: unknown): value is Rgb =>
   Array.isArray(value) &&

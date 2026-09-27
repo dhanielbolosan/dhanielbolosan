@@ -67,6 +67,7 @@ export const channels = [
 export const settings = [
   { id: "window", label: "Window color" },
   { id: "text", label: "Text colors" },
+  { id: "volume", label: "Volume" },
   { id: "reset", label: "Reset to default" },
 ] as const;
 
@@ -75,6 +76,7 @@ export type Setting = (typeof settings)[number]["id"];
 export const settingHelp: Record<Setting, string> = {
   window: "Select colors for each corner of the window",
   text: "Select colors for each text type",
+  volume: "Select volume for sound effects",
   reset: "Select to reset configs to default",
 };
 

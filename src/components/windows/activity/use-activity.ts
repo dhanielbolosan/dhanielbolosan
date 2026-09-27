@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useWindowFade } from "@/lib/window-fade";
 import { cornerTransitionMs } from "@/lib/motion";
+import { playSound } from "@/lib/audio";
 import {
   screens,
   activityInstruction,
@@ -10,13 +11,9 @@ import {
 
 export const useActivity = () => {
   const [activeScreen, setActiveScreen] = useState<ActivityScreen>("GitHub");
-
   const activeScreenIndex = screens.indexOf(activeScreen);
-
   const [isMenuOpen, setMenuOpen] = useState(false);
-
   const { fadeTo } = useWindowFade();
-
   const [pointedOption, setPointedOption] = useState(0);
 
   // Show help for the pointed option while the menu is open.
@@ -26,6 +23,7 @@ export const useActivity = () => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
+  // Manage dismissal and delayed focus while the screen menu is open.
   useEffect(() => {
     if (!isMenuOpen) return;
 
@@ -36,7 +34,10 @@ export const useActivity = () => {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        playSound("select");
+        setMenuOpen(false);
+      }
     };
 
     // Focus the current screen's choice after the corner menu finishes opening.

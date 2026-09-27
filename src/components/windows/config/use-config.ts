@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
 import {
   colorDefinitions,
   defaultColors,
@@ -7,13 +8,19 @@ import {
   type ColorKey,
   type Rgb,
 } from "./config.data";
-import { loadSavedColors, rgbToHex } from "./config.utils";
+import {
+  getMutedCreditColor,
+  getMutedCreditOutline,
+  loadSavedColors,
+  rgbToHex,
+} from "./config.utils";
 
 export const useConfig = () => {
   // Restore the saved palette once when Config mounts.
   const [colors, setColors] = useState(() =>
     loadSavedColors(storageKey, defaultColors),
   );
+
   const [hoveredSetting, setHoveredSetting] = useState<Setting>();
   const [openSetting, setOpenSetting] = useState<Setting>();
   const [selectedColorKey, setSelectedColorKey] = useState<ColorKey>();
@@ -24,6 +31,11 @@ export const useConfig = () => {
   });
   const [activeChannelIndex, setActiveChannelIndex] = useState(0);
 
+  // Return keyboard focus to the color opener, then its setting label.
+  const settingButtonRef = useRef<HTMLButtonElement>(null);
+  const colorButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Apply and persist palette changes, including adaptive credit colors.
   useEffect(() => {
     // Apply color changes immediately through the shared CSS variables.
     for (const definition of colorDefinitions)
@@ -31,6 +43,14 @@ export const useConfig = () => {
         definition.cssVar,
         rgbToHex(colors[definition.key]),
       );
+
+    // Keep muted text and its outline readable over every window corner.
+    const mutedCredit = getMutedCreditColor(colors.br);
+    document.documentElement.style.setProperty("--muted-credit", mutedCredit);
+    document.documentElement.style.setProperty(
+      "--muted-credit-outline",
+      getMutedCreditOutline(mutedCredit),
+    );
 
     const saveColors = () => {
       try {
@@ -71,18 +91,22 @@ export const useConfig = () => {
 
   // Close the sliders first, then the setting on the next Back action.
   const stepBack = () => {
+    playSound("select");
     if (selectedColorKey) setSelectedColorKey(undefined);
     else closeSetting();
   };
 
+  // Listen for Escape while a setting is open and restore focus on close.
   useEffect(() => {
     if (!openSetting) return;
 
     // Escape follows the same two-step path as Back.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        playSound("select");
         if (selectedColorKey) setSelectedColorKey(undefined);
         else {
+          settingButtonRef.current?.focus();
           setOpenSetting(undefined);
           setSelectedColorKey(undefined);
         }
@@ -94,6 +118,7 @@ export const useConfig = () => {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [openSetting, selectedColorKey]);
 
+  // Close an expanded setting on outside presses after its sliders close.
   useEffect(() => {
     // Dismiss outside clicks only when the sliders are closed.
     if (!openSetting || selectedColorKey) return;
@@ -115,10 +140,11 @@ export const useConfig = () => {
   // Hover takes priority over the open setting for the header hint.
   const pointedSetting = hoveredSetting ?? openSetting;
 
-  // Toggle the chosen setting, or restore the default palette for Reset.
+  // Toggle the chosen setting, or restore the default palette and volume.
   const selectSetting = (setting: Setting) => {
     if (setting === "reset") {
       setColors(defaultColors);
+      setSoundSettings(defaultSoundSettings);
       closeSetting();
     } else if (openSetting === setting) closeSetting();
     else {
@@ -128,7 +154,8 @@ export const useConfig = () => {
   };
 
   // Open the color's sliders and remember it for the setting's next visit.
-  const selectColor = (key: ColorKey) => {
+  const selectColor = (key: ColorKey, button: HTMLButtonElement) => {
+    colorButtonRef.current = button;
     setSelectedColorKey(key);
     if (openSetting)
       setLastColorKeys((current) => ({ ...current, [openSetting]: key }));
@@ -144,6 +171,8 @@ export const useConfig = () => {
     setHoveredColorKey,
     lastColorKeys,
     activeChannelIndex,
+    settingButtonRef,
+    colorButtonRef,
     setActiveChannelIndex,
     setChannelValue,
     stepBack,

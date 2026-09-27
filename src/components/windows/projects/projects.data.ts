@@ -22,7 +22,7 @@ export const projects: Project[] = [
       "/projects/kumu/kumu3.png",
     ],
     description:
-      "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions and music.",
+      "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions, music, sound effects, and graphics.",
     stack: [
       { name: "HTML/CSS", type: "language" },
       { name: "HyperFrames", type: "library" },
@@ -41,15 +41,16 @@ export const projects: Project[] = [
   },
 
   {
-    name: "SENTINEL",
+    name: "SENTINEL Mobile App",
     thumbnail: "/projects/sentinel/thumbnail.png",
     images: [
       "/projects/sentinel/sentinel1.png",
       "/projects/sentinel/sentinel2.png",
       "/projects/sentinel/sentinel3.png",
+      "/projects/sentinel/sentinel4.png",
     ],
     description:
-      "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch, 5G mesh network, and drone swarm simulations.",
+      "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch detection, 5G mesh network, and drone swarm simulations.",
     stack: [
       { name: "TypeScript", type: "language" },
       { name: "Capacitor", type: "framework" },

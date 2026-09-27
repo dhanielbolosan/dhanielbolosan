@@ -40,9 +40,7 @@ export const ColorPreview = ({
       role="radio"
       aria-checked={selectedColorKey === key}
       aria-label={label}
-      onClick={() => {
-        selectColor(key);
-      }}
+      onClick={(event) => selectColor(key, event.currentTarget)}
       onMouseEnter={() => setHoveredColorKey(key)}
       onFocus={() => setHoveredColorKey(key)}
       onBlur={() => setHoveredColorKey(undefined)}

@@ -20,6 +20,7 @@ export const useTypewriter = (
     // Wait for the entrance animation; reduced motion shows text immediately.
     if (!ready || reducedMotion) return;
 
+    // Advance or erase text using elapsed time between animation frames.
     let lastUpdateMs = performance.now();
     let frame = requestAnimationFrame(function tick(now) {
       const { state: next, consumedMs } = advanceTypewriter(
