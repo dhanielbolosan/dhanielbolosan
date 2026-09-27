@@ -141,7 +141,7 @@ export const Config = () => {
 
       <footer className="muted-credit mt-auto pt-3 text-right font-heading text-xs leading-relaxed">
         <span className="inline-block">
-          <span className="text-[10px]">☻</span> db /
+          <span className="text-[10px]">☻</span> dab /
         </span>{" "}
         <span className="inline-block">inspired by FINAL FANTASY VII</span>
       </footer>

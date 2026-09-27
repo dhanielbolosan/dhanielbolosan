@@ -86,11 +86,7 @@ function App() {
           <ScrollHint
             key={activeTabIndex}
             columnRef={activeColumnRef}
-            enabled={
-              !isTabletOrWider &&
-              !entering &&
-              columns[activeTabIndex].windows.length > 1
-            }
+            enabled={!isTabletOrWider && !entering}
           />
         </main>
       </div>

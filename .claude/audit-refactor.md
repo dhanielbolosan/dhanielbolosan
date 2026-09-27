@@ -113,7 +113,7 @@ Use this directory layout as the project reference. Inspect the current tree bef
 - Contact must prevent duplicate submissions and handle failure without losing entered data. Test submissions with a mocked endpoint.
 - Focused project images close through Back only. Preserve their image proportions and sizing behavior.
 - Project thumbnails overlapping in narrow windows is an accepted design choice. Do not flag that overlap as a defect or propose resizing/reflowing the grid to remove it unless the user changes this preference.
-- The mobile scroll hint appears only when the active column has another window and actually overflows. Start its full 3-second duration when it first appears; scrolling does not dismiss it. Keep its 150 ms fade-in/out, vertical bob, reduced-motion behavior, text-only presentation, and established bottom spacing. No dark gradient overlay.
+- The mobile scroll hint can appear on any tab when its active column actually overflows, including tabs with a single window. Start its full 4.5-second duration when it first appears; scrolling does not dismiss it. Keep its 150 ms fade-in/out, vertical bob, reduced-motion behavior, text-only presentation, and established bottom spacing. No dark gradient overlay.
 
 ### Project checks
 
