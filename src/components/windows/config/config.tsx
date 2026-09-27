@@ -15,6 +15,8 @@ export const Config = () => {
     setHoveredSetting,
     openSetting,
     selectedColorKey,
+    settingButtonRef,
+    colorButtonRef,
     stepBack,
     selectSetting,
     pointedSetting,
@@ -70,18 +72,20 @@ export const Config = () => {
               className="col-span-2 grid min-h-9 cursor-pointer grid-cols-subgrid items-center"
             >
               <button
+                ref={openSetting === id ? settingButtonRef : undefined}
                 type="button"
                 aria-expanded={id === "reset" ? undefined : openSetting === id}
                 onFocus={() => setHoveredSetting(id)}
                 onBlur={() => setHoveredSetting(undefined)}
                 className={cn(
-                  "relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
+                  "group relative cursor-pointer py-0.5 pl-7 text-left text-base outline-none",
                   id === "reset" && "col-span-2",
                 )}
               >
                 <RowHand
                   show={hoveredSetting === id || openSetting === id}
                   bob={hoveredSetting === id && openSetting !== id}
+                  className="group-focus-visible:visible"
                 />
 
                 <span className="text-label">{label}</span>
@@ -106,6 +110,12 @@ export const Config = () => {
                       sideOffset={6}
                       collisionPadding={12}
                       onEscapeKeyDown={(event) => event.preventDefault()}
+                      onCloseAutoFocus={(event) => {
+                        event.preventDefault();
+                        // Restore a removed slider's focus without overriding an outside control.
+                        if (document.activeElement === document.body)
+                          colorButtonRef.current?.focus();
+                      }}
                       onInteractOutside={(event) =>
                         (event.target as Element).closest(
                           `[data-setting="${id}"]`,

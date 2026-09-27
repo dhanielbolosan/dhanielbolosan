@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
 import {
   colorDefinitions,
@@ -29,6 +29,9 @@ export const useConfig = () => {
     text: "text",
   });
   const [activeChannelIndex, setActiveChannelIndex] = useState(0);
+  // Return keyboard focus to the color opener, then its setting label.
+  const settingButtonRef = useRef<HTMLButtonElement>(null);
+  const colorButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Apply color changes immediately through the shared CSS variables.
@@ -98,6 +101,7 @@ export const useConfig = () => {
         playSound("select");
         if (selectedColorKey) setSelectedColorKey(undefined);
         else {
+          settingButtonRef.current?.focus();
           setOpenSetting(undefined);
           setSelectedColorKey(undefined);
         }
@@ -144,7 +148,8 @@ export const useConfig = () => {
   };
 
   // Open the color's sliders and remember it for the setting's next visit.
-  const selectColor = (key: ColorKey) => {
+  const selectColor = (key: ColorKey, button: HTMLButtonElement) => {
+    colorButtonRef.current = button;
     setSelectedColorKey(key);
     if (openSetting)
       setLastColorKeys((current) => ({ ...current, [openSetting]: key }));
@@ -160,6 +165,8 @@ export const useConfig = () => {
     setHoveredColorKey,
     lastColorKeys,
     activeChannelIndex,
+    settingButtonRef,
+    colorButtonRef,
     setActiveChannelIndex,
     setChannelValue,
     stepBack,

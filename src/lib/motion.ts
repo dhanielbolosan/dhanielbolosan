@@ -12,8 +12,8 @@ export const portraitHitMs = 150;
 export const damageNumberMs = 600;
 export const portraitAttackCooldownMs = 450;
 
-// Allow the mobile hint to remain visible through ten window-entry durations.
-export const scrollHintDurationMs = windowEntryMs * 10;
+// Keep the mobile hint visible for three seconds after it first appears.
+export const scrollHintDurationMs = fadeMs * 20;
 
 // Share the typing cadence and scale the erase speed.
 export const typingIntervalMs = 10;

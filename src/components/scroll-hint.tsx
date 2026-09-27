@@ -14,38 +14,31 @@ export const ScrollHint = ({
   useEffect(() => {
     // Measure only the active mobile column and its window wrappers.
     const column = columnRef.current;
-    let dismissed = false;
-    const update = () =>
-      setVisible(
-        enabled &&
-          !!column &&
-          !dismissed &&
-          column.scrollTop < 8 &&
-          column.scrollHeight > column.clientHeight + 8,
-      );
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const update = () => {
+      if (timer !== undefined) return;
+      const overflowing =
+        enabled && !!column && column.scrollHeight > column.clientHeight + 8;
+      setVisible(overflowing);
 
-    const frame = requestAnimationFrame(update);
-    if (!enabled || !column) return () => cancelAnimationFrame(frame);
-
-    const observer = new ResizeObserver(update);
-    // Stop measuring once scrolling or the display timeout dismisses this cue.
-    const dismiss = () => {
-      dismissed = true;
-      setVisible(false);
-      observer.disconnect();
-      column.removeEventListener("scroll", dismiss);
+      // Start the full display duration only once the hint can be shown.
+      if (overflowing) {
+        observer?.disconnect();
+        timer = setTimeout(() => setVisible(false), scrollHintDurationMs);
+      }
     };
 
-    const timer = setTimeout(dismiss, scrollHintDurationMs);
+    const observer = enabled && column ? new ResizeObserver(update) : undefined;
+    const frame = requestAnimationFrame(update);
+    if (!observer || !column) return () => cancelAnimationFrame(frame);
+
     observer.observe(column);
     for (const child of Array.from(column.children)) observer.observe(child);
-    column.addEventListener("scroll", dismiss, { passive: true });
 
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(timer);
       observer.disconnect();
-      column.removeEventListener("scroll", dismiss);
     };
   }, [columnRef, enabled]);
 
