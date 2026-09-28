@@ -151,6 +151,12 @@ export const playSound = (sound: Sound) => {
     .catch(() => undefined); // Audio failures must never interrupt an action.
 };
 
+// Hints never wait for a click to unlock audio.
+export const playSelectHint = () => {
+  if (context?.state === "running" && buffers.has("select"))
+    playSound("select");
+};
+
 // Delegation also covers controls rendered in Radix portals.
 export const attachMenuSounds = () => {
   let keyboardFocus = false;
@@ -170,13 +176,6 @@ export const attachMenuSounds = () => {
       : element;
   };
 
-  // Preview available controls with the shared selection sound.
-  const point = (element: HTMLElement | null) => {
-    // Drop hover sounds until audio is unlocked and decoded, avoiding a backlog.
-    if (element && context?.state === "running" && buffers.has("select"))
-      playSound("select");
-  };
-
   // Unlock audio on a pointer gesture and clear keyboard navigation state.
   const onPointerDown = () => {
     keyboardFocus = false;
@@ -189,20 +188,9 @@ export const attachMenuSounds = () => {
     void unlockAudio()?.catch(() => undefined);
   };
 
-  // Play hover feedback once per control, for mouse pointers only.
-  const onPointerOver = (event: PointerEvent) => {
-    const element = control(event.target);
-    if (
-      event.pointerType === "mouse" &&
-      element &&
-      !element.contains(event.relatedTarget as Node | null)
-    )
-      point(element);
-  };
-
   // Play focus feedback when Tab or arrow navigation moves between controls.
   const onFocus = (event: FocusEvent) => {
-    if (keyboardFocus) point(control(event.target));
+    if (keyboardFocus && control(event.target)) playSelectHint();
   };
 
   // Play selection feedback for activated controls, excluding editable fields.
@@ -221,14 +209,12 @@ export const attachMenuSounds = () => {
   // Attach delegated listeners once and remove them on cleanup.
   document.addEventListener("pointerdown", onPointerDown, true);
   document.addEventListener("keydown", onKeyDown, true);
-  document.addEventListener("pointerover", onPointerOver);
   document.addEventListener("focusin", onFocus);
   document.addEventListener("click", onClick, true);
   document.addEventListener("change", onChange);
   return () => {
     document.removeEventListener("pointerdown", onPointerDown, true);
     document.removeEventListener("keydown", onKeyDown, true);
-    document.removeEventListener("pointerover", onPointerOver);
     document.removeEventListener("focusin", onFocus);
     document.removeEventListener("click", onClick, true);
     document.removeEventListener("change", onChange);

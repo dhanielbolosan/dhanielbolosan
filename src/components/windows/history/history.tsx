@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { Popover } from "radix-ui";
 import { cn } from "@/lib/utils";
-import { playSound } from "@/lib/audio";
 import { RowHand } from "../../pixel-hand";
 import { WindowHeader } from "../../window";
 import { groups } from "./history.data";
@@ -34,7 +33,6 @@ export const History = () => {
                     open={openEntryName === entry.name}
                     onOpenChange={(isOpen) => {
                       if (!isOpen) {
-                        if (pinnedEntryName === entry.name) playSound("select");
                         setPinnedEntryName(undefined);
                         setHoveredEntryName(undefined);
                       }

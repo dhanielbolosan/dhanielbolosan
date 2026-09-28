@@ -91,7 +91,6 @@ export const useConfig = () => {
 
   // Close the sliders first, then the setting on the next Back action.
   const stepBack = () => {
-    playSound("select");
     if (selectedColorKey) setSelectedColorKey(undefined);
     else closeSetting();
   };
