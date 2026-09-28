@@ -41,7 +41,7 @@ export const experience: Entry[] = [
 
   {
     name: "Blockchain in Paradise",
-    subtitle: "Full-Stack Software Developer Intern",
+    subtitle: "Full-Stack Software Engineer Intern",
     date: "Jan. 2026 - May 2026",
     description: [
       "Deployed a decentralized supply chain tracker on Base Sepolia Testnet using Solidity smart contracts to verify the origin of local Hawaiian coffee.",
@@ -52,7 +52,7 @@ export const experience: Entry[] = [
 
   {
     name: "University of Hawaiʻi Office of Government Relations",
-    subtitle: "Backend Cloud Developer Intern",
+    subtitle: "Backend Cloud Engineer Intern",
     date: "Aug. 2025 - Dec. 2025",
     description: [
       "Architected a cost-efficient FastAPI backend on Google Cloud, streamlining manual legislative analysis workflows for university staff.",
