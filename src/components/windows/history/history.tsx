@@ -52,7 +52,10 @@ export const History = () => {
                       className="group relative flex w-full cursor-pointer items-start py-1.5 pl-7 text-left font-heading outline-none"
                     >
                       <RowHand
-                        show={openEntryName === entry.name}
+                        show={
+                          pinnedEntryName === entry.name ||
+                          hoveredEntryName === entry.name
+                        }
                         bob={
                           hoveredEntryName === entry.name &&
                           pinnedEntryName !== entry.name

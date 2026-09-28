@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { playSound } from "@/lib/audio";
 import { avatarUrl, displayName } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Bar } from "../../bar";
@@ -42,7 +43,8 @@ export const StatusProfile = ({
               health ? "Attack Dhaniel's portrait" : "Dhaniel is knocked out"
             }
             aria-disabled={!health}
-            title={health ? "Attack" : "KO"}
+            title={health ? "Hit Me!" : "x_x"}
+            onMouseEnter={() => playSound("select")}
             onClick={attack}
             className="relative block size-27 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
