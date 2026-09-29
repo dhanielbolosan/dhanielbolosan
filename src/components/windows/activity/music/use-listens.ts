@@ -9,17 +9,37 @@ interface LoadedListens {
   covers: CoverState[];
   decoded: Promise<void>[];
   images: HTMLImageElement[];
+  loadedAt: number;
 }
 
-// Share one load per page, so covers are decoded before Music is even opened.
+// Identify a set of listens by what the player shows, so an unchanged refetch doesn't remount it.
+export const signature = (listens: Listen[]) =>
+  listens
+    .map((listen) =>
+      [listen.track, listen.artist, listen.playingNow].join("\u0000"),
+    )
+    .join("\u0001");
+
+// Reuse a load for a minute, matching the function's edge cache, so Now Playing stays current.
+const freshMs = 60_000;
+
+// Share one load at a time, so covers are decoded before Music is even opened.
 let loaded: LoadedListens | undefined;
 let loading: Promise<LoadedListens | undefined> | undefined;
 
-// Fetch the listens and decode every cover; a failed fetch lets the next call retry.
-export const preloadListens = () =>
-  (loading ??= fetchRecentListens()
+// Fetch the listens and decode every cover; a failed or stale load lets the next call fetch again.
+export const preloadListens = () => {
+  if (loaded && Date.now() - loaded.loadedAt > freshMs) loading = undefined;
+
+  return (loading ??= fetchRecentListens()
     .then((listens) => {
       if (!listens?.length) throw new Error("No listens");
+
+      // Nothing changed: keep the decoded covers and just mark the load fresh again.
+      if (loaded && signature(listens) === signature(loaded.listens)) {
+        loaded = { ...loaded, listens, loadedAt: Date.now() };
+        return loaded;
+      }
 
       // Load the marker font now, so a blank CD-R never flashes a fallback font.
       if (listens.some((listen) => !listen.coverUrl))
@@ -44,7 +64,7 @@ export const preloadListens = () =>
         );
       });
 
-      loaded = { listens, covers, decoded, images };
+      loaded = { listens, covers, decoded, images, loadedAt: Date.now() };
 
       return loaded;
     })
@@ -52,6 +72,7 @@ export const preloadListens = () =>
       loading = undefined;
       return undefined;
     }));
+};
 
 export const useListens = () => {
   // Start from whatever the page-level preload already has.
@@ -61,7 +82,7 @@ export const useListens = () => {
   useEffect(() => {
     let active = true;
 
-    // Pick up the preload, then refresh each cover's state as it settles.
+    // Pick up the preload (refetched if over a minute old), then refresh each cover's state as it settles.
     void preloadListens().then((result) => {
       if (!active || !result) return;
 

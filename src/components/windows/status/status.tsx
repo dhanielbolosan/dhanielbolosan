@@ -18,7 +18,20 @@ export const Status = () => {
 
       {/* Personal details and introduction */}
       <Stats
-        pairs={profileStats}
+        pairs={[
+          ...profileStats,
+          [
+            "Resume",
+            <a
+              href="/Dhaniel_Bolosan_Resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="text-gold underline underline-offset-2 hover:text-foreground"
+            >
+              View
+            </a>,
+          ],
+        ]}
         className="text-base"
         valueClassName="text-right font-semibold"
       />

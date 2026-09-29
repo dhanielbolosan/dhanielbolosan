@@ -1,5 +1,6 @@
 export const displayName = "Dhaniel Bolosan";
 export const githubUsername = "dhanielbolosan";
-export const avatarUrl = `https://github.com/${githubUsername}.png`;
+// Twice the 108px portrait, for sharp high-density screens without the full-size download.
+export const avatarUrl = `https://github.com/${githubUsername}.png?size=216`;
 export const timeZone = "Pacific/Honolulu";
 export const listenbrainzUsername = "dhanielbolosan";

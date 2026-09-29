@@ -4,7 +4,7 @@ import { RowHand } from "../../../pixel-hand";
 import { Loopmaster } from "./loopmaster";
 import { placeholderListens } from "./music.data";
 import { formatDuration, formatPlayedAgo } from "./music.utils";
-import { useListens, type CoverState } from "./use-listens";
+import { signature, useListens, type CoverState } from "./use-listens";
 import { useLoopmaster } from "./use-loopmaster";
 
 // Step focus between the stack's buttons with the up and down arrow keys.
@@ -23,10 +23,10 @@ export const MusicActivity = () => {
   const { listens, covers, waitForCover } = useListens();
   const live = listens.length > 0;
 
-  // Show stand-in discs until listens arrive; remount on arrival so the stack starts fresh.
+  // Show stand-in discs until listens arrive; remount only when the listens change, so the stack starts fresh.
   return (
     <MusicPlayer
-      key={live ? "live" : "placeholder"}
+      key={live ? signature(listens) : "placeholder"}
       listens={live ? listens : placeholderListens}
       covers={live ? covers : placeholderListens.map(() => "missing")}
       waitForCover={waitForCover}

@@ -33,6 +33,8 @@ export const Navbar = ({
           <Tabs.Trigger
             key={column.label}
             value={String(columnIndex)}
+            // The tabs switch layout columns, not Radix panels, so there is no panel to point at.
+            aria-controls={undefined}
             onMouseEnter={() => setPointedTabIndex(columnIndex)}
             onFocus={() => setPointedTabIndex(columnIndex)}
             onBlur={() => setPointedTabIndex(undefined)}

@@ -92,53 +92,82 @@ test("a song playing now leads the stack without repeating its scrobble", () => 
   );
 
   const now = 1_790_650_622_000;
-  assert.equal(formatPlayedAgo(now / 1000 - 30, now), "Played just now");
-  assert.equal(formatPlayedAgo(now / 1000 - 7200, now), "Played 2 hours ago");
-  assert.equal(formatPlayedAgo(now / 1000 - 86400, now), "Played yesterday");
+  assert.equal(formatPlayedAgo(now / 1000 - 30, now), "Just now");
+  assert.equal(formatPlayedAgo(now / 1000 - 7200, now), "2 hr. ago");
+  assert.equal(formatPlayedAgo(now / 1000 - 86400, now), "Yesterday");
 });
 
-test("the function falls back to the last good listens when ListenBrainz fails", async () => {
+test("the function caches by username, tolerates playing-now, and falls back when ListenBrainz fails", async () => {
   const { onRequestGet } = await import("../functions/api/recent-listens.ts");
   const store = new Map();
   const background = [];
+  const cacheKey =
+    "https://site.test/api/recent-listens?username=dhanielbolosan";
 
-  // Stand in for Cloudflare's cache and the network.
+  // Stand in for Cloudflare's cache, and count calls to ListenBrainz.
   globalThis.caches = {
     default: {
       match: async (key) => store.get(key.url ?? key)?.clone(),
       put: async (key, response) => void store.set(key.url ?? key, response),
     },
   };
-  const call = async () => {
+  let upstreamCalls = 0;
+  const call = async (query = "") => {
     const response = await onRequestGet({
-      request: new Request(
-        "https://site.test/api/recent-listens?username=dhanielbolosan",
-      ),
+      request: new Request(`${cacheKey}${query}`),
       waitUntil: (work) => background.push(work),
     });
     await Promise.all(background);
     return response;
   };
+  const listens = (track) =>
+    Response.json({
+      payload: {
+        listens: [
+          { track_metadata: { track_name: track, artist_name: "LUCKI" } },
+        ],
+      },
+    });
 
   const realFetch = globalThis.fetch;
+  const realTimeout = AbortSignal.timeout;
   try {
-    // A good answer, with a song playing right now, gets saved.
-    globalThis.fetch = async (url) =>
-      Response.json({
-        payload: {
-          listens: [
-            {
-              track_metadata: { track_name: "Widebody", artist_name: "LUCKI" },
-            },
-          ],
-        },
-      });
-    assert.equal((await call()).status, 200);
+    // Time out in 10 ms instead of the real 5 seconds.
+    AbortSignal.timeout = () => realTimeout.call(AbortSignal, 10);
 
-    // ListenBrainz now hangs past the timeout; the saved listens come back instead.
-    store.delete(
-      "https://site.test/api/recent-listens?username=dhanielbolosan",
+    // A good answer with a song playing now is served and saved.
+    globalThis.fetch = async (url) => {
+      upstreamCalls++;
+      return String(url).endsWith("/playing-now")
+        ? listens("Tokyo")
+        : listens("Widebody");
+    };
+    const first = await (await call()).json();
+    assert.deepEqual(
+      first.listens.map((l) => [l.track, l.playingNow]),
+      [
+        ["Tokyo", true],
+        ["Widebody", false],
+      ],
     );
+
+    // Extra query parameters still hit the cache instead of ListenBrainz.
+    const calls = upstreamCalls;
+    assert.equal((await call("&bust=1")).status, 200);
+    assert.equal(upstreamCalls, calls);
+
+    // A malformed playing-now body is ignored; the recent listens still come through fresh.
+    store.delete(cacheKey);
+    globalThis.fetch = async (url) =>
+      String(url).endsWith("/playing-now")
+        ? new Response("not json")
+        : listens("Widebody");
+    const tolerant = await call();
+    assert.equal(tolerant.status, 200);
+    assert.equal((await tolerant.json()).listens[0].track, "Widebody");
+
+    // ListenBrainz now hangs past the timeout; the saved listens come back, marked stale.
+    store.delete(cacheKey);
     globalThis.fetch = async (url, { signal }) =>
       new Promise((_, reject) =>
         signal.addEventListener("abort", () => reject(signal.reason)),
@@ -152,5 +181,6 @@ test("the function falls back to the last good listens when ListenBrainz fails",
     assert.equal(body.listens[0].playingNow, false);
   } finally {
     globalThis.fetch = realFetch;
+    AbortSignal.timeout = realTimeout;
   }
 });

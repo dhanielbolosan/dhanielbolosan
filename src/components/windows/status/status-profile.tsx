@@ -153,7 +153,7 @@ export const StatusProfile = ({
             <button
               type="button"
               data-sound="none"
-              aria-label="Restore full HP with Limit"
+              aria-label="Limit level 1: restore full HP"
               disabled={limit < maxLimit}
               title={
                 limit === maxLimit

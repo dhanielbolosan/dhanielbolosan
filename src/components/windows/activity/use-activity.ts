@@ -31,9 +31,17 @@ export const useActivity = () => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
-  // Load recent listens and decode their covers while the GitHub screen is showing.
+  // Load recent listens and decode their covers once the browser is idle, before Music opens.
   useEffect(() => {
-    void preloadListens();
+    const preload = () => void preloadListens();
+
+    if ("requestIdleCallback" in window) {
+      const idle = requestIdleCallback(preload, { timeout: 2000 });
+      return () => cancelIdleCallback(idle);
+    }
+
+    const timer = setTimeout(preload, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Manage dismissal and delayed focus while the screen menu is open.

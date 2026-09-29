@@ -15,7 +15,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     name: "Kumu",
-    thumbnail: "/projects/kumu/thumbnail.png",
+    thumbnail: "/projects/kumu/thumbnail.webp",
     images: [
       "/projects/kumu/kumu1.jpg",
       "/projects/kumu/kumu2.png",
@@ -42,7 +42,7 @@ export const projects: Project[] = [
 
   {
     name: "SENTINEL Mobile App",
-    thumbnail: "/projects/sentinel/thumbnail.png",
+    thumbnail: "/projects/sentinel/thumbnail.webp",
     images: [
       "/projects/sentinel/sentinel1.png",
       "/projects/sentinel/sentinel2.png",
@@ -66,7 +66,7 @@ export const projects: Project[] = [
 
   {
     name: "KopeChain",
-    thumbnail: "/projects/kopechain/thumbnail.png",
+    thumbnail: "/projects/kopechain/thumbnail.webp",
     images: [
       "/projects/kopechain/kopechain1.png",
       "/projects/kopechain/kopechain2.png",
@@ -90,7 +90,7 @@ export const projects: Project[] = [
 
   {
     name: "Legislative Cloud Platform",
-    thumbnail: "/projects/legislative-cloud-platform/thumbnail.png",
+    thumbnail: "/projects/legislative-cloud-platform/thumbnail.webp",
     images: [
       "/projects/legislative-cloud-platform/uhgro1.png",
       "/projects/legislative-cloud-platform/uhgro2.png",
@@ -116,7 +116,7 @@ export const projects: Project[] = [
 
   {
     name: "VENOM-RAG",
-    thumbnail: "/projects/venom-rag/thumbnail.png",
+    thumbnail: "/projects/venom-rag/thumbnail.webp",
     images: [
       "/projects/venom-rag/venomrag1.png",
       "/projects/venom-rag/venomrag2.png",
@@ -138,7 +138,7 @@ export const projects: Project[] = [
 
   {
     name: "Pathfinity",
-    thumbnail: "/projects/pathfinity/thumbnail.png",
+    thumbnail: "/projects/pathfinity/thumbnail.webp",
     images: [
       "/projects/pathfinity/pathfinity1.png",
       "/projects/pathfinity/pathfinity2.png",

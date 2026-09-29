@@ -95,23 +95,30 @@ export const useLoopmaster = ({
       fill: "forwards",
       ...options,
     });
-    signal?.addEventListener("abort", () => animation.cancel(), { once: true });
 
-    return animation.finished;
+    // Cancel on unmount, and drop the listener once the animation settles.
+    const stop = () => animation.cancel();
+    signal?.addEventListener("abort", stop, { once: true });
+
+    return animation.finished.finally(() =>
+      signal?.removeEventListener("abort", stop),
+    );
   };
 
+  // Pause for a moment; unmounting stops the wait and the swap with it.
   const wait = (ms: number) =>
     new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(resolve, ms);
+      const signal = aliveRef.current?.signal;
+      const stop = () => {
+        clearTimeout(timer);
+        reject(new Error("stopped"));
+      };
+      const timer = setTimeout(() => {
+        signal?.removeEventListener("abort", stop);
+        resolve();
+      }, ms);
 
-      aliveRef.current?.signal.addEventListener(
-        "abort",
-        () => {
-          clearTimeout(timer);
-          reject(new Error("stopped"));
-        },
-        { once: true },
-      );
+      signal?.addEventListener("abort", stop, { once: true });
     });
 
   // Ease the motor to a new speed; the newest ramp takes over any older one.
@@ -205,7 +212,10 @@ export const useLoopmaster = ({
     const previous = orderRef.current;
     const next = playFromStack(previous.current, previous.stack, picked);
 
-    if (reducedMotion) return commit(next);
+    if (reducedMotion) {
+      if (spinRef.current) spinRef.current.currentTime = 0;
+      return commit(next);
+    }
 
     const disc = discRef.current;
     const lid = lidRef.current;
@@ -246,7 +256,7 @@ export const useLoopmaster = ({
 
     // Hold the list's height through the swap, so the window never resizes as rows trade places.
     const list = rowsRef.current.get(picked)?.parentElement;
-    if (list) list.style.height = `${list.offsetHeight}px`;
+    if (list) list.style.height = `${list.getBoundingClientRect().height}px`;
 
     // The picked row leaves the stack while its disc goes into the player.
     const leaving = closeRow(rowsRef.current.get(picked));
@@ -257,8 +267,8 @@ export const useLoopmaster = ({
     await waitForCover(picked);
     orderRef.current = { current: picked, stack: previous.stack };
     flushSync(() => setCurrent(picked));
-    if (spinRef.current)
-      spinRef.current.currentTime = Math.random() * discSpinMs;
+    // The new disc goes in upright, with its cover art the right way up.
+    if (spinRef.current) spinRef.current.currentTime = 0;
 
     await run(
       disc,

@@ -35,13 +35,16 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
     return json({ error: "A valid ListenBrainz username is required." }, 400);
   }
 
-  const cachedResponse = await caches.default.match(request);
-  if (cachedResponse) return cachedResponse;
-
-  // A separate cache entry per username holds the last successful response.
+  // Key both caches on the validated username alone, so extra query parameters can't bypass them.
+  const { origin } = new URL(request.url);
+  const query = `username=${encodeURIComponent(username)}`;
+  const cacheKey = new Request(`${origin}/api/recent-listens?${query}`);
   const lastGoodKey = new Request(
-    `${new URL(request.url).origin}/api/recent-listens/last-good?username=${encodeURIComponent(username)}`,
+    `${origin}/api/recent-listens/last-good?${query}`,
   );
+
+  const cachedResponse = await caches.default.match(cacheKey);
+  if (cachedResponse) return cachedResponse;
 
   // Serve the saved listens when ListenBrainz fails, or an error if there are none yet.
   const fallback = async () => {
@@ -80,8 +83,10 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
 
     type Payload = { payload?: { listens?: ListenBrainzListen[] } };
     const result = (await response.json()) as Payload;
+    // Playing-now is optional, so a malformed body is ignored rather than failing the response.
     const playing = playingResponse?.ok
-      ? ((await playingResponse.json()) as Payload).payload?.listens?.[0]
+      ? ((await playingResponse.json().catch(() => ({}))) as Payload).payload
+          ?.listens?.[0]
       : undefined;
 
     const listens = withPlayingNow(
@@ -103,7 +108,7 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
     // Write both caches in the background without delaying the response.
     waitUntil(
       Promise.all([
-        caches.default.put(request, listensResponse.clone()),
+        caches.default.put(cacheKey, listensResponse.clone()),
         caches.default.put(lastGoodKey, lastGood),
       ]),
     );

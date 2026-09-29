@@ -44,7 +44,6 @@ export const Loopmaster = ({
   <button
     type="button"
     aria-label={playing ? "Pause" : "Play"}
-    aria-pressed={playing}
     aria-disabled={disabled}
     onClick={onToggle}
     className={cn(
@@ -105,7 +104,7 @@ export const Loopmaster = ({
           <span className="cd-art absolute inset-0">
             {cover === "missing" && (
               <span className="absolute inset-x-[17%] top-[6%] flex h-[26%] items-center justify-center text-center">
-                <b className="line-clamp-2 font-marker text-[12px] leading-[1.1] font-normal wrap-anywhere text-[#1d2233] opacity-90 [text-shadow:none]">
+                <b className="line-clamp-2 font-marker text-[12px] leading-[1.1] font-normal wrap-anywhere text-(--cd-ink) opacity-90 [text-shadow:none]">
                   {title}
                 </b>
               </span>
@@ -113,7 +112,7 @@ export const Loopmaster = ({
 
             {/* One line; a long album is cut off at the edge with no ellipsis. */}
             {cover === "missing" && album && (
-              <span className="absolute inset-x-[22%] bottom-[12%] overflow-hidden text-center font-marker text-[10px] leading-[1.2] whitespace-nowrap text-[#1d2233] opacity-80 [text-shadow:none]">
+              <span className="absolute inset-x-[22%] bottom-[12%] overflow-hidden text-center font-marker text-[10px] leading-[1.2] whitespace-nowrap text-(--cd-ink) opacity-80 [text-shadow:none]">
                 {album}
               </span>
             )}

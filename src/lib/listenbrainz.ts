@@ -1,14 +1,8 @@
+import type { Listen } from "../../functions/lib/listens";
 import { listenbrainzUsername } from "./site";
 
-export interface Listen {
-  track: string;
-  artist: string;
-  album: string;
-  durationMs: number | null;
-  coverUrl: string | null;
-  listenedAt: number | null;
-  playingNow: boolean;
-}
+// The function defines the shape; a type-only import keeps server code out of the bundle.
+export type { Listen };
 
 // Fetch through the server endpoint so repeat visits hit the edge cache.
 export const fetchRecentListens = async (signal?: AbortSignal) => {

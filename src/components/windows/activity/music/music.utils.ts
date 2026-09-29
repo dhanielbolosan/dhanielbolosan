@@ -17,16 +17,23 @@ export const playFromStack = (
   stack: [current, ...stack.filter((index) => index !== picked)],
 });
 
-// Describe when the disc was last played, like "Played 2 hours ago".
+// Say when the disc was last played in a few words, like "2 hr. ago", to fit the narrow details column.
 export const formatPlayedAgo = (listenedAt: number, now = Date.now()) => {
   const seconds = Math.max(0, now / 1000 - listenedAt);
-  const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const format = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+    style: "short",
+  });
 
-  if (seconds < 60) return "Played just now";
-  if (seconds < 3600)
-    return `Played ${format.format(-Math.floor(seconds / 60), "minute")}`;
-  if (seconds < 86400)
-    return `Played ${format.format(-Math.floor(seconds / 3600), "hour")}`;
+  const text =
+    seconds < 60
+      ? "just now"
+      : seconds < 3600
+        ? format.format(-Math.floor(seconds / 60), "minute")
+        : seconds < 86400
+          ? format.format(-Math.floor(seconds / 3600), "hour")
+          : format.format(-Math.floor(seconds / 86400), "day");
 
-  return `Played ${format.format(-Math.floor(seconds / 86400), "day")}`;
+  // Capitalize the label, so "yesterday" reads "Yesterday".
+  return text[0].toUpperCase() + text.slice(1);
 };
