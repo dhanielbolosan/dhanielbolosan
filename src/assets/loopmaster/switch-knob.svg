@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 320 330">
+  <!-- Open switch knob; slides along the slot when the lid opens. Traced from photos held upside down, so it is turned back upright here. -->
+  <g transform="rotate(180 150 155)"><g transform="rotate(28 254 26)"><rect x="243" y="21" width="12" height="10" rx="5" fill="#d2d4dd" stroke="#000" stroke-opacity=".3" /></g></g>
+</svg>

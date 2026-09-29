@@ -4,6 +4,7 @@
 @import "@fontsource/m-plus-rounded-1c/latin-700.css";
 @import "@fontsource/m-plus-rounded-1c/latin-ext-500.css";
 @import "@fontsource/m-plus-rounded-1c/latin-ext-700.css";
+@import "@fontsource/permanent-marker/latin-400.css";
 
 :root {
   color-scheme: dark;
@@ -52,6 +53,7 @@
 
 @theme inline {
   --font-heading: "M PLUS Rounded 1c", var(--font-sans);
+  --font-marker: "Permanent Marker", cursive;
   --color-frame: var(--frame);
   --color-label: var(--label);
   --color-gold: var(--gold);
@@ -254,6 +256,36 @@
   background-image: url("./assets/contribution-sqaure.svg");
   background-size: 100% 100%;
   image-rendering: pixelated;
+}
+
+/* Matte CD-R label side: center hole, clear hub, mirror band, then fine grooves. */
+@utility cd-face {
+  background:
+    radial-gradient(
+      circle,
+      transparent 0 8%,
+      rgb(233 230 240 / 30%) 8.5% 13%,
+      #c6c6ca 13.5% 17.5%,
+      transparent 18%
+    ),
+    repeating-radial-gradient(circle, #d3d5dc 0 1px, #c8cad2 1px 2.5px);
+  mask-image: radial-gradient(circle, transparent 0 8%, #000 8.5%);
+}
+
+/* Keep cover art and marker text off the hub and inside the disc edge. */
+@utility cd-art {
+  mask-image: radial-gradient(
+    circle,
+    transparent 0 18%,
+    #000 18.5% 70.2%,
+    transparent 70.7%
+  );
+}
+
+/* Soften the disc under the lid's window, like old frosted plastic. */
+@utility lid-haze {
+  background: rgb(233 238 248 / 10%);
+  backdrop-filter: blur(0.35px) saturate(0.9);
 }
 
 @utility group-heading {

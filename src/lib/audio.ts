@@ -8,6 +8,9 @@ const sounds = [
   "delete",
   "limit",
   "fanfare",
+  "switch",
+  "lid",
+  "disc",
 ] as const;
 
 export type Sound = (typeof sounds)[number];

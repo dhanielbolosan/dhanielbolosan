@@ -2,7 +2,8 @@ import { Choices } from "../../choices";
 import { CornerBox } from "../../corner-box";
 import { PixelHand } from "../../pixel-hand";
 import { Faded, WindowHeader } from "../../window";
-import { GithubActivity } from "./github-activity";
+import { GithubActivity } from "./github/github-activity";
+import { MusicActivity } from "./music/music-activity";
 import { screens } from "./activity.data";
 import { useActivity } from "./use-activity";
 
@@ -63,7 +64,9 @@ export const Activity = () => {
       <Faded className="flex flex-1 flex-col gap-3">
         {activeScreen === "GitHub" && <GithubActivity />}
 
-        {activeScreen !== "GitHub" && (
+        {activeScreen === "Music" && <MusicActivity />}
+
+        {activeScreen === "Games" && (
           <p className="flex min-h-64 flex-1 items-center justify-center text-center font-heading text-base">
             WIP :)
           </p>

@@ -1,4 +1,4 @@
-import { groupContributionsByMonth } from "./activity.utils";
+import { groupContributionsByMonth } from "./github.utils";
 import type { ContributionCalendarData, ContributionLevel } from "@/lib/github";
 
 const levelIndex: Record<ContributionLevel, number> = {

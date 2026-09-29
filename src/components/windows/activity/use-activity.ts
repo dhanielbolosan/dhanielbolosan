@@ -2,26 +2,39 @@ import { useEffect, useRef, useState } from "react";
 import { useWindowFade } from "@/lib/window-fade";
 import { cornerTransitionMs } from "@/lib/motion";
 import { playSound } from "@/lib/audio";
+import { readChoice, saveChoice } from "@/lib/saved-choice";
 import {
   screens,
   activityInstruction,
+  screenInstruction,
   screenHelp,
   type ActivityScreen,
 } from "./activity.data";
+import { preloadListens } from "./music/use-listens";
+
+const screenStorageKey = "activity-screen";
 
 export const useActivity = () => {
-  const [activeScreen, setActiveScreen] = useState<ActivityScreen>("GitHub");
+  // Reopen the screen the visitor last left on.
+  const [activeScreen, setActiveScreen] = useState(() =>
+    readChoice(screenStorageKey, screens, "GitHub"),
+  );
   const activeScreenIndex = screens.indexOf(activeScreen);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const { fadeTo } = useWindowFade();
   const [pointedOption, setPointedOption] = useState(0);
 
-  // Show help for the pointed option while the menu is open.
+  // Show help for the pointed option while the menu is open, else the screen's own instruction.
   const helpText = isMenuOpen
     ? screenHelp[screens[pointedOption]]
-    : activityInstruction;
+    : (screenInstruction[activeScreen] ?? activityInstruction);
 
   const headerRef = useRef<HTMLDivElement>(null);
+
+  // Load recent listens and decode their covers while the GitHub screen is showing.
+  useEffect(() => {
+    void preloadListens();
+  }, []);
 
   // Manage dismissal and delayed focus while the screen menu is open.
   useEffect(() => {
@@ -65,6 +78,7 @@ export const useActivity = () => {
     else
       fadeTo(() => {
         setActiveScreen(nextScreen);
+        saveChoice(screenStorageKey, nextScreen);
         setMenuOpen(false);
       });
   };

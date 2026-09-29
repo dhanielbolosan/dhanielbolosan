@@ -1,6 +1,6 @@
-import { Stats } from "../../stats";
+import { Stats } from "../../../stats";
 import { ActivityCalendar } from "./activity-calendar";
-import { getContributionStats } from "./activity.utils";
+import { getContributionStats } from "./github.utils";
 import { useContributions } from "./use-contributions";
 
 export const GithubActivity = () => {

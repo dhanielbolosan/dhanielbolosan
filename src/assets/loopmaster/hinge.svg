@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 320 330">
+  <!-- Hinge tab on the lid; the lid pivots on its top edge. Traced from photos held upside down, so it is turned back upright here. -->
+  <g transform="rotate(180 150 155)"><path d="M215.9 302.0A162 162 0 0 1 84.1 302.0L94.3 279.2A137 137 0 0 0 205.7 279.2Z" fill="#9c9eab" stroke="#000" stroke-opacity=".3" stroke-width="1.5" stroke-linejoin="round" /><path d="M208.6 285.6A144 144 0 0 1 91.4 285.6L94.3 279.2A137 137 0 0 0 205.7 279.2Z" fill="#cfd1da" /></g>
+</svg>

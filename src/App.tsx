@@ -9,13 +9,28 @@ import { Navbar } from "./components/navbar";
 import { getEntryDelay } from "./lib/entrance";
 import { useMenuEntrance } from "./lib/use-menu-entrance";
 import { ScrollHint } from "./components/scroll-hint";
+import { readChoice, saveChoice } from "./lib/saved-choice";
+
+// Remember the tab by its label, so reordering tabs never restores the wrong one.
+const tabStorageKey = "active-tab";
+const tabLabels = columns.map((column) => column.label);
 
 function App() {
   // Listen once for menu interaction sounds, including controls in portals.
   useEffect(attachMenuSounds, []);
   const isTabletOrWider = useMedia("(min-width: 48rem)");
 
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  // Reopen the tab the visitor last left on.
+  const [activeTabIndex, setActiveTabIndex] = useState(() =>
+    tabLabels.indexOf(readChoice(tabStorageKey, tabLabels, tabLabels[0])),
+  );
+
+  // Switch tabs and remember the choice for the next visit.
+  const selectTab = (index: number) => {
+    setActiveTabIndex(index);
+    saveChoice(tabStorageKey, tabLabels[index]);
+  };
+
   const activeColumnRef = useRef<HTMLDivElement>(null);
 
   // Tablet keeps Status visible while tabs select the right column.
@@ -35,7 +50,7 @@ function App() {
       >
         <Navbar
           selectedTabIndex={selectedTabIndex}
-          onSelectTab={setActiveTabIndex}
+          onSelectTab={selectTab}
           entering={entering}
         />
 

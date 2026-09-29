@@ -12,6 +12,10 @@ export const portraitHitMs = 150;
 export const damageNumberMs = 600;
 export const portraitAttackCooldownMs = 450;
 
+// Spin one disc turn per 1.5 seconds and wait up to 1.5 seconds for a cover.
+export const discSpinMs = fadeMs * 10;
+export const coverWaitMs = fadeMs * 10;
+
 // Keep the mobile hint visible for 4.5 seconds after it first appears.
 export const scrollHintDurationMs = fadeMs * 30;
 

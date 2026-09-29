@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchContributionCalendar } from "@/lib/github";
-import { createEmptyCalendar } from "./activity.utils";
+import { createEmptyCalendar } from "./github.utils";
 
 export const useContributions = () => {
   // Keep a complete empty calendar visible until contribution data arrives.
