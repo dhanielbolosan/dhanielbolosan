@@ -4,6 +4,7 @@ import { damageNumberMs, portraitAttackCooldownMs } from "@/lib/motion";
 import { calculateHit, limitGain } from "./status.utils";
 import { maxLimit } from "./status.data";
 
+// Track the portrait's HP, Limit gauge, and floating hit number as it is attacked and healed.
 export const usePortrait = (maxHealth: number) => {
   const [currentHealth, setHealth] = useState(maxHealth);
   const health = Math.min(currentHealth, maxHealth);

@@ -5,7 +5,6 @@ type Entry = {
   description: string[];
 };
 
-// Each entry's commented bullets are the resume's wording, kept to paste from.
 const experience: Entry[] = [
   /*
     - Engineered a geospatial intelligence dashboard and backend data pipeline that queried and rendered live data streams across desktop and mobile platforms.

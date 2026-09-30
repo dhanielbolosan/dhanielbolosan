@@ -1,4 +1,5 @@
 import { contactErrors } from "@/lib/integrations/contact";
+import { githubUsername } from "@/lib/site";
 import { formatMissingFields } from "./contact.utils";
 
 export type ContactMode = "menu" | "form" | "sent";
@@ -16,3 +17,9 @@ export const dialogueLines = {
   redirect: "Got it, redirecting now!",
   allErrors: formatMissingFields(Object.values(contactErrors)),
 };
+
+export const contactLinks = [
+  { label: "GitHub", href: `https://github.com/${githubUsername}` },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/dhaniel-bolosan/" },
+  { label: "Email", href: "mailto:dhanielb808@gmail.com" },
+];

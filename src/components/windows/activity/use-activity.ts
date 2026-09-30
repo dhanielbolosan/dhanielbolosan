@@ -14,6 +14,7 @@ import { preloadListens } from "./music/use-listens";
 
 const screenStorageKey = "activity-screen";
 
+// Manage the Activity window's saved screen, its corner menu, and the help text for the pointed option.
 export const useActivity = () => {
   // Reopen the screen the visitor last left on.
   const [activeScreen, setActiveScreen] = useState(() =>

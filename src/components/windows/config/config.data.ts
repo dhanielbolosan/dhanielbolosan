@@ -9,16 +9,13 @@ export const corners = [
 
 export const textColors = [
   { key: "text", label: "Text", cssVar: "--foreground", fallback: "#f3f1f7" },
-
   { key: "accent", label: "Accent", cssVar: "--label", fallback: "#6fd6e8" },
-
   {
     key: "highlight",
     label: "Highlight",
     cssVar: "--gold",
     fallback: "#e0c13b",
   },
-
   {
     key: "shadow",
     label: "Shadow",

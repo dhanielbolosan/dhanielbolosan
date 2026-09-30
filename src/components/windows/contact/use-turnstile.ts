@@ -47,12 +47,17 @@ export const useTurnstile = (active: boolean) => {
     loadTurnstile()
       .then((turnstile) => {
         if (cancelled || !ref.current) return;
+        // Cloudflare's widget is at least 300px wide, so shrink it to match the message box above it.
+        // Measure that box, since this container is hidden (zero-width) until the widget fills it.
+        const box = ref.current.previousElementSibling;
+        ref.current.style.zoom = String(
+          Math.min(1, (box?.getBoundingClientRect().width ?? 300) / 300),
+        );
         widgetId.current = turnstile.render(ref.current, {
           sitekey: turnstileSiteKey,
           appearance: "interaction-only",
           theme: "dark",
-          // Fill the form's width like the fields; Cloudflare's minimum is 300px, so narrower forms (1280px desktops) take the compact box.
-          size: ref.current.clientWidth < 300 ? "compact" : "flexible",
+          size: "flexible",
         });
       })
       // Without a token the server refuses the send, and the dialogue offers a retry.

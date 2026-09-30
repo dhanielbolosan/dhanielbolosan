@@ -2,7 +2,6 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource/permanent-marker/latin-400.css";
 
-/* Keep extended Latin from downloading for basic Latin text. */
 @font-face {
   font-family: "M PLUS Rounded 1c";
   font-style: normal;

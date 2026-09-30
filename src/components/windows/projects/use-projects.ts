@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useWindowFade } from "@/lib/menu/window-fade";
 import { projects } from "./projects.data";
 
+// Track the hovered, selected, and previewed projects, the expanded gallery, and the hand's target.
 export const useProjects = () => {
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState<number>();
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);

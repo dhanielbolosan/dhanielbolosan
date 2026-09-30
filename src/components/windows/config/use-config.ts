@@ -17,6 +17,7 @@ import {
   rgbToHex,
 } from "./config.utils";
 
+// Manage the Config window's saved palette, open setting, color selection, and focus return.
 export const useConfig = () => {
   // Restore the saved palette once when Config mounts.
   const [colors, setColors] = useState(() =>

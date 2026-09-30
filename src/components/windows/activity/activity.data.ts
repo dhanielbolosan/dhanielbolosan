@@ -1,4 +1,3 @@
-// The Activity screens, in menu order.
 export const screens = ["GitHub", "Music", "Games"] as const;
 export type ActivityScreen = (typeof screens)[number];
 

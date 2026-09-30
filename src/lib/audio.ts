@@ -127,7 +127,7 @@ const unlockAudio = () => {
   }
 };
 
-// Coalesce duplicate events and drop superseded or delayed playback requests.
+// Ignore duplicate events and drop superseded or delayed playback requests.
 export const playSound = (sound: Sound) => {
   if (!settings.volume || document.hidden) return;
   const now = performance.now();

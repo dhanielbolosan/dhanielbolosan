@@ -11,7 +11,6 @@ export default defineConfig({
     tailwindcss(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
-  // Split React and other libraries into their own cached chunks, apart from app code.
   build: {
     rolldownOptions: {
       output: {
