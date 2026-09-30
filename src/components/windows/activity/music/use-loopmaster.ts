@@ -5,16 +5,35 @@ import { discSpinMs, enterEasing, exitEasing, fadeMs } from "@/lib/motion";
 import { reducedMotionQuery, useMedia } from "@/lib/use-media";
 import { playFromStack } from "./music.utils";
 
-// Disc positions for the lift out of the player and the drop back in.
-const seated = { transform: "none", boxShadow: "none" };
-const lifted = {
-  transform: "scale(1.04)",
-  boxShadow: "3px 5px 0 var(--text-shadow)",
+// Disc positions for the lift out of the player and the drop back in; transform only, so the compositor runs them.
+const seated = { transform: "none" };
+const lifted = { transform: "scale(1.04)" };
+const away = (x: number) => ({ transform: `translateX(${x}px) scale(1.04)` });
+
+// The lifted disc's shadow fades on its own layer, so the lift never repaints a box-shadow.
+const shadowOff = { opacity: 0 };
+const shadowOn = { opacity: 1 };
+
+// How far the disc turns per millisecond at full speed.
+const degreesPerMs = 360 / discSpinMs;
+
+// Turn covered by progress p of a ramp whose speed eases out from `from` to `to`, in full-speed milliseconds per ramp millisecond.
+const rampTurn = (from: number, to: number, p: number) =>
+  from * p + (to - from) * (p - (1 - (1 - p) ** 3) / 3);
+
+// Browsers without linear() easing fall back to a close stock curve.
+const linearEasing =
+  typeof CSS !== "undefined" &&
+  CSS.supports("transition-timing-function", "linear(0, 1)");
+
+// The motor: a constant spin (ms 0) or a ramp between speeds, each starting from `angle`.
+type Motor = {
+  animation?: Animation;
+  angle: number;
+  from: number;
+  to: number;
+  ms: number;
 };
-const away = (x: number) => ({
-  ...lifted,
-  transform: `translateX(${x}px) scale(1.04)`,
-});
 
 // Slide the open switch along its tilted slot, and swing the lid up past upright.
 const switchOpen = "translate(-3.168px, -1.692px)";
@@ -66,34 +85,65 @@ export const useLoopmaster = ({
   const lidRef = useRef<HTMLSpanElement>(null);
   const rowsRef = useRef(new Map<number, HTMLLIElement>());
 
-  // Share one spin animation and track whether a swap is running.
-  const spinRef = useRef<Animation>(null);
-  const rampRef = useRef({ frame: 0, settle: () => {} });
+  // Drive the spin as compositor animations, and track whether a swap is running.
+  const motorRef = useRef<Motor>({ angle: 0, from: 0, to: 0, ms: 0 });
+  const shadowRef = useRef<HTMLSpanElement>(null);
   const busyRef = useRef(false);
   const aliveRef = useRef<AbortController>(null);
+
+  // Read where the disc is and how fast it turns right now.
+  const motorNow = () => {
+    const { animation, angle, from, to, ms } = motorRef.current;
+    const elapsed = Number(animation?.currentTime ?? 0);
+
+    if (!ms)
+      return {
+        angle: angle + ((elapsed * degreesPerMs * to) % 360),
+        speed: to,
+      };
+
+    const p = Math.min(1, elapsed / ms);
+    return {
+      angle: angle + degreesPerMs * ms * rampTurn(from, to, p),
+      speed: from + (to - from) * (1 - (1 - p) ** 2),
+    };
+  };
+
+  // Hold the disc still at an angle, or spin it at a constant speed from there.
+  const setMotor = (angle: number, speed: number) => {
+    const face = faceRef.current;
+    motorRef.current.animation?.cancel();
+    angle %= 360;
+
+    // The resting angle lives in the style, so the disc stays put between animations.
+    if (face) face.style.rotate = `${angle}deg`;
+    const animation =
+      speed && face
+        ? face.animate(
+            [{ rotate: `${angle}deg` }, { rotate: `${angle + 360}deg` }],
+            {
+              duration: discSpinMs / speed,
+              iterations: Infinity,
+            },
+          )
+        : undefined;
+
+    motorRef.current = { animation, angle, from: speed, to: speed, ms: 0 };
+  };
 
   // Start the spin and stop all motion when the screen unmounts.
   useEffect(() => {
     const alive = new AbortController();
     aliveRef.current = alive;
 
-    const spin = faceRef.current?.animate(
-      [{ rotate: "0deg" }, { rotate: "360deg" }],
-      { duration: discSpinMs, iterations: Infinity },
-    );
-
     // Reduced motion starts paused; the listener can still press play.
-    if (spin)
-      spin.playbackRate = matchMedia(reducedMotionQuery).matches ? 0 : 1;
-    spinRef.current = spin ?? null;
+    setMotor(0, matchMedia(reducedMotionQuery).matches ? 0 : 1);
 
-    const ramp = rampRef.current;
+    const motor = motorRef;
 
     return () => {
       alive.abort();
-      cancelAnimationFrame(ramp.frame);
-      ramp.settle();
-      spin?.cancel();
+      motor.current.animation?.cancel();
     };
   }, []);
 
@@ -137,29 +187,41 @@ export const useLoopmaster = ({
       signal?.addEventListener("abort", stop, { once: true });
     });
 
-  // Ease the motor to a new speed; the newest ramp takes over, settling the one it replaces.
-  const ramp = (to: number, ms: number) =>
-    new Promise<void>((resolve) => {
-      const spin = spinRef.current;
-      const from = spin?.playbackRate ?? 0;
-      const start = performance.now();
+  // Ease the motor to a new speed as one compositor animation; the newest ramp takes over, settling the one it replaces.
+  const ramp = async (to: number, ms: number) => {
+    const face = faceRef.current;
+    const { angle, speed: from } = motorNow();
+    const turn = degreesPerMs * ms * rampTurn(from, to, 1);
 
-      cancelAnimationFrame(rampRef.current.frame);
-      rampRef.current.settle();
-      rampRef.current.settle = resolve;
+    if (!face || !turn) return setMotor(angle, to);
 
-      const step = (time: number) => {
-        if (!spin) return resolve();
+    // Sample the eased turn into linear() stops, so the disc slows or speeds up exactly as the old per-frame ramp did.
+    const easing = linearEasing
+      ? `linear(${Array.from({ length: 17 }, (_, i) => (rampTurn(from, to, i / 16) / rampTurn(from, to, 1)).toFixed(4)).join(", ")})`
+      : to > from
+        ? "ease-in"
+        : "ease-out";
 
-        const progress = Math.min(1, (time - start) / ms);
-        spin.playbackRate = from + (to - from) * (1 - (1 - progress) ** 2);
+    motorRef.current.animation?.cancel();
+    face.style.rotate = `${angle % 360}deg`;
+    const animation = face.animate(
+      [
+        { rotate: `${angle % 360}deg` },
+        { rotate: `${(angle % 360) + turn}deg` },
+      ],
+      { duration: ms, easing, fill: "forwards" },
+    );
+    motorRef.current = { animation, angle: angle % 360, from, to, ms };
 
-        if (progress < 1) rampRef.current.frame = requestAnimationFrame(step);
-        else resolve();
-      };
-
-      rampRef.current.frame = requestAnimationFrame(step);
-    });
+    // A replaced or unmounted ramp settles quietly; a finished one hands over to the steady spin.
+    await animation.finished.then(
+      () => {
+        if (motorRef.current.animation === animation)
+          setMotor(angle + turn, to);
+      },
+      () => undefined,
+    );
+  };
 
   // Render the new order synchronously, so the swap can measure rows in their new slots.
   const commit = (next: { current: number; stack: number[] }) => {
@@ -199,7 +261,7 @@ export const useLoopmaster = ({
     const next = playFromStack(previous.current, previous.stack, picked);
 
     if (reducedMotion) {
-      if (spinRef.current) spinRef.current.currentTime = 0;
+      setMotor(0, motorNow().speed);
       return commit(next);
     }
 
@@ -246,6 +308,15 @@ export const useLoopmaster = ({
         ],
         { duration: fadeMs * 4 },
       ),
+      run(
+        shadowRef.current,
+        [
+          { ...shadowOff, easing: enterEasing },
+          { ...shadowOn, offset: 0.25 },
+          shadowOn,
+        ],
+        { duration: fadeMs * 4 },
+      ),
       fadeRow(rowsRef.current.get(picked), false),
     ]);
 
@@ -261,7 +332,7 @@ export const useLoopmaster = ({
 
     // The old disc lands on top of the stack as the picked disc heads for the player, upright.
     commit(next);
-    if (spinRef.current) spinRef.current.currentTime = 0;
+    setMotor(0, 0);
 
     // Rows above the picked one slide down a slot; rows below it are already in place.
     const shifts = next.stack.slice(1).map((index) => {
@@ -304,6 +375,15 @@ export const useLoopmaster = ({
         ],
         { duration: fadeMs * 4 },
       ).then(() => playSound("disc")),
+      run(
+        shadowRef.current,
+        [
+          shadowOn,
+          { ...shadowOn, offset: 0.75, easing: exitEasing },
+          shadowOff,
+        ],
+        { duration: fadeMs * 4 },
+      ),
     ]);
 
     playSound("lid");
@@ -383,6 +463,6 @@ export const useLoopmaster = ({
     play,
     togglePlaying,
     registerRow,
-    parts: { knobRef, discRef, faceRef, lidRef },
+    parts: { knobRef, discRef, shadowRef, faceRef, lidRef },
   };
 };

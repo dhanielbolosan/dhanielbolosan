@@ -52,7 +52,7 @@ export const Activity = () => {
                   onClick={openMenu}
                   className="group relative cursor-pointer outline-none"
                 >
-                  <PixelHand className="invisible absolute inset-y-0 right-full my-auto mr-1.5 group-hover:visible group-focus-visible:visible motion-safe:animate-bob" />
+                  <PixelHand className="invisible absolute inset-y-0 right-full my-auto mr-1.5 group-hover:visible group-focus-visible:visible group-hover:motion-safe:animate-bob group-focus-visible:motion-safe:animate-bob" />
                   Activity
                 </button>
               </h2>

@@ -25,6 +25,7 @@ export const Loopmaster = ({
   disabled,
   knobRef,
   discRef,
+  shadowRef,
   faceRef,
   lidRef,
   className,
@@ -38,6 +39,7 @@ export const Loopmaster = ({
   disabled: boolean;
   knobRef: Ref<HTMLImageElement>;
   discRef: Ref<HTMLSpanElement>;
+  shadowRef: Ref<HTMLSpanElement>;
   faceRef: Ref<HTMLSpanElement>;
   lidRef: Ref<HTMLSpanElement>;
   className?: string;
@@ -89,6 +91,12 @@ export const Loopmaster = ({
       ref={discRef}
       className="absolute top-[7.742%] left-[6%] aspect-square w-[88%] rounded-full after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:bg-linear-135 after:from-white/20 after:via-transparent after:to-black/15"
     >
+      {/* The lifted disc's drop shadow, faded in as its own layer so the lift never repaints. */}
+      <span
+        ref={shadowRef}
+        className="absolute inset-0 rounded-full opacity-0 shadow-[3px_5px_0_var(--text-shadow)]"
+      />
+
       <span
         ref={faceRef}
         className="cd-face absolute inset-0 overflow-hidden rounded-full"
