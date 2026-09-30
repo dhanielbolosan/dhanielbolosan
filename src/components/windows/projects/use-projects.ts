@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useWindowFade } from "@/lib/window-fade";
+import { useWindowFade } from "@/lib/menu/window-fade";
 import { projects } from "./projects.data";
 
 export const useProjects = () => {
@@ -17,9 +17,9 @@ export const useProjects = () => {
   // Show the selected gallery, otherwise keep the last preview after hover ends.
   const previewedProject =
     projects[
-    isExpanded
-      ? selectedProjectIndex
-      : (hoveredProjectIndex ?? lastPreviewedIndex)
+      isExpanded
+        ? selectedProjectIndex
+        : (hoveredProjectIndex ?? lastPreviewedIndex)
     ];
 
   const pointedElementRef = useRef<HTMLElement>(null);

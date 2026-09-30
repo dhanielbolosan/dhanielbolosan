@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fadeMs } from "./motion";
-import { useMedia } from "./use-media";
+import { fadeMs } from "@/lib/motion";
+import { reducedMotionQuery, useMedia } from "@/lib/use-media";
 
+// Fade a window out, apply a change, and fade back in, skipping the fade for reduced motion.
 export const useWindowTransition = () => {
   const [fading, setFading] = useState(false);
 
-  const reducedMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const reducedMotion = useMedia(reducedMotionQuery);
 
   const pending = useRef({ change: 0, after: 0, frame: 0 });
 

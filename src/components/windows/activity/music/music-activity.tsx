@@ -1,10 +1,10 @@
 import type { KeyboardEvent } from "react";
-import type { Listen } from "@/lib/listenbrainz";
+import type { Listen } from "@/lib/integrations/listenbrainz";
 import { RowHand } from "../../../pixel-hand";
 import { Loopmaster } from "./loopmaster";
 import { placeholderListens } from "./music.data";
-import { formatDuration, formatPlayedAgo } from "./music.utils";
-import { signature, useListens, type CoverState } from "./use-listens";
+import { formatDuration, formatPlayedAgo, signature } from "./music.utils";
+import { useListens, type CoverState } from "./use-listens";
 import { useLoopmaster } from "./use-loopmaster";
 
 // Step focus between the stack's buttons with the up and down arrow keys.
@@ -48,6 +48,7 @@ const MusicPlayer = ({
     stack,
     playing,
     swapping,
+    queued,
     play,
     togglePlaying,
     registerRow,
@@ -61,9 +62,9 @@ const MusicPlayer = ({
 
   return (
     // Clip only sideways, so the disc slides out under the frame while the lid can swing up over the header.
-    <div className="-mx-5 flex flex-col overflow-x-clip px-5 pt-11">
+    <div className="-mx-4.5 flex flex-col overflow-x-clip px-4.5 pt-11">
       {/* Center a fixed-width group, so the player only moves when the window resizes. */}
-      <div className="mb-6 grid grid-cols-[auto_minmax(0,8rem)] items-center justify-center gap-5">
+      <div className="mb-6 grid grid-cols-[auto_minmax(0,8rem)] items-center justify-center gap-6">
         <Loopmaster
           title={listen.track}
           album={listen.album}
@@ -76,14 +77,12 @@ const MusicPlayer = ({
         />
 
         <div className="flex min-w-0 flex-col font-heading">
-          {/* Say whether this disc is playing right now or when it was last played. */}
-          {(listen.playingNow || listen.listenedAt) && (
-            <p className="mb-1 text-xs text-label">
-              {listen.playingNow
-                ? "Now Playing"
-                : formatPlayedAgo(listen.listenedAt!)}
-            </p>
-          )}
+          {/* Say when this disc was last played; a live or placeholder disc reads "Now Playing". */}
+          <p className="mb-1 text-xs text-label">
+            {!listen.playingNow && listen.listenedAt
+              ? formatPlayedAgo(listen.listenedAt)
+              : "Now Playing"}
+          </p>
 
           <h3 className="line-clamp-2 text-base font-semibold wrap-break-word">
             {listen.track}
@@ -112,18 +111,16 @@ const MusicPlayer = ({
             <li
               key={index}
               ref={registerRow(index)}
-              className="py-1"
             >
               <button
                 type="button"
-                // Unavailable mid-swap: no click sound, no queued pick, and focus stays put.
-                aria-disabled={swapping}
                 title="Play now"
                 onClick={() => play(index)}
-                className="group relative flex w-full cursor-pointer items-center gap-3 py-1.5 pl-7 aria-disabled:cursor-default text-left font-heading outline-none"
+                className="group relative flex w-full cursor-pointer items-center gap-3 py-1.5 pl-6.5 text-left font-heading outline-none"
               >
+                {/* The hand stays on a pick that is waiting for the current swap. */}
                 <RowHand
-                  show={false}
+                  show={queued === index}
                   bob
                   className="group-hover:visible group-focus-visible:visible"
                 />

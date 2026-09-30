@@ -22,11 +22,11 @@ export const History = () => {
         {groups.map((group) => (
           <div
             key={group.label}
-            className="not-first-of-type:pt-5"
+            className="not-first-of-type:pt-6"
           >
             <h3 className="group-heading">{group.label}</h3>
 
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col">
               {group.entries.map((entry) => (
                 <li key={entry.name}>
                   <Popover.Root
@@ -47,7 +47,7 @@ export const History = () => {
                           current === entry.name ? undefined : entry.name,
                         );
                       }}
-                      className="group relative flex w-full cursor-pointer items-start py-1.5 pl-7 text-left font-heading outline-none"
+                      className="group relative flex w-full cursor-pointer items-start py-1.5 pl-6.5 text-left font-heading outline-none"
                     >
                       <RowHand
                         show={
@@ -76,7 +76,7 @@ export const History = () => {
                       <Popover.Content
                         side="bottom"
                         align="start"
-                        sideOffset={2}
+                        sideOffset={6}
                         collisionPadding={12}
                         onOpenAutoFocus={(event) => {
                           if (pinnedEntryName !== entry.name)
@@ -92,9 +92,9 @@ export const History = () => {
                         }}
                         aria-label={`${entry.name} details`}
                         className={cn(
-                          "window z-50 max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) max-w-[calc(100vw-24px)] overflow-y-auto overscroll-contain p-4",
+                          "window z-50 max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) max-w-[calc(100vw-24px)] overflow-y-auto overscroll-contain p-4.5",
                           pinnedEntryName !== entry.name &&
-                          "pointer-events-none",
+                            "pointer-events-none",
                         )}
                       >
                         <ul className="flex list-disc flex-col gap-1.5 pl-5 marker:text-frame">

@@ -1,5 +1,8 @@
 import { parseLocalDate, formatShortDate } from "@/lib/dates";
-import type { ContributionDay, ContributionCalendarData } from "@/lib/github";
+import type {
+  ContributionDay,
+  ContributionCalendarData,
+} from "@/lib/integrations/github";
 
 // Summarize chronological contribution days into the displayed statistics.
 export const getContributionStats = (days: ContributionDay[]) => {
@@ -52,26 +55,26 @@ export const getContributionStats = (days: ContributionDay[]) => {
   const hasNoContributions = !bestDay || bestDay.contributionCount === 0;
 
   // Use placeholder dates when the calendar has no contributions.
+  // Non-breaking spaces keep each date whole; only a Best Day count may drop to a second line.
   const pairs: [string, string][] = [
-    ["Longest Streak", `${longestStreak} days`],
+    ["Longest Streak", `${longestStreak}\u00a0days`],
 
     [
       "Best Day",
       hasNoContributions
-        ? "Jan 01 (0)"
-        : `${formatShortDate(parseLocalDate(bestDay.date))} (${bestDay.contributionCount})`,
+        ? "Jan\u00a001 (0)"
+        : `${formatShortDate(parseLocalDate(bestDay.date)).replace(" ", "\u00a0")} (${bestDay.contributionCount})`,
     ],
 
-    ["Current Streak", `${currentStreak} days`],
+    ["Current Streak", `${currentStreak}\u00a0days`],
 
     [
       "Busiest Month",
       hasNoContributions || !busiestMonth
-        ? "Jan 01"
-        : parseLocalDate(`${busiestMonth}-01`).toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          }),
+        ? `Jan\u00a0${new Date().getFullYear()}`
+        : parseLocalDate(`${busiestMonth}-01`)
+            .toLocaleDateString("en-US", { month: "short", year: "numeric" })
+            .replace(" ", "\u00a0"),
     ],
   ];
 

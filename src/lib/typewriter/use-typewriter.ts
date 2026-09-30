@@ -1,17 +1,19 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { useMedia } from "./use-media";
-import { typingIntervalMs } from "./motion";
+import { reducedMotionQuery, useMedia } from "@/lib/use-media";
+import { typingIntervalMs } from "@/lib/motion";
 import { advanceTypewriter } from "./typewriter";
 
+// Hold dialogue until the menu entrance finishes.
 export const TypewriterReady = createContext(true);
 
+// Type a line out after erasing back to what it shares with the last one; reduced motion shows it at once.
 export const useTypewriter = (
   target: string,
   speed = typingIntervalMs,
   scene = "",
 ) => {
   const ready = useContext(TypewriterReady);
-  const reducedMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const reducedMotion = useMedia(reducedMotionQuery);
 
   const [state, setState] = useState({ text: "", line: target, scene });
   const currentState = useRef(state);

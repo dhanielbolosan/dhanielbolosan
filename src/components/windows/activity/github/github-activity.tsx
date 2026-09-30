@@ -11,9 +11,11 @@ export const GithubActivity = () => {
 
   return (
     <>
+      {/* Size every column to its content, so labels get room before values wrap. */}
       <Stats
         pairs={stats}
         columns={4}
+        className="grid-cols-[repeat(4,auto)] justify-between"
       />
 
       <ActivityCalendar calendar={calendar} />

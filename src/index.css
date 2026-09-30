@@ -26,6 +26,9 @@
   --text-shadow: #15121a;
   --muted-credit: #8a8895;
   --muted-credit-outline: #000000;
+  --track: #1a1730;
+  --track-border: #c9c7dc;
+  --track-outline: #15121a;
   --frame-bevel:
     inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
     inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
@@ -66,9 +69,7 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --animate-bob: bob var(--pointer-bob-duration) steps(1) infinite;
-  --animate-scroll-hint: scroll-hint var(--pointer-bob-duration) steps(1)
-    infinite;
-  --animate-limit: limit 0.4s steps(1) infinite;
+  --animate-limit: limit 0.45s steps(1) infinite;
 
   @keyframes limit {
     0% {
@@ -132,12 +133,6 @@
       transform: translateX(-3px);
     }
   }
-
-  @keyframes scroll-hint {
-    50% {
-      transform: translateY(-3px);
-    }
-  }
 }
 
 @layer base {
@@ -164,7 +159,8 @@
   }
 
   .damage-number {
-    animation: damage-number var(--damage-number-duration) ease-out both;
+    animation: damage-number var(--damage-number-duration) var(--enter-easing)
+      both;
   }
 
   @keyframes portrait-hit {
@@ -201,8 +197,7 @@
   }
 
   .menu-enter {
-    animation: menu-enter var(--window-entry-duration)
-      cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: menu-enter var(--window-entry-duration) var(--enter-easing) both;
   }
 
   .menu-enter[data-enter="left"] {
@@ -254,7 +249,7 @@
 
 /* Layer pixel shading over each cell's contribution color. */
 @utility pixel-cell {
-  background-image: url("./assets/contribution-sqaure.svg");
+  background-image: url("./assets/contribution-square.svg");
   background-size: 100% 100%;
   image-rendering: pixelated;
 }
@@ -322,7 +317,7 @@
 
 @utility window-title {
   align-self: flex-end;
-  margin-right: -1.25rem;
+  margin-right: -1.125rem;
   width: 7rem;
   padding: 0.5rem 1.25rem;
   text-align: left;
@@ -346,7 +341,7 @@
 }
 
 @utility window-title-float {
-  @apply window-title float-right -mt-5 mb-1 ml-3;
+  @apply window-title float-right -mt-4.5 mb-1 ml-3;
 }
 
 * {
@@ -369,10 +364,10 @@
   box-sizing: border-box;
   width: 100%;
   height: 0.875rem;
-  background: #1a1730;
-  border: 2px solid #c9c7dc;
+  background: var(--track);
+  border: 2px solid var(--track-border);
   border-radius: 2px;
-  box-shadow: 0 0 0 1px #15121a;
+  box-shadow: 0 0 0 1px var(--track-outline);
 }
 
 .ff7-slider::-webkit-slider-thumb {
@@ -382,7 +377,7 @@
   height: 1.25rem;
   margin-top: -5px;
   background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
-  border: 1px solid #15121a;
+  border: 1px solid var(--track-outline);
   border-radius: 1px;
 }
 
@@ -390,10 +385,10 @@
   box-sizing: border-box;
   width: 100%;
   height: 0.875rem;
-  background: #1a1730;
-  border: 2px solid #c9c7dc;
+  background: var(--track);
+  border: 2px solid var(--track-border);
   border-radius: 2px;
-  box-shadow: 0 0 0 1px #15121a;
+  box-shadow: 0 0 0 1px var(--track-outline);
 }
 
 .ff7-slider::-moz-range-thumb {
@@ -401,7 +396,7 @@
   width: 0.75rem;
   height: 1.25rem;
   background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
-  border: 1px solid #15121a;
+  border: 1px solid var(--track-outline);
   border-radius: 1px;
 }
 

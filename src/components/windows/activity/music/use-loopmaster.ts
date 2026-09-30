@@ -1,27 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { playSound } from "@/lib/audio";
-import { discSpinMs, fadeMs } from "@/lib/motion";
-import { useMedia } from "@/lib/use-media";
+import { discSpinMs, enterEasing, exitEasing, fadeMs } from "@/lib/motion";
+import { reducedMotionQuery, useMedia } from "@/lib/use-media";
 import { playFromStack } from "./music.utils";
 
 // Disc positions for the lift out of the player and the drop back in.
-const seated = { transform: "none", opacity: 1, boxShadow: "none" };
+const seated = { transform: "none", boxShadow: "none" };
 const lifted = {
   transform: "scale(1.04)",
-  opacity: 1,
   boxShadow: "3px 5px 0 var(--text-shadow)",
 };
-const away = {
+const away = (x: number) => ({
   ...lifted,
-  transform: "translateX(-190px) scale(1.04)",
-  opacity: 0,
-};
+  transform: `translateX(${x}px) scale(1.04)`,
+});
 
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-
-// Slide the open switch along its tilted slot.
+// Slide the open switch along its tilted slot, and swing the lid up past upright.
 const switchOpen = "translate(-4.4px, -2.35px)";
+const lidOpen = "rotateX(98deg)";
+
+// Clear the clipped window edge by a few pixels; the fallback covers an unmeasured player.
+const offscreenMarginPx = 8;
+const offscreenFallbackPx = -200;
 
 export const useLoopmaster = ({
   count,
@@ -42,6 +43,10 @@ export const useLoopmaster = ({
   // Mirror the swap for rendering, so the controls read as unavailable while it runs.
   const [swapping, setSwapping] = useState(false);
 
+  // The pick waiting for the current swap to finish, so its row can keep the hand.
+  const [queued, setQueued] = useState<number | null>(null);
+  const queuedRef = useRef<number | null>(null);
+
   // Mirror the order in a ref so the running swap always reads the latest value.
   const orderRef = useRef({ current, stack });
 
@@ -53,7 +58,7 @@ export const useLoopmaster = ({
 
   // Share one spin animation and track whether a swap is running.
   const spinRef = useRef<Animation>(null);
-  const rampRef = useRef({ id: 0, frame: 0 });
+  const rampRef = useRef({ frame: 0, settle: () => {} });
   const busyRef = useRef(false);
   const aliveRef = useRef<AbortController>(null);
 
@@ -77,6 +82,7 @@ export const useLoopmaster = ({
     return () => {
       alive.abort();
       cancelAnimationFrame(ramp.frame);
+      ramp.settle();
       spin?.cancel();
     };
   }, []);
@@ -121,18 +127,19 @@ export const useLoopmaster = ({
       signal?.addEventListener("abort", stop, { once: true });
     });
 
-  // Ease the motor to a new speed; the newest ramp takes over any older one.
+  // Ease the motor to a new speed; the newest ramp takes over, settling the one it replaces.
   const ramp = (to: number, ms: number) =>
     new Promise<void>((resolve) => {
       const spin = spinRef.current;
-      const id = ++rampRef.current.id;
       const from = spin?.playbackRate ?? 0;
       const start = performance.now();
 
       cancelAnimationFrame(rampRef.current.frame);
+      rampRef.current.settle();
+      rampRef.current.settle = resolve;
 
       const step = (time: number) => {
-        if (!spin || id !== rampRef.current.id) return resolve();
+        if (!spin) return resolve();
 
         const progress = Math.min(1, (time - start) / ms);
         spin.playbackRate = from + (to - from) * (1 - (1 - progress) ** 2);
@@ -144,6 +151,7 @@ export const useLoopmaster = ({
       rampRef.current.frame = requestAnimationFrame(step);
     });
 
+  // Render the new order synchronously, so the swap can measure rows in their new slots.
   const commit = (next: { current: number; stack: number[] }) => {
     orderRef.current = next;
     flushSync(() => {
@@ -152,60 +160,19 @@ export const useLoopmaster = ({
     });
   };
 
-  // Fade a row's text out, then close its height so the rows below glide up.
-  const closeRow = async (row: HTMLLIElement | undefined) => {
-    if (!row) return;
-
-    const { height, paddingTop, paddingBottom } = getComputedStyle(row);
-    row.style.overflow = "hidden";
-
-    await Promise.all(
-      [...row.children].map((child) =>
-        run(child, [{ opacity: 1 }, { opacity: 0 }], { duration: fadeMs }),
+  // Fade a row's text in or out without changing its height.
+  const fadeRow = (row: HTMLLIElement | undefined, fadeIn: boolean) =>
+    Promise.all(
+      [...(row?.children ?? [])].map((child) =>
+        run(
+          child,
+          fadeIn
+            ? [{ opacity: 0 }, { opacity: 1 }]
+            : [{ opacity: 1 }, { opacity: 0 }],
+          { duration: fadeMs, fill: fadeIn ? "backwards" : "forwards" },
+        ),
       ),
     );
-    await run(
-      row,
-      [
-        { height, paddingTop, paddingBottom },
-        {
-          height: "0px",
-          paddingTop: "0px",
-          paddingBottom: "0px",
-          borderTopWidth: "0px",
-        },
-      ],
-      { duration: fadeMs * 2, easing: "ease" },
-    );
-  };
-
-  // Open a new row at the top, then fade its text in.
-  const openRow = async (row: HTMLLIElement | undefined) => {
-    if (!row) return;
-
-    const { height, paddingTop, paddingBottom } = getComputedStyle(row);
-    row.style.overflow = "hidden";
-
-    await Promise.all([
-      run(
-        row,
-        [
-          { height: "0px", paddingTop: "0px", paddingBottom: "0px" },
-          { height, paddingTop, paddingBottom },
-        ],
-        { duration: fadeMs * 2, easing: "ease", fill: "none" },
-      ),
-      ...[...row.children].map((child) =>
-        run(child, [{ opacity: 0 }, { opacity: 1 }], {
-          duration: fadeMs,
-          delay: fadeMs * 2,
-          fill: "backwards",
-        }),
-      ),
-    ]);
-
-    row.style.overflow = "";
-  };
 
   // Stop, open the lid, trade the discs, and update the stack in step with them.
   const swap = async (picked: number) => {
@@ -221,81 +188,113 @@ export const useLoopmaster = ({
     const lid = lidRef.current;
     const knob = knobRef.current;
 
-    await ramp(0, fadeMs * 3);
+    // Travel far enough to clear the window's clipped edge, wherever the player sits.
+    const clip = disc?.closest(".overflow-x-clip");
+    const offscreen =
+      disc && clip
+        ? clip.getBoundingClientRect().left -
+          disc.getBoundingClientRect().right -
+          offscreenMarginPx
+        : offscreenFallbackPx;
+
+    // The disc slows for a beat before the switch flips, and the lid pops open as it stops.
+    const stopped = ramp(0, fadeMs * 3);
+    await wait(fadeMs);
 
     // Each physical step gets its own sound: the switch, the lid pop, the disc seating.
     playSound("switch");
     await run(knob, [{ transform: "none" }, { transform: switchOpen }], {
       duration: fadeMs,
-      easing: "ease-out",
+      easing: enterEasing,
     });
     playSound("lid");
-    await run(
-      lid,
-      [{ transform: "rotateX(0)" }, { transform: "rotateX(98deg)" }],
-      {
+    await Promise.all([
+      run(lid, [{ transform: "rotateX(0)" }, { transform: lidOpen }], {
         duration: fadeMs * 2,
-        easing: "cubic-bezier(.3, 1.3, .5, 1)",
-      },
-    );
+        easing: enterEasing,
+      }),
+      stopped,
+    ]);
 
-    // Lift and slide are one motion, so there is no hitch between them.
-    await run(
-      disc,
-      [
-        seated,
-        { ...lifted, offset: 1 / 3, easing: "ease-in" },
-        { ...lifted, offset: 0.8 },
-        away,
-      ],
-      {
-        duration: fadeMs * 3,
-        easing: "ease-out",
-      },
-    );
-
-    // Hold the list's height through the swap, so the window never resizes as rows trade places.
-    const list = rowsRef.current.get(picked)?.parentElement;
-    if (list) list.style.height = `${list.getBoundingClientRect().height}px`;
-
-    // The picked row leaves the stack while its disc goes into the player.
-    const leaving = closeRow(rowsRef.current.get(picked));
-
-    // Mark the rejection handled now; the swap still awaits it below.
-    leaving.catch(() => undefined);
+    // Lift the old disc and slide it out of the window as one motion, while the picked row empties.
+    await Promise.all([
+      run(
+        disc,
+        [
+          { ...seated, easing: enterEasing },
+          { ...lifted, offset: 0.25, easing: exitEasing },
+          away(offscreen),
+        ],
+        { duration: fadeMs * 4 },
+      ),
+      fadeRow(rowsRef.current.get(picked), false),
+    ]);
 
     await waitForCover(picked);
-    orderRef.current = { current: picked, stack: previous.stack };
-    flushSync(() => setCurrent(picked));
-    // The new disc goes in upright, with its cover art the right way up.
+
+    // Note each row's slot, so the reorder can glide rows from where they were.
+    const before = new Map(
+      [...rowsRef.current].map(([index, row]) => [
+        index,
+        row.getBoundingClientRect().top,
+      ]),
+    );
+
+    // The old disc lands on top of the stack as the picked disc heads for the player, upright.
+    commit(next);
     if (spinRef.current) spinRef.current.currentTime = 0;
 
-    await run(
-      disc,
-      [away, { ...lifted, offset: 2 / 3, easing: "ease-in" }, seated],
-      {
-        duration: fadeMs * 3,
-        easing: "ease-out",
-      },
-    );
-    playSound("disc");
+    // Rows above the picked one slide down a slot; rows below it are already in place.
+    const shifts = next.stack.slice(1).map((index) => {
+      const row = rowsRef.current.get(index);
+      const from =
+        (before.get(index) ?? 0) - (row?.getBoundingClientRect().top ?? 0);
 
-    // Only once that row is gone does the old disc land on top of the stack.
-    await leaving;
-    commit(next);
+      return from
+        ? run(row, [{ translate: `0 ${from}px` }, { translate: "0 0" }], {
+            duration: fadeMs * 2,
+            easing: enterEasing,
+            fill: "none",
+          })
+        : undefined;
+    });
+
+    // The rows move with the stack right away; only the disc waits for its cover.
+    const rows = Promise.all([
+      ...shifts,
+      fadeRow(rowsRef.current.get(previous.current), true),
+    ]);
+
+    // Mark the rejection handled now; the swap still awaits it below.
+    rows.catch(() => undefined);
+
+    // The disc no longer fades in, so let its new cover finish decoding before it shows.
+    await disc
+      ?.querySelector("img")
+      ?.decode()
+      .catch(() => undefined);
+
+    await Promise.all([
+      rows,
+      run(
+        disc,
+        [
+          { ...away(offscreen), easing: enterEasing },
+          { ...lifted, offset: 0.75, easing: exitEasing },
+          seated,
+        ],
+        { duration: fadeMs * 4 },
+      ).then(() => playSound("disc")),
+    ]);
 
     playSound("lid");
-    await Promise.all([
-      openRow(rowsRef.current.get(previous.current)),
-      run(lid, [{ transform: "rotateX(98deg)" }, { transform: "rotateX(0)" }], {
-        duration: fadeMs,
-        easing: "ease-in",
-      }),
-    ]);
-    if (list) list.style.height = "";
+    await run(lid, [{ transform: lidOpen }, { transform: "rotateX(0)" }], {
+      duration: fadeMs,
+      easing: exitEasing,
+    });
     await run(knob, [{ transform: switchOpen }, { transform: "none" }], {
       duration: fadeMs,
-      easing: "ease-in",
+      easing: exitEasing,
     });
   };
 
@@ -308,16 +307,31 @@ export const useLoopmaster = ({
     await ramp(1, fadeMs * 4);
   };
 
-  // Play a disc from the stack; picks are ignored until the new disc is back at full speed.
+  // Play a disc from the stack; a pick made mid-swap waits its turn, and the latest one wins.
   const play = async (picked: number) => {
-    if (busyRef.current || !orderRef.current.stack.includes(picked)) return;
+    if (busyRef.current) {
+      queuedRef.current = picked;
+      setQueued(picked);
+      return;
+    }
+    if (!orderRef.current.stack.includes(picked)) return;
 
     busyRef.current = true;
     setSwapping(true);
 
     try {
-      await swap(picked);
-      if (!reducedMotion) await spinUp();
+      let next: number | null = picked;
+
+      while (next !== null) {
+        if (orderRef.current.stack.includes(next)) await swap(next);
+
+        // Go straight into a waiting pick; otherwise bring the disc up to speed, then check again.
+        if (queuedRef.current === null && !reducedMotion) await spinUp();
+
+        next = queuedRef.current;
+        queuedRef.current = null;
+        setQueued(null);
+      }
     } catch {
       // The screen unmounted mid-swap; its animations were already cancelled.
     } finally {
@@ -346,6 +360,7 @@ export const useLoopmaster = ({
     stack,
     playing,
     swapping,
+    queued,
     play,
     togglePlaying,
     registerRow,

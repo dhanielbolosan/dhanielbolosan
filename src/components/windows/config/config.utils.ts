@@ -1,4 +1,9 @@
-import type { Colors, ColorKey, Rgb } from "./config.data";
+import {
+  colorDefinitions,
+  type Colors,
+  type ColorKey,
+  type Rgb,
+} from "./config.data";
 
 // Split a six-digit hex color into its red, green, and blue channels.
 export const hexToRgb = (hex: string): Rgb => [
@@ -56,7 +61,7 @@ const isRgb = (value: unknown): value is Rgb =>
   );
 
 // Restore known color keys, replacing missing or invalid values with defaults.
-export const parseSavedColors = (saved: unknown, defaults: Colors): Colors => {
+const parseSavedColors = (saved: unknown, defaults: Colors): Colors => {
   const values =
     saved && typeof saved === "object"
       ? (saved as Record<string, unknown>)
@@ -92,3 +97,9 @@ export const loadSavedColors = (storageKey: string, defaults: Colors) => {
     return defaults;
   }
 };
+
+// Look up a color's label for the slider's accessible name.
+export const getColorLabel = (key: ColorKey) =>
+  colorDefinitions
+    .find((definition) => definition.key === key)!
+    .label.toLowerCase();

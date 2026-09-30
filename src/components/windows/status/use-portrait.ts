@@ -46,7 +46,7 @@ export const usePortrait = (maxHealth: number) => {
   };
 
   // Spend a full gauge to restore all HP, including from KO.
-  const useLimit = () => {
+  const spendLimit = () => {
     if (limit < maxLimit) {
       playSound("error");
       return;
@@ -61,5 +61,5 @@ export const usePortrait = (maxHealth: number) => {
     playSound("heal");
   };
 
-  return { health, hit, attack, limit, useLimit };
+  return { health, hit, attack, limit, spendLimit };
 };

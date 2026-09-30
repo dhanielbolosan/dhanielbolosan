@@ -1,4 +1,4 @@
-import { contactErrors } from "@/lib/contact";
+import { contactErrors } from "@/lib/integrations/contact";
 import { formatMissingFields } from "./contact.utils";
 
 export type ContactMode = "menu" | "form" | "sent";
@@ -6,9 +6,6 @@ export type ContactAction =
   | { type: "form" }
   | { type: "redirect"; href: string }
   | { type: "back" };
-
-export const redirectDelayMs = 400;
-export const redirectResetMs = 1800;
 
 export const dialogueLines = {
   menu: "I'm always open to discussing new projects, opportunities, or just talking. How would you like to reach out?",

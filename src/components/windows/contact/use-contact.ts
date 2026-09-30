@@ -7,15 +7,14 @@ import {
 } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { contactSchema, type ContactFields } from "@/lib/contact";
 import { playSound } from "@/lib/audio";
+import { contactSchema, type ContactFields } from "@/lib/integrations/contact";
+import { useWindowFade } from "@/lib/menu/window-fade";
+import { redirectDelayMs, redirectResetMs } from "@/lib/motion";
+import { useTypewriter } from "@/lib/typewriter/use-typewriter";
 import type { Choice } from "../../choices";
-import { useWindowFade } from "@/lib/window-fade";
-import { useTypewriter } from "@/lib/use-typewriter";
 import {
   dialogueLines,
-  redirectDelayMs,
-  redirectResetMs,
   type ContactAction,
   type ContactMode,
 } from "./contact.data";
@@ -48,7 +47,7 @@ export const useContact = () => {
 
   // Swap screens during fade-out, then start dialogue after fade-in finishes.
   const transitionToMode = useCallback(
-    (next: typeof mode) =>
+    (next: ContactMode) =>
       fadeTo(
         () => {
           setMode(next);
@@ -91,7 +90,7 @@ export const useContact = () => {
   }, [dialogueText, visibleDialogue, pendingHref]);
 
   // Submit the validated message, then show confirmation or retry dialogue.
-  async function submitMessage(data: ContactFields) {
+  const submitMessage = async (data: ContactFields) => {
     playSound("select");
     setDialogueText(dialogueLines.sending);
 
@@ -110,7 +109,7 @@ export const useContact = () => {
       playSound("error");
       setDialogueText(dialogueLines.failed);
     }
-  }
+  };
 
   // Turn field errors into one dialogue line.
   const handleValidationErrors = (

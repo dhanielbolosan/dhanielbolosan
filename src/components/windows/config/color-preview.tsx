@@ -1,5 +1,5 @@
-import { PixelHand } from "../../pixel-hand";
 import { cn } from "@/lib/utils";
+import { PixelHand } from "../../pixel-hand";
 import {
   corners,
   textColors,
@@ -112,7 +112,7 @@ export const ColorPreview = ({
       role={active ? "radiogroup" : undefined}
       aria-label={active ? "Text color" : undefined}
       onMouseLeave={() => setHoveredColorKey(undefined)}
-      className="grid grid-cols-2 gap-x-7 gap-y-3 @min-[21rem]:grid-cols-4 @min-[21rem]:gap-x-3"
+      className="grid grid-cols-2 gap-3 @min-[21rem]:grid-cols-4"
     >
       {textColors.map((colorDefinition) => (
         <span
@@ -130,7 +130,7 @@ export const ColorPreview = ({
 
           {active &&
             handAt === colorDefinition.key &&
-            renderColorHand("inset-y-0 right-full my-auto mr-2")}
+            renderColorHand("inset-y-0 right-full my-auto mr-1.5")}
         </span>
       ))}
     </div>

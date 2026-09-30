@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+// Label and value pairs laid out as an FF7 stat sheet, in two or four columns.
 export const Stats = ({
   pairs,
   columns = 2,
@@ -17,7 +18,7 @@ export const Stats = ({
       "grid font-heading text-sm",
       columns === 4
         ? "grid-cols-[auto_1fr_auto_1fr] gap-x-3"
-        : "grid-cols-[auto_1fr] gap-x-4",
+        : "grid-cols-[auto_1fr] gap-x-3",
       className,
     )}
   >

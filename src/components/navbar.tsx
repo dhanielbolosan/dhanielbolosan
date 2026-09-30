@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Tabs } from "radix-ui";
-import { PixelHand } from "@/components/pixel-hand";
+import { columns, entryDirections } from "@/lib/menu/layout";
 import { cn } from "@/lib/utils";
-import { columns, entryDirections } from "@/lib/layout";
+import { PixelHand } from "./pixel-hand";
 
+// Column tabs for phones and tablets, with the hand sliding to the selected one.
 export const Navbar = ({
   selectedTabIndex,
   onSelectTab,
@@ -39,7 +40,7 @@ export const Navbar = ({
             onFocus={() => setPointedTabIndex(columnIndex)}
             onBlur={() => setPointedTabIndex(undefined)}
             className={cn(
-              "relative flex cursor-pointer items-center pl-7 font-heading text-xs font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:text-base",
+              "relative flex cursor-pointer items-center pl-6.5 font-heading text-xs font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-foreground data-[state=active]:text-foreground md:text-base",
               columnIndex === 0 && "md:hidden",
             )}
           >

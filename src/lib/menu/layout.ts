@@ -7,6 +7,7 @@ import { Skills } from "@/components/windows/skills/skills";
 import { Activity } from "@/components/windows/activity/activity";
 import { Config } from "@/components/windows/config/config";
 
+// The side each window slides in from when the menu opens.
 export const entryDirections = {
   Navbar: "top",
   Status: "left",
@@ -28,6 +29,7 @@ type WindowColumn = {
   }[];
 };
 
+// The menu's columns, each a navbar tab on phones, with the windows they stack.
 export const columns: WindowColumn[] = [
   {
     label: "Status",
@@ -44,7 +46,7 @@ export const columns: WindowColumn[] = [
   },
 
   {
-    label: "Materia",
+    label: "Projects",
     split: true,
     windows: [
       {

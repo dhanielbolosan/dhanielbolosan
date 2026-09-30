@@ -1,3 +1,4 @@
+// Who the site belongs to, and the accounts and time zone its live data comes from.
 export const displayName = "Dhaniel Bolosan";
 export const githubUsername = "dhanielbolosan";
 // Twice the 108px portrait, for sharp high-density screens without the full-size download.

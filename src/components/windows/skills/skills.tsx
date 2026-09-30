@@ -9,7 +9,7 @@ export const Skills = () => (
     {groups.map((group) => (
       <div
         key={group.label}
-        className="not-first-of-type:pt-5"
+        className="not-first-of-type:pt-6"
       >
         <h3 className="group-heading flex items-center gap-2">
           <img
@@ -29,17 +29,13 @@ export const Skills = () => (
               <IconItem
                 key={skill}
                 icon={
-                  icon ? (
-                    <svg
-                      viewBox={icon.viewBox ?? "0 0 24 24"}
-                      aria-hidden="true"
-                      className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
-                    >
-                      <path d={icon.path} />
-                    </svg>
-                  ) : (
-                    <span className="size-4 shrink-0" />
-                  )
+                  <svg
+                    viewBox={"viewBox" in icon ? icon.viewBox : "0 0 24 24"}
+                    aria-hidden="true"
+                    className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
+                  >
+                    <path d={icon.path} />
+                  </svg>
                 }
               >
                 {skill}

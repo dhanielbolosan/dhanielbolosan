@@ -1,13 +1,13 @@
-import type { Listen } from "../../functions/lib/listens";
-import { listenbrainzUsername } from "./site";
+import type { Listen } from "../../../functions/lib/listens";
+import { listenbrainzUsername } from "@/lib/site";
 
 // The function defines the shape; a type-only import keeps server code out of the bundle.
 export type { Listen };
 
 // Fetch through the server endpoint so repeat visits hit the edge cache.
-export const fetchRecentListens = async (signal?: AbortSignal) => {
+export const fetchRecentListens = async () => {
   const params = new URLSearchParams({ username: listenbrainzUsername });
-  const response = await fetch(`/api/recent-listens?${params}`, { signal });
+  const response = await fetch(`/api/recent-listens?${params}`);
 
   // Return no data on an HTTP failure so the caller keeps its current state.
   if (!response.ok) return;

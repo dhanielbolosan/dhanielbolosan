@@ -17,7 +17,7 @@ export const StatusProfile = ({
 }) => {
   // Use age for LV and Aerith's corresponding resource growth for HP and MP.
   const { maxHealth, maxMana } = calculatePortraitResources(level);
-  const { health, hit, attack, limit, useLimit } = usePortrait(maxHealth);
+  const { health, hit, attack, limit, spendLimit } = usePortrait(maxHealth);
   const condition = healthStatus(health, maxHealth);
   const portraitRef = useRef<HTMLDivElement>(null);
 
@@ -138,7 +138,7 @@ export const StatusProfile = ({
           </div>
 
           {/* Shared grid rows align birthday and Limit bars with HP and MP. */}
-          <div className="col-start-2 row-span-2 row-start-2 ml-7 grid min-w-0 grid-rows-subgrid items-end self-stretch">
+          <div className="col-start-2 row-span-2 row-start-2 ml-6.5 grid min-w-0 grid-rows-subgrid items-end self-stretch">
             {/* Birthday progress */}
             <div className="min-w-0 space-y-1">
               <span className="block text-xs leading-none">next level</span>
@@ -160,7 +160,7 @@ export const StatusProfile = ({
                   ? "Restore full HP, including from KO"
                   : "Take damage to charge Limit"
               }
-              onClick={useLimit}
+              onClick={spendLimit}
               className={cn(
                 "min-w-0 space-y-1 text-left outline-none enabled:hover:brightness-125 focus-visible:ring-2 focus-visible:ring-ring",
                 limit === maxLimit && "cursor-pointer",
@@ -178,7 +178,7 @@ export const StatusProfile = ({
 
                 {/* Full Limit pointer */}
                 {limit === maxLimit && (
-                  <PixelHand className="pointer-events-none absolute top-1/2 right-full mr-2 -translate-y-1/2 motion-safe:animate-bob" />
+                  <PixelHand className="pointer-events-none absolute top-1/2 right-full mr-1.5 -translate-y-1/2 motion-safe:animate-bob" />
                 )}
               </span>
             </button>

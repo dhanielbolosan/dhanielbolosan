@@ -1,21 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import { attachMenuSounds } from "./lib/audio";
-import { useMedia } from "./lib/use-media";
-import { TypewriterReady } from "./lib/use-typewriter";
-import { Window } from "./components/window";
-import { cn } from "./lib/utils";
-import { columns } from "./lib/layout";
-import { Navbar } from "./components/navbar";
-import { getEntryDelay } from "./lib/entrance";
-import { useMenuEntrance } from "./lib/use-menu-entrance";
-import { ScrollHint } from "./components/scroll-hint";
-import { readChoice, saveChoice } from "./lib/saved-choice";
+import { useEffect, useState } from "react";
+import { Navbar } from "@/components/navbar";
+import { Window } from "@/components/window";
+import { attachMenuSounds } from "@/lib/audio";
+import { getEntryDelay } from "@/lib/menu/entrance";
+import { columns } from "@/lib/menu/layout";
+import { useMenuEntrance } from "@/lib/menu/use-menu-entrance";
+import { readChoice, saveChoice } from "@/lib/saved-choice";
+import { TypewriterReady } from "@/lib/typewriter/use-typewriter";
+import { useMedia } from "@/lib/use-media";
+import { cn } from "@/lib/utils";
 
 // Remember the tab by its label, so reordering tabs never restores the wrong one.
 const tabStorageKey = "active-tab";
 const tabLabels = columns.map((column) => column.label);
 
-function App() {
+export const App = () => {
   // Listen once for menu interaction sounds, including controls in portals.
   useEffect(attachMenuSounds, []);
   const isTabletOrWider = useMedia("(min-width: 48rem)");
@@ -30,8 +29,6 @@ function App() {
     setActiveTabIndex(index);
     saveChoice(tabStorageKey, tabLabels[index]);
   };
-
-  const activeColumnRef = useRef<HTMLDivElement>(null);
 
   // Tablet keeps Status visible while tabs select the right column.
   const rightColumnIndex = activeTabIndex === 0 ? 1 : activeTabIndex;
@@ -55,11 +52,10 @@ function App() {
         />
 
         {/* One column on mobile, two on tablet, four on desktop. */}
-        <main className="relative grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {columns.map((column, columnIndex) => (
             <div
               key={column.label}
-              ref={columnIndex === activeTabIndex ? activeColumnRef : undefined}
               className={cn(
                 columnIndex === activeTabIndex ? "flex" : "hidden",
                 columnIndex === 0 || columnIndex === rightColumnIndex
@@ -98,15 +94,8 @@ function App() {
               )}
             </div>
           ))}
-          <ScrollHint
-            key={activeTabIndex}
-            columnRef={activeColumnRef}
-            enabled={!isTabletOrWider && !entering}
-          />
         </main>
       </div>
     </TypewriterReady.Provider>
   );
-}
-
-export default App;
+};

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { fadeMs } from "./motion";
+import { fadeMs } from "@/lib/motion";
 
+// Keep the old view on screen until its fade-out ends, then show the new one.
 export const useSwap = <View>(id: string, view: View, instant = false) => {
   const [shown, setShown] = useState({ id, view });
 

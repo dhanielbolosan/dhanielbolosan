@@ -1,6 +1,7 @@
 import { formatTime, formatShortDate } from "@/lib/dates";
 import { timeZone } from "@/lib/site";
 import { Stats } from "../../stats";
+import { TextLink } from "../../text-link";
 import { profileStats } from "./status.data";
 import { StatusProfile } from "./status-profile";
 import { useStatus } from "./use-status";
@@ -16,20 +17,13 @@ export const Status = () => {
         experienceProgress={experienceProgress}
       />
 
-      {/* Personal details and introduction */}
+      {/* Personal details and the resume link */}
       <Stats
         pairs={[
           ...profileStats,
           [
             "Resume",
-            <a
-              href="/Dhaniel_Bolosan_Resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="text-gold underline underline-offset-2 hover:text-foreground"
-            >
-              View
-            </a>,
+            <TextLink href="/Dhaniel_Bolosan_Resume.pdf">View</TextLink>,
           ],
         ]}
         className="text-base"

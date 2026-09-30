@@ -1,5 +1,6 @@
-import { githubUsername } from "./site";
+import { githubUsername } from "@/lib/site";
 
+// The contribution calendar's shape, as the server endpoint returns it.
 export type ContributionLevel =
   | "NONE"
   | "FIRST_QUARTILE"
@@ -7,29 +8,29 @@ export type ContributionLevel =
   | "THIRD_QUARTILE"
   | "FOURTH_QUARTILE";
 
-export interface ContributionDay {
+export type ContributionDay = {
   contributionCount: number;
   contributionLevel: ContributionLevel;
   date: string;
   weekday: number;
-}
+};
 
-export interface ContributionWeek {
+type ContributionWeek = {
   contributionDays: ContributionDay[];
   firstDay: string;
-}
+};
 
-export interface ContributionRange {
+type ContributionRange = {
   from: string;
   to: string;
   asOf: string;
-}
+};
 
-export interface ContributionCalendarData {
+export type ContributionCalendarData = {
   range: ContributionRange;
   totalContributions: number;
   weeks: ContributionWeek[];
-}
+};
 
 // Fetch through the server endpoint so the GitHub token stays private.
 export const fetchContributionCalendar = async (

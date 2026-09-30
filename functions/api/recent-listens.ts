@@ -13,6 +13,9 @@ const listenCount = 4;
 const upstreamTimeoutMs = 5000;
 const lastGoodSeconds = 60 * 60 * 24 * 7;
 
+// The part of a ListenBrainz response the player reads.
+type Payload = { payload?: { listens?: ListenBrainzListen[] } };
+
 // Cache successful JSON for 30 browser seconds and one edge minute, so Now Playing stays fresh.
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -27,7 +30,7 @@ function json(body: unknown, status = 200) {
 
 // Proxy ListenBrainz recent listens; the edge cache absorbs repeat visits and covers outages.
 export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
-  const { searchParams } = new URL(request.url);
+  const { origin, searchParams } = new URL(request.url);
   const username = searchParams.get("username")?.trim() ?? "";
 
   // Require a ListenBrainz-style username: letters, digits, dots, dashes, and underscores.
@@ -36,7 +39,6 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
   }
 
   // Key both caches on the validated username alone, so extra query parameters can't bypass them.
-  const { origin } = new URL(request.url);
   const query = `username=${encodeURIComponent(username)}`;
   const cacheKey = new Request(`${origin}/api/recent-listens?${query}`);
   const lastGoodKey = new Request(
@@ -54,7 +56,7 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
     const { listens } = (await saved.json()) as { listens: Listen[] };
 
     return new Response(
-      JSON.stringify({ listens: withoutPlayingNow(listens), stale: true }),
+      JSON.stringify({ listens: withoutPlayingNow(listens) }),
       {
         headers: {
           "Cache-Control": "no-store",
@@ -81,7 +83,6 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
       return fallback();
     }
 
-    type Payload = { payload?: { listens?: ListenBrainzListen[] } };
     const result = (await response.json()) as Payload;
     // Playing-now is optional, so a malformed body is ignored rather than failing the response.
     const playing = playingResponse?.ok

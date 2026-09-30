@@ -1,8 +1,8 @@
-import { eraseSpeedMultiplier } from "./motion";
+import { eraseSpeedMultiplier } from "@/lib/motion";
 
-export type TypewriterState = { text: string; line: string; scene: string };
+type TypewriterState = { text: string; line: string; scene: string };
 
-export const stepTypewriter = (
+const stepTypewriter = (
   current: TypewriterState,
   target: string,
   scene: string,
@@ -24,6 +24,7 @@ export const stepTypewriter = (
   };
 };
 
+// Advance the typewriter by the elapsed time, one character per typing step.
 export const advanceTypewriter = (
   state: TypewriterState,
   target: string,

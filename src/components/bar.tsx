@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 
+// An FF7 gauge, such as HP or project progress, filled from 0 to 1.
 export const Bar = ({
   value,
   label,
@@ -22,7 +23,7 @@ export const Bar = ({
       aria-valuemin={0}
       aria-valuemax={100}
       className={cn(
-        "block overflow-hidden rounded-[2px] border-2 border-[#c9c7dc] bg-[#1a1730] shadow-[0_0_0_1px_#15121a]",
+        "block overflow-hidden rounded-[2px] border-2 border-(--track-border) bg-(--track) shadow-[0_0_0_1px_var(--track-outline)]",
         className,
       )}
     >

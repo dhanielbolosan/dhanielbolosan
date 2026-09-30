@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchContributionCalendar } from "@/lib/github";
+import { fetchContributionCalendar } from "@/lib/integrations/github";
 import { createEmptyCalendar } from "./github.utils";
 
 export const useContributions = () => {

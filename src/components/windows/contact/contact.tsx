@@ -31,7 +31,7 @@ export const Contact = () => {
           reservedDialogueLines={reservedDialogueLines}
         />
 
-        <div className="-mt-5 ml-3 shrink-0">
+        <div className="-mt-4.5 ml-3 shrink-0">
           <CornerBox
             view={commands}
             id={commands ? commands.map((item) => item.label).join() : "title"}

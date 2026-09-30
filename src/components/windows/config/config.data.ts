@@ -9,6 +9,7 @@ export const corners = [
 
 export const textColors = [
   { key: "text", label: "Text", cssVar: "--foreground", fallback: "#f3f1f7" },
+
   { key: "accent", label: "Accent", cssVar: "--label", fallback: "#6fd6e8" },
 
   {
@@ -27,7 +28,7 @@ export const textColors = [
 ] as const;
 
 export type Corner = (typeof corners)[number]["key"];
-export type TextColor = (typeof textColors)[number]["key"];
+type TextColor = (typeof textColors)[number]["key"];
 export type ColorKey = Corner | TextColor;
 export type Rgb = [number, number, number];
 export type Colors = Record<ColorKey, Rgb>;
@@ -52,9 +53,9 @@ export const defaultColors = Object.fromEntries(
 ) as Colors;
 
 export const cornerHandPositions: Record<Corner, string> = {
-  tl: "top-0 right-full mr-2",
+  tl: "top-0 right-full mr-1.5",
   tr: "top-0 right-2",
-  bl: "bottom-0 right-full mr-2",
+  bl: "bottom-0 right-full mr-1.5",
   br: "bottom-0 right-2",
 };
 
@@ -79,9 +80,3 @@ export const settingHelp: Record<Setting, string> = {
   volume: "Select volume for sound effects",
   reset: "Select to reset configs to default",
 };
-
-// Look up a color's label for the slider's accessible name.
-export const getColorLabel = (key: ColorKey) =>
-  colorDefinitions
-    .find((definition) => definition.key === key)!
-    .label.toLowerCase();

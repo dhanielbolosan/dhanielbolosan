@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { useMedia } from "@/lib/use-media";
+import { reducedMotionQuery, useMedia } from "@/lib/use-media";
 import { columns } from "./layout";
 import { getEntranceDuration } from "./entrance";
 
+// Play the opening entrance once, for the windows on screen, and report when it ends.
 export const useMenuEntrance = (
   activeTabIndex: number,
   isTabletOrWider: boolean,
   rightColumnIndex: number,
 ) => {
   const isDesktop = useMedia("(min-width: 80rem)");
-  const reducedMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const reducedMotion = useMedia(reducedMotionQuery);
 
   const [entering, setEntering] = useState(
-    () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => !window.matchMedia(reducedMotionQuery).matches,
   );
 
   useEffect(() => {

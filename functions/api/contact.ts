@@ -1,4 +1,4 @@
-import { contactSchema } from "../../src/lib/contact";
+import { contactSchema } from "../../src/lib/integrations/contact";
 
 interface Env {
   RESEND_API_KEY: string;

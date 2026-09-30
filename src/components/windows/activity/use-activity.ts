@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useWindowFade } from "@/lib/window-fade";
-import { cornerTransitionMs } from "@/lib/motion";
 import { playSound } from "@/lib/audio";
+import { useWindowFade } from "@/lib/menu/window-fade";
+import { cornerTransitionMs } from "@/lib/motion";
 import { readChoice, saveChoice } from "@/lib/saved-choice";
 import {
   screens,

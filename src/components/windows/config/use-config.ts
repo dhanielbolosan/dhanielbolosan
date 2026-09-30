@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
+import { defaultSoundSettings, playSound, setSoundSettings } from "@/lib/audio";
+import { fadeMs } from "@/lib/motion";
+import { saveChoice } from "@/lib/saved-choice";
 import {
   colorDefinitions,
   defaultColors,
@@ -25,7 +27,9 @@ export const useConfig = () => {
   const [openSetting, setOpenSetting] = useState<Setting>();
   const [selectedColorKey, setSelectedColorKey] = useState<ColorKey>();
   const [hoveredColorKey, setHoveredColorKey] = useState<ColorKey>();
-  const [lastColorKeys, setLastColorKeys] = useState<Record<string, ColorKey>>({
+  const [lastColorKeys, setLastColorKeys] = useState<
+    Partial<Record<Setting, ColorKey>>
+  >({
     window: "tl",
     text: "text",
   });
@@ -52,16 +56,11 @@ export const useConfig = () => {
       getMutedCreditOutline(mutedCredit),
     );
 
-    const saveColors = () => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(colors));
-      } catch {
-        // Keep customization usable when storage is unavailable.
-      }
-    };
+    // Blocked storage keeps the palette for this visit only.
+    const saveColors = () => saveChoice(storageKey, JSON.stringify(colors));
 
     // Save after dragging settles, and flush before a refresh or navigation.
-    const saveTimer = window.setTimeout(saveColors, 150);
+    const saveTimer = setTimeout(saveColors, fadeMs);
     window.addEventListener("pagehide", saveColors);
 
     return () => {

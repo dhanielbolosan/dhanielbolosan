@@ -1,24 +1,20 @@
 import { useEffect, useState } from "react";
-import { fetchRecentListens, type Listen } from "@/lib/listenbrainz";
+import {
+  fetchRecentListens,
+  type Listen,
+} from "@/lib/integrations/listenbrainz";
 import { coverWaitMs } from "@/lib/motion";
+import { signature } from "./music.utils";
 
 export type CoverState = "loading" | "ready" | "missing";
 
-interface LoadedListens {
+type LoadedListens = {
   listens: Listen[];
   covers: CoverState[];
   decoded: Promise<void>[];
   images: HTMLImageElement[];
   loadedAt: number;
-}
-
-// Identify a set of listens by what the player shows, so an unchanged refetch doesn't remount it.
-export const signature = (listens: Listen[]) =>
-  listens
-    .map((listen) =>
-      [listen.track, listen.artist, listen.playingNow].join("\u0000"),
-    )
-    .join("\u0001");
+};
 
 // Reuse a load for a minute, matching the function's edge cache, so Now Playing stays current.
 const freshMs = 60_000;

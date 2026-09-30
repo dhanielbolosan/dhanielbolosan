@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchLatestPush } from "@/lib/github";
+import { fetchLatestPush } from "@/lib/integrations/github";
 import { calculateLevelProgress } from "./status.utils";
 
 export const useStatus = () => {

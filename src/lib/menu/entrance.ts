@@ -3,7 +3,7 @@ import {
   windowStaggerMs,
   windowEntryMs,
   entranceBufferMs,
-} from "./motion";
+} from "@/lib/motion";
 
 // Combine column and window offsets to stagger the entrances.
 export const getEntryDelay = (columnIndex: number, windowIndex: number) =>

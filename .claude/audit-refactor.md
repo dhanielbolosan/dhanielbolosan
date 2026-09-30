@@ -39,7 +39,8 @@ My ground rules for reviewing code. Project conventions live in [project.md](pro
 ## Reporting
 
 - Lead with actionable findings by impact: file and line, trigger, consequence, and a concrete fix. Mark uncertain and optional items.
-- Write a standalone HTML report (unless asked otherwise) with the base and revision, working-tree scope, findings, proposals, validation, and limitations. Each finding gets severity, file and line, evidence, impact, fix, and a before/after when it helps. Keep proposed work separate from completed fixes.
+- Write a standalone HTML report with the base and revision, working-tree scope, findings, proposals, validation, and limitations. Each finding gets severity, file and line, evidence, impact, and fix. Keep proposed work separate from completed fixes.
+- Every fix and proposal shows how, as a before/after code comparison: a unified diff block (`-` before, `+` after, with the file path and line) of only the lines that change plus a little context. Completed fixes show the real `git diff` of the change; proposals show the suggested change and are labeled as such. Structural moves show the `git mv` list and one example import change.
 - Make it readable and responsive: semantic headings, a short overview, and findings linked to their proposals, with screenshots or measurements when available. Inline styles and native HTML only; no external assets or report app. Escape embedded repo content.
 - Open the report at mobile and desktop sizes to check it reads well. Reply with a clickable link and a short summary; the report must stand on its own without the chat.
 - After fixes, explain what changed and why, how it follows the repo's conventions, what was tested, and what risks remain. Separate pre-existing work from audit edits.

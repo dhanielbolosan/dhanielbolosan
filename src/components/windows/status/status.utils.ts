@@ -1,4 +1,4 @@
-import { aerithGrowth, birthday } from "./status.data.ts";
+import { aerithGrowth, birthday } from "./status.data";
 
 // Derive deterministic HP and MP totals from Aerith's growth brackets.
 export const calculatePortraitResources = (level: number) => {

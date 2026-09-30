@@ -1,13 +1,14 @@
-import { Bar } from "../../bar";
-import { Faded } from "../../window";
-import { Stats } from "../../stats";
-import { IconItem } from "../../icon-item";
 import { orbs } from "@/lib/materia";
+import { Bar } from "../../bar";
+import { IconItem } from "../../icon-item";
+import { Stats } from "../../stats";
+import { TextLink } from "../../text-link";
+import { Faded } from "../../window";
 import type { Project } from "./projects.data";
 
 export const ProjectDetails = ({ project }: { project: Project }) => (
-  <Faded className="-mx-5 -mb-5 flex flex-1 flex-col">
-    <div className="window flex flex-1 flex-col gap-1.5 px-5 py-3.5">
+  <Faded className="-mx-4.5 -mb-4.5 flex flex-1 flex-col">
+    <div className="window flex flex-1 flex-col gap-1.5 px-4.5 py-3.5">
       <h3 className="font-heading text-base font-semibold">{project.name}</h3>
 
       <Stats
@@ -27,20 +28,16 @@ export const ProjectDetails = ({ project }: { project: Project }) => (
               />
             </span>,
           ],
+
           ...(project.link?.href
             ? ([
-              [
-                "Link",
-                <a
-                  href={project.link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-gold underline underline-offset-2 hover:text-foreground"
-                >
-                  {project.link.label}
-                </a>,
-              ],
-            ] as const)
+                [
+                  "Link",
+                  <TextLink href={project.link.href}>
+                    {project.link.label}
+                  </TextLink>,
+                ],
+              ] as const)
             : []),
         ]}
       />

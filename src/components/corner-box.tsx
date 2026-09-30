@@ -5,11 +5,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSwap } from "@/lib/use-swap";
+import { useSwap } from "@/lib/menu/use-swap";
 import { fadeMs } from "@/lib/motion";
-import { useWindowFade } from "@/lib/window-fade";
+import { useWindowFade } from "@/lib/menu/window-fade";
 import { cn } from "@/lib/utils";
 
+// A box that cross-fades between views and eases to each view's size.
 export const CornerBox = <View,>({
   view,
   id,

@@ -1,11 +1,11 @@
-export type Entry = {
+type Entry = {
   name: string;
   subtitle: string;
   date: string;
   description: string[];
 };
 
-export const experience: Entry[] = [
+const experience: Entry[] = [
   /*
     - Engineered a geospatial intelligence dashboard and backend data pipeline that queried and rendered live data streams across desktop and mobile platforms.
     - Built interactive Space Domain Awareness simulations, including ML-based satellite thermal anomaly detection for missile launches, 5G mesh network visualizations, and a game-theoretic drone swarm engine.
@@ -80,7 +80,7 @@ export const experience: Entry[] = [
   },
 ];
 
-export const education: Entry[] = [
+const education: Entry[] = [
   {
     name: "University of Hawaiʻi at Mānoa",
     subtitle: "Computer Science, B.S.",

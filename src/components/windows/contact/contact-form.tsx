@@ -1,6 +1,6 @@
 import type { FormEventHandler } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import type { ContactFields } from "@/lib/contact";
+import type { ContactFields } from "@/lib/integrations/contact";
 
 const field =
   "w-full min-w-0 rounded-[4px] border border-frame/50 bg-input/30 px-2 font-heading text-base transition-colors outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30";
@@ -18,7 +18,7 @@ export const ContactForm = ({
     noValidate
     aria-busy={form.formState.isSubmitting}
     onSubmit={onSubmit}
-    className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
+    className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-3 font-heading"
   >
     {/* Keep the submitted fields unchanged while the request is pending. */}
     <label

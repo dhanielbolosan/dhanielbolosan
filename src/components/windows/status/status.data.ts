@@ -23,10 +23,6 @@ export const profileStats: [string, string][] = [
 
   ["Origin", "Bacarra, Philippines"],
 
-  ["Device", "ROG Zephyrus G16"],
-
-  ["GPU", "RTX 5070 Ti"],
-
   ["OS", "CachyOS"],
 
   ["Avail", "Open to Work"],
