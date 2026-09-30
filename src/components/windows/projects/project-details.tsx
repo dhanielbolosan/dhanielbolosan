@@ -8,7 +8,7 @@ import type { Project } from "./projects.data";
 
 export const ProjectDetails = ({ project }: { project: Project }) => (
   <Faded className="-mx-4.5 -mb-4.5 flex flex-1 flex-col">
-    <div className="window flex flex-1 flex-col gap-1.5 px-4.5 py-3.5">
+    <div className="window flex flex-1 flex-col gap-1.5 p-4.5">
       <h3 className="font-heading text-base font-semibold">{project.name}</h3>
 
       <Stats
@@ -44,7 +44,7 @@ export const ProjectDetails = ({ project }: { project: Project }) => (
 
       <p className="text-sm leading-relaxed">{project.description}</p>
 
-      <ul className="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
+      <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1.5 @min-[24rem]:grid-cols-3 font-heading text-sm">
         {project.stack.map(({ name: tech, type }) => (
           <IconItem
             key={tech}

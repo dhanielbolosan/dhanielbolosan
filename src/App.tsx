@@ -62,7 +62,9 @@ export const App = () => {
                   ? "md:flex"
                   : "md:hidden",
                 "min-h-0 flex-col gap-3 xl:flex",
-                entering ? "overflow-visible" : "overflow-y-auto",
+                entering
+                  ? "overflow-visible"
+                  : "overflow-y-auto [scrollbar-gutter:stable]",
               )}
             >
               {column.windows.map(

@@ -55,7 +55,14 @@ export const useActivity = () => {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      const target = event.target as Node;
+      // One Escape belongs to the menu containing focus.
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        (target === document.body || headerRef.current?.contains(target))
+      ) {
+        event.preventDefault();
         playSound("select");
         setMenuOpen(false);
       }

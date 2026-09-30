@@ -17,26 +17,36 @@ const away = (x: number) => ({
 });
 
 // Slide the open switch along its tilted slot, and swing the lid up past upright.
-const switchOpen = "translate(-4.4px, -2.35px)";
+const switchOpen = "translate(-3.168px, -1.692px)";
 const lidOpen = "rotateX(98deg)";
 
 // Clear the clipped window edge by a few pixels; the fallback covers an unmeasured player.
 const offscreenMarginPx = 8;
 const offscreenFallbackPx = -200;
 
+// Keep the committed order of each set of listens for this visit.
+const savedOrders = new Map<string, { current: number; stack: number[] }>();
+
+// Run the disc swap, the spin, and the stack's LIFO order for the Music screen.
 export const useLoopmaster = ({
   count,
+  id,
   waitForCover,
 }: {
   count: number;
+  id: string;
   waitForCover: (index: number) => Promise<void>;
 }) => {
   const reducedMotion = useMedia(reducedMotionQuery);
 
   // The disc in the player plus the stack beneath it, newest on top.
-  const [current, setCurrent] = useState(0);
-  const [stack, setStack] = useState(() =>
-    Array.from({ length: count - 1 }, (_, i) => i + 1),
+  const [current, setCurrent] = useState(
+    () => savedOrders.get(id)?.current ?? 0,
+  );
+  const [stack, setStack] = useState(
+    () =>
+      savedOrders.get(id)?.stack ??
+      Array.from({ length: count - 1 }, (_, i) => i + 1),
   );
   const [playing, setPlaying] = useState(() => !reducedMotion);
 
@@ -153,11 +163,20 @@ export const useLoopmaster = ({
 
   // Render the new order synchronously, so the swap can measure rows in their new slots.
   const commit = (next: { current: number; stack: number[] }) => {
+    // The picked row unmounts; if it had focus, move it to the disc that just landed on top.
+    const hadFocus = rowsRef.current
+      .get(next.current)
+      ?.contains(document.activeElement);
+
     orderRef.current = next;
+    savedOrders.set(id, next);
     flushSync(() => {
       setCurrent(next.current);
       setStack(next.stack);
     });
+
+    if (hadFocus)
+      rowsRef.current.get(next.stack[0])?.querySelector("button")?.focus();
   };
 
   // Fade a row's text in or out without changing its height.
@@ -189,7 +208,7 @@ export const useLoopmaster = ({
     const knob = knobRef.current;
 
     // Travel far enough to clear the window's clipped edge, wherever the player sits.
-    const clip = disc?.closest(".overflow-x-clip");
+    const clip = disc?.closest("[data-player-clip]");
     const offscreen =
       disc && clip
         ? clip.getBoundingClientRect().left -

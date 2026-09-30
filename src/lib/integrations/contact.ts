@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/mini";
 
 // Field messages become the missing-information dialogue in the contact form.
 export const contactErrors = {
@@ -9,12 +9,22 @@ export const contactErrors = {
 
 // Share contact validation between the browser form and server endpoint.
 export const contactSchema = z.object({
-  name: z.string().trim().min(1, contactErrors.name).max(100, "a shorter name"),
-  email: z.email(contactErrors.email).max(254, contactErrors.email),
+  name: z
+    .string()
+    .check(
+      z.trim(),
+      z.minLength(1, contactErrors.name),
+      z.maxLength(100, "a shorter name"),
+    ),
+  email: z
+    .email(contactErrors.email)
+    .check(z.maxLength(254, contactErrors.email)),
   message: z
     .string()
-    .min(10, contactErrors.message)
-    .max(5000, "a shorter message"),
+    .check(
+      z.minLength(10, contactErrors.message),
+      z.maxLength(5000, "a shorter message"),
+    ),
 });
 
 export type ContactFields = z.infer<typeof contactSchema>;

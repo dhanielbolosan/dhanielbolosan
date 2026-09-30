@@ -1,7 +1,7 @@
 import type { Listen } from "@/lib/integrations/listenbrainz";
 
 // Stand-in discs while listens load or when ListenBrainz is unavailable.
-export const placeholderListens: Listen[] = Array.from({ length: 4 }, () => ({
+export const placeholderListens: Listen[] = Array.from({ length: 5 }, () => ({
   track: "Song Title",
   artist: "Artist",
   album: "Album",

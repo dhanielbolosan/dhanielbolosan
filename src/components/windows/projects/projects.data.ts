@@ -17,9 +17,9 @@ export const projects: Project[] = [
     name: "Kumu",
     thumbnail: "/projects/kumu/thumbnail.webp",
     images: [
-      "/projects/kumu/kumu1.jpg",
-      "/projects/kumu/kumu2.png",
-      "/projects/kumu/kumu3.png",
+      "/projects/kumu/kumu1.webp",
+      "/projects/kumu/kumu2.webp",
+      "/projects/kumu/kumu3.webp",
     ],
     description:
       "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions, music, sound effects, and graphics.",
@@ -44,10 +44,10 @@ export const projects: Project[] = [
     name: "SENTINEL Mobile App",
     thumbnail: "/projects/sentinel/thumbnail.webp",
     images: [
-      "/projects/sentinel/sentinel1.png",
-      "/projects/sentinel/sentinel2.png",
-      "/projects/sentinel/sentinel3.png",
-      "/projects/sentinel/sentinel4.png",
+      "/projects/sentinel/sentinel1.webp",
+      "/projects/sentinel/sentinel2.webp",
+      "/projects/sentinel/sentinel3.webp",
+      "/projects/sentinel/sentinel4.webp",
     ],
     description:
       "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch detection, 5G mesh network, and drone swarm simulations.",
@@ -68,9 +68,9 @@ export const projects: Project[] = [
     name: "KopeChain",
     thumbnail: "/projects/kopechain/thumbnail.webp",
     images: [
-      "/projects/kopechain/kopechain1.png",
-      "/projects/kopechain/kopechain2.png",
-      "/projects/kopechain/kopechain3.png",
+      "/projects/kopechain/kopechain1.webp",
+      "/projects/kopechain/kopechain2.webp",
+      "/projects/kopechain/kopechain3.webp",
     ],
     description:
       "Decentralized supply chain tracker on Base Sepolia Testnet to verify the origin of local Hawaiian coffee, with QR codes, 3D mapping, and NFT minting.",
@@ -92,8 +92,8 @@ export const projects: Project[] = [
     name: "Legislative Cloud Platform",
     thumbnail: "/projects/legislative-cloud-platform/thumbnail.webp",
     images: [
-      "/projects/legislative-cloud-platform/uhgro1.png",
-      "/projects/legislative-cloud-platform/uhgro2.png",
+      "/projects/legislative-cloud-platform/uhgro1.webp",
+      "/projects/legislative-cloud-platform/uhgro2.webp",
     ],
     description:
       "Backend service powering AI bill summarization and automated notifications for UH staff and officials, helping track legislation that affects the university.",
@@ -118,8 +118,8 @@ export const projects: Project[] = [
     name: "VENOM-RAG",
     thumbnail: "/projects/venom-rag/thumbnail.webp",
     images: [
-      "/projects/venom-rag/venomrag1.png",
-      "/projects/venom-rag/venomrag2.png",
+      "/projects/venom-rag/venomrag1.webp",
+      "/projects/venom-rag/venomrag2.webp",
     ],
     description:
       "Security research demonstrating adversarial data poisoning and retrieval manipulation in RAG pipelines through vector manipulation and PDF text poisoning.",
@@ -140,9 +140,9 @@ export const projects: Project[] = [
     name: "Pathfinity",
     thumbnail: "/projects/pathfinity/thumbnail.webp",
     images: [
-      "/projects/pathfinity/pathfinity1.png",
-      "/projects/pathfinity/pathfinity2.png",
-      "/projects/pathfinity/pathfinity3.png",
+      "/projects/pathfinity/pathfinity1.webp",
+      "/projects/pathfinity/pathfinity2.webp",
+      "/projects/pathfinity/pathfinity3.webp",
     ],
     description:
       "Full-stack platform for exploring university courses with natural language search, text-to-speech accessibility, and AI-suggested career paths.",

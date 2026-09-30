@@ -1,0 +1,8 @@
+# Vite fingerprints build assets.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com https://coverartarchive.org https://archive.org https://*.archive.org; connect-src 'self'; media-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

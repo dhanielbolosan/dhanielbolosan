@@ -12,6 +12,7 @@ const levelIndex: Record<ContributionLevel, number> = {
   FOURTH_QUARTILE: 4,
 };
 
+// A year of contributions as one small calendar per month.
 export const ActivityCalendar = ({
   calendar,
 }: {
@@ -21,9 +22,9 @@ export const ActivityCalendar = ({
     {groupContributionsByMonth(calendar).map((month) => (
       <li
         key={month.key}
-        className="flex flex-col gap-1 rounded-[4px] bg-black/20 p-1.5"
+        className="flex flex-col gap-1.5 rounded-[4px] bg-black/20 p-1.5"
       >
-        <div className="flex items-baseline justify-between px-0.5 font-heading text-xs">
+        <div className="flex items-baseline justify-between gap-1.5 px-0.5 font-heading text-xs">
           <span className="text-label">{month.name}</span>
 
           <span className="font-semibold tabular-nums">{month.total}</span>

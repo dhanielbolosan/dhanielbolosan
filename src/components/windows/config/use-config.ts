@@ -100,7 +100,15 @@ export const useConfig = () => {
 
     // Escape follows the same two-step path as Back.
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      const target = event.target as Element;
+      // Include the portalled sliders, and leave other menus alone.
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        (target === document.body ||
+          target.closest(`[data-setting="${openSetting}"], [role="dialog"]`))
+      ) {
+        event.preventDefault();
         playSound("select");
         if (selectedColorKey) setSelectedColorKey(undefined);
         else {
@@ -111,9 +119,9 @@ export const useConfig = () => {
       }
     };
 
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, true);
 
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
   }, [openSetting, selectedColorKey]);
 
   // Close an expanded setting on outside presses after its sliders close.

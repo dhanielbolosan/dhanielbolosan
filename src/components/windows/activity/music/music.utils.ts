@@ -1,8 +1,8 @@
 import type { Listen } from "@/lib/integrations/listenbrainz";
 
-// Show a track length as m:ss, or a dash when ListenBrainz has no duration.
+// Show a track length as m:ss, or 0:00 when ListenBrainz has no duration.
 export const formatDuration = (durationMs: number | null) => {
-  if (durationMs === null) return "—";
+  if (durationMs === null) return "0:00";
 
   const seconds = Math.round(durationMs / 1000);
 

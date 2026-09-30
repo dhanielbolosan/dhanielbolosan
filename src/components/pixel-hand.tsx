@@ -1,5 +1,5 @@
-import hand from "@/assets/ff7-hand.png";
 import { useLayoutEffect, useRef } from "react";
+import hand from "@/assets/ff7-hand.png";
 import { cn } from "@/lib/utils";
 
 // The FF7 glove pointer, kept in step with every other hand on the page.

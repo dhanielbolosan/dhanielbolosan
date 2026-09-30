@@ -29,10 +29,8 @@ export const WindowHeader = ({
           !help && "invisible",
         )}
       >
-        <p className="window flex size-full items-center pr-32 pl-5 font-heading text-sm">
-          <span className="min-w-0 truncate @max-[26rem]:line-clamp-2 @max-[26rem]:text-xs @max-[26rem]:leading-4 @max-[26rem]:whitespace-normal">
-            {help}
-          </span>
+        <p className="window flex size-full items-center py-0 px-4.5 pr-32 font-heading text-sm">
+          <span className="min-w-0 truncate">{help}</span>
         </p>
       </div>
 
@@ -57,7 +55,7 @@ export const Window = ({
     <WindowFade.Provider value={{ fading, fadeTo }}>
       <div
         className={cn(
-          "relative isolate flex grow flex-col gap-3 px-4.5 pt-4.5 pb-4.5 [text-shadow:2px_2px_0_var(--text-shadow)]",
+          "relative isolate flex grow flex-col gap-3 p-4.5 [text-shadow:2px_2px_0_var(--text-shadow)]",
           className,
         )}
       >

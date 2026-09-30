@@ -22,7 +22,7 @@ export const VolumeSlider = ({ config }: { config: ConfigState }) => {
     <div className="relative ml-8 grid min-w-0 grid-cols-[minmax(0,6.25rem)_auto] items-center gap-x-1.5 text-base @min-[21rem]:grid-cols-[minmax(0,11.25rem)_auto]">
       <span
         aria-hidden="true"
-        className="absolute right-full mr-1.5 @max-[18rem]:right-auto @max-[18rem]:bottom-full @max-[18rem]:left-0 @max-[18rem]:mb-1 @max-[18rem]:mr-0"
+        className="absolute right-full mr-1.5 @max-[18rem]:right-auto @max-[18rem]:bottom-full @max-[18rem]:left-0 @max-[18rem]:mb-1.5 @max-[18rem]:mr-0"
       >
         {openSetting === "volume" && (
           <PixelHand className="pointer-events-none absolute inset-y-0 right-full my-auto mr-1.5 motion-safe:animate-bob" />
@@ -59,7 +59,7 @@ export const VolumeSlider = ({ config }: { config: ConfigState }) => {
 
       <span
         aria-hidden="true"
-        className="@max-[18rem]:absolute @max-[18rem]:bottom-full @max-[18rem]:left-25 @max-[18rem]:mb-1 @max-[18rem]:-translate-x-full"
+        className="@max-[18rem]:absolute @max-[18rem]:bottom-full @max-[18rem]:left-25 @max-[18rem]:mb-1.5 @max-[18rem]:-translate-x-full"
       >
         High
       </span>

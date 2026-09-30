@@ -48,6 +48,9 @@ export const Status = () => {
                 ? `${formatShortDate(latestPush.at, timeZone)} ${formatTime(latestPush.at, timeZone)}`
                 : "Jan 01 00:00:00"}{" "}
               HST
+              {latestPush && (
+                <span className="sr-only"> to {latestPush.repo}</span>
+              )}
             </span>,
           ],
         ]}

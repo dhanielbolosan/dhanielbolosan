@@ -1,3 +1,4 @@
+import { githubUsername } from "../../src/lib/site";
 import {
   isCalendarDate,
   getRangeFromDates,
@@ -70,9 +71,9 @@ export const onRequestGet: PagesFunction<Env> = async ({
   const rangePreset =
     requestedRange === "current-year" ? "current-year" : "rolling-year";
 
-  // Require a username with valid characters, length, and non-hyphen ends.
-  if (!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(username)) {
-    return json({ error: "A valid GitHub username is required." }, 400);
+  // Spend the private token on the site owner only.
+  if (username.toLowerCase() !== githubUsername) {
+    return json({ error: "Only this site's GitHub account is served." }, 400);
   }
 
   // Custom ranges need both real calendar dates in chronological order.
@@ -82,26 +83,33 @@ export const onRequestGet: PagesFunction<Env> = async ({
       !customTo ||
       !isCalendarDate(customFrom) ||
       !isCalendarDate(customTo) ||
-      customFrom > customTo)
+      customFrom > customTo ||
+      Date.parse(customTo) - Date.parse(customFrom) > 366 * 86_400_000)
   ) {
     return json(
-      { error: "Custom ranges require ordered YYYY-MM-DD from and to dates." },
+      {
+        error:
+          "Custom ranges require ordered YYYY-MM-DD dates within one year.",
+      },
       400,
     );
   }
 
-  const cachedResponse = await caches.default.match(request);
+  // Canonicalize the account and resolved dates so extra query parameters cannot bypass the cache.
+  const range =
+    customFrom && customTo
+      ? getRangeFromDates(customFrom, customTo, new Date())
+      : getContributionRange(rangePreset);
+  const cacheKey = new Request(
+    `${new URL(request.url).origin}/api/github-contributions?${new URLSearchParams({ username: githubUsername, from: range.from, to: range.to })}`,
+  );
+  const cachedResponse = await caches.default.match(cacheKey);
   if (cachedResponse) return cachedResponse;
 
   try {
-    // Use explicit dates when supplied, otherwise resolve the requested preset.
-    const range =
-      customFrom && customTo
-        ? getRangeFromDates(customFrom, customTo, new Date())
-        : getContributionRange(rangePreset);
-
     const response = await fetch("https://api.github.com/graphql", {
       method: "POST",
+      signal: AbortSignal.timeout(5000),
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${env.GITHUB_TOKEN}`,
@@ -112,7 +120,7 @@ export const onRequestGet: PagesFunction<Env> = async ({
         query: contributionQuery,
         variables: {
           from: range.queryFrom,
-          login: username,
+          login: githubUsername,
           to: range.queryTo,
         },
       }),
@@ -137,11 +145,11 @@ export const onRequestGet: PagesFunction<Env> = async ({
           to: range.to,
         },
       },
-      username,
+      username: githubUsername,
     });
 
     // Write the cache in the background without delaying the response.
-    waitUntil(caches.default.put(request, calendarResponse.clone()));
+    waitUntil(caches.default.put(cacheKey, calendarResponse.clone()));
 
     return calendarResponse;
   } catch (error) {

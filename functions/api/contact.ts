@@ -4,19 +4,16 @@ interface Env {
   RESEND_API_KEY: string;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
-// Answer the browser's CORS preflight without sending a message.
-export const onRequestOptions: PagesFunction = async () => {
-  return new Response(null, { status: 204, headers: corsHeaders });
-};
-
 // Validate contact fields and send the message through the server's email service.
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  // Only accept the same-origin browser form.
+  if (request.headers.get("Origin") !== new URL(request.url).origin) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     // Treat malformed JSON as invalid input using the same schema as the form.
     const payload = await request.json().catch(() => null);
@@ -25,7 +22,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (!parsed.success) {
       return new Response(JSON.stringify({ error: "Invalid contact fields" }), {
         status: 400,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
@@ -33,6 +30,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
+      // Give up on a hung email service; the catch below answers 500 and the form keeps the text.
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
@@ -55,13 +54,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
       return new Response(JSON.stringify({ error: "Email service error" }), {
         status: 502,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // Return a generic response for unexpected failures.
@@ -69,7 +68,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     return new Response(JSON.stringify({ error: "Server error" }), {
       status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json" },
     });
   }
 };

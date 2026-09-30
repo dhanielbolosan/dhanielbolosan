@@ -72,7 +72,15 @@ export const CornerBox = <View,>({
   useEffect(() => {
     if (settled) return;
 
-    const timer = setTimeout(() => setSettledId(swap.shownId), fadeMs);
+    const timer = setTimeout(() => {
+      setSettledId(swap.shownId);
+
+      // A swap that removed the focused control drops focus to the page; hand it to the new view.
+      if (document.activeElement === document.body)
+        content.current
+          ?.querySelector<HTMLElement>("a, button, input, textarea")
+          ?.focus();
+    }, fadeMs);
 
     return () => clearTimeout(timer);
   }, [settled, swap.shownId]);

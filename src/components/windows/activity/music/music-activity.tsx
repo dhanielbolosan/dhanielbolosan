@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import type { Listen } from "@/lib/integrations/listenbrainz";
 import { RowHand } from "../../../pixel-hand";
 import { Loopmaster } from "./loopmaster";
@@ -8,6 +8,7 @@ import { useListens, type CoverState } from "./use-listens";
 import { useLoopmaster } from "./use-loopmaster";
 
 // Step focus between the stack's buttons with the up and down arrow keys.
+// Unlike Choices, which steps from the hand (it follows hover), this steps from the focused row.
 const moveFocus = (event: KeyboardEvent<HTMLOListElement>) => {
   if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
 
@@ -19,14 +20,16 @@ const moveFocus = (event: KeyboardEvent<HTMLOListElement>) => {
   buttons[(index + step + buttons.length) % buttons.length]?.focus();
 };
 
+// The Music screen: the player plus the Recently Played stack, with stand-ins until listens load.
 export const MusicActivity = () => {
   const { listens, covers, waitForCover } = useListens();
   const live = listens.length > 0;
 
-  // Show stand-in discs until listens arrive; remount only when the listens change, so the stack starts fresh.
+  // Show stand-in discs until listens arrive; remount only when the listens change, so each set keeps its order for the visit.
   return (
     <MusicPlayer
       key={live ? signature(listens) : "placeholder"}
+      id={live ? signature(listens) : "placeholder"}
       listens={live ? listens : placeholderListens}
       covers={live ? covers : placeholderListens.map(() => "missing")}
       waitForCover={waitForCover}
@@ -34,11 +37,14 @@ export const MusicActivity = () => {
   );
 };
 
+// One set of listens in the player; remounted when the listens change.
 const MusicPlayer = ({
+  id,
   listens,
   covers,
   waitForCover,
 }: {
+  id: string;
   listens: Listen[];
   covers: CoverState[];
   waitForCover: (index: number) => Promise<void>;
@@ -55,16 +61,28 @@ const MusicPlayer = ({
     parts,
   } = useLoopmaster({
     count: listens.length,
+    id,
     waitForCover,
   });
 
   const listen = listens[current];
 
+  // Refresh elapsed time while Music stays open.
+  const [now, setNow] = useState(Date.now);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    // Clip only sideways, so the disc slides out under the frame while the lid can swing up over the header.
-    <div className="-mx-4.5 flex flex-col overflow-x-clip px-4.5 pt-11">
-      {/* Center a fixed-width group, so the player only moves when the window resizes. */}
-      <div className="mb-6 grid grid-cols-[auto_minmax(0,8rem)] items-center justify-center gap-6">
+    // Clip the disc sideways; compensate for transparent SVG pixels so the open lid keeps the 18px frame inset.
+    <div
+      data-player-clip
+      className="-mx-4.5 flex flex-col overflow-x-clip px-4.5 pt-[calc(var(--spacing)*9_-_1px)]"
+    >
+      {/* Center a fixed-width group and pin the player to its top, so neither the window width nor a long title moves the lid. */}
+      <div className="mb-6 grid grid-cols-[auto_minmax(0,8rem)] items-start justify-center gap-6">
         <Loopmaster
           title={listen.track}
           album={listen.album}
@@ -76,15 +94,19 @@ const MusicPlayer = ({
           {...parts}
         />
 
-        <div className="flex min-w-0 flex-col font-heading">
+        <div className="flex min-w-0 flex-col self-center font-heading">
           {/* Say when this disc was last played; a live or placeholder disc reads "Now Playing". */}
-          <p className="mb-1 text-xs text-label">
+          <p className="mb-1.5 text-sm text-label">
             {!listen.playingNow && listen.listenedAt
-              ? formatPlayedAgo(listen.listenedAt)
+              ? formatPlayedAgo(listen.listenedAt, now)
               : "Now Playing"}
           </p>
 
-          <h3 className="line-clamp-2 text-base font-semibold wrap-break-word">
+          {/* Announce the new song after a swap. */}
+          <h3
+            aria-live="polite"
+            className="line-clamp-2 text-base font-semibold wrap-break-word"
+          >
             {listen.track}
           </h3>
 
@@ -93,7 +115,7 @@ const MusicPlayer = ({
           </p>
 
           {listen.album && (
-            <p className="mt-1 line-clamp-2 text-sm wrap-break-word text-gold">
+            <p className="mt-1.5 line-clamp-2 text-sm wrap-break-word text-gold">
               {listen.album}
             </p>
           )}

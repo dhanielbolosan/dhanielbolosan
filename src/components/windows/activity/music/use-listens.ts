@@ -70,6 +70,7 @@ export const preloadListens = () => {
     }));
 };
 
+// Load recent listens and track each cover's decode state.
 export const useListens = () => {
   // Start from whatever the page-level preload already has.
   const [listens, setListens] = useState(() => loaded?.listens ?? []);

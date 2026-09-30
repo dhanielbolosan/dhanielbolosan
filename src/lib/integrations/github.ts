@@ -45,30 +45,31 @@ export const fetchContributionCalendar = async (
   // Return no data on an HTTP failure so the caller keeps its fallback calendar.
   if (!response.ok) return;
 
-  const result = (await response.json()) as {
+  const { calendar } = (await response.json()) as {
     calendar?: ContributionCalendarData;
   };
 
-  return result.calendar;
+  // A body in the wrong shape (a stale cache, an upstream change) keeps the fallback instead of crashing the page.
+  const valid =
+    typeof calendar?.range?.from === "string" &&
+    Array.isArray(calendar.weeks) &&
+    calendar.weeks.every(
+      (week) =>
+        typeof week?.firstDay === "string" &&
+        Array.isArray(week.contributionDays) &&
+        week.contributionDays.every((day) => typeof day?.date === "string"),
+    );
+
+  return valid ? calendar : undefined;
 };
 
-// Fetch recent public events to find the latest available push.
+// Fetch through the cached server endpoint so visitors do not spend their GitHub rate limit.
 export const fetchLatestPush = async (signal: AbortSignal) => {
-  const response = await fetch(
-    `https://api.github.com/users/${githubUsername}/events/public?per_page=30`,
-    { signal },
-  );
-
-  // Return no data on an HTTP failure so the caller keeps its last-save placeholder.
+  const response = await fetch("/api/latest-push", { signal });
   if (!response.ok) return;
 
-  const events = (await response.json()) as {
-    type: string;
-    created_at: string;
-    repo: { name: string };
-  }[];
-
-  // Use a recent public push as the portfolio's last-save timestamp.
-  const push = events.find((event) => event.type === "PushEvent");
-  if (push) return { at: new Date(push.created_at), repo: push.repo.name };
+  const { push } = (await response.json()) as {
+    push?: { at: string; repo: string };
+  };
+  if (push) return { at: new Date(push.at), repo: push.repo };
 };

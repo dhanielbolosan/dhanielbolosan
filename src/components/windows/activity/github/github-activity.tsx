@@ -3,6 +3,7 @@ import { ActivityCalendar } from "./activity-calendar";
 import { getContributionStats } from "./github.utils";
 import { useContributions } from "./use-contributions";
 
+// The GitHub screen: contribution stats, the year calendar, and its legend.
 export const GithubActivity = () => {
   const calendar = useContributions();
 
@@ -15,12 +16,12 @@ export const GithubActivity = () => {
       <Stats
         pairs={stats}
         columns={4}
-        className="grid-cols-[repeat(4,auto)] justify-between"
+        className="justify-between @min-[26rem]:grid-cols-[repeat(4,auto)]"
       />
 
       <ActivityCalendar calendar={calendar} />
 
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-heading text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 font-heading text-sm">
         <span className="whitespace-nowrap">
           {calendar.totalContributions.toLocaleString()} contributions in the
           last year

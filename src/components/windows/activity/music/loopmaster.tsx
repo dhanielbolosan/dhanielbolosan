@@ -12,8 +12,9 @@ import type { CoverState } from "./use-listens";
 
 // Every part is drawn on the same canvas, so each layer fills the player box.
 const layer =
-  "pointer-events-none absolute -top-1.25 -left-1.25 h-41.25 w-40 max-w-none select-none";
+  "pointer-events-none absolute -top-[3.226%] -left-[3.333%] h-[106.452%] w-[106.667%] max-w-none select-none";
 
+// The Loopmaster player: body, disc, and lid layers that toggle play on press.
 export const Loopmaster = ({
   title,
   album,
@@ -47,7 +48,7 @@ export const Loopmaster = ({
     aria-disabled={disabled}
     onClick={onToggle}
     className={cn(
-      "relative h-38.75 w-37.5 shrink-0 cursor-pointer aria-disabled:cursor-default rounded-[2.5rem] [perspective:800px] outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-label",
+      "relative aspect-150/155 w-27 shrink-0 cursor-pointer aria-disabled:cursor-default rounded-[1.8rem] [perspective:576px] outline-hidden focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-solid focus-visible:outline-label",
       className,
     )}
   >
@@ -86,7 +87,7 @@ export const Loopmaster = ({
     {/* The disc spins on its face; the swap slides the disc itself, so the two never fight. */}
     <span
       ref={discRef}
-      className="absolute top-3 left-2.25 size-33 rounded-full after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:bg-linear-135 after:from-white/20 after:via-transparent after:to-black/15"
+      className="absolute top-[7.742%] left-[6%] aspect-square w-[88%] rounded-full after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:bg-linear-135 after:from-white/20 after:via-transparent after:to-black/15"
     >
       <span
         ref={faceRef}
@@ -124,9 +125,9 @@ export const Loopmaster = ({
     {/* The lid and its hinge tab pivot where the tab meets the body's top edge. */}
     <span
       ref={lidRef}
-      className="absolute inset-0 z-10 origin-[50%_2px]"
+      className="absolute inset-0 z-10 origin-[50%_1.44px]"
     >
-      <span className="lid-haze absolute top-3 left-2.25 size-33 rounded-full" />
+      <span className="lid-haze absolute top-[7.742%] left-[6%] aspect-square w-[88%] rounded-full" />
       <img
         src={lid}
         alt=""

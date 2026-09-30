@@ -11,7 +11,7 @@ export const Skills = () => (
         key={group.label}
         className="not-first-of-type:pt-6"
       >
-        <h3 className="group-heading flex items-center gap-2">
+        <h3 className="group-heading flex items-center gap-1.5">
           <img
             src={group.orb}
             alt=""
@@ -21,7 +21,7 @@ export const Skills = () => (
           {group.label}
         </h3>
 
-        <ul className="grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 @min-[24rem]:grid-cols-3 font-heading text-sm">
           {group.skills.map((skill) => {
             const icon = skillIcons[skill];
 

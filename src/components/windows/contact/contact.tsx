@@ -23,7 +23,27 @@ export const Contact = () => {
 
   return (
     <section className="flex grow flex-col">
-      <div className="flex items-start">
+      <Faded className="flex min-h-0 grow flex-col">
+        {mode === "form" && (
+          <ContactForm
+            form={form}
+            onSubmit={handleFormSubmit}
+          />
+        )}
+
+        {mode === "menu" && (
+          <div className="mt-3">
+            <Choices
+              items={menuChoices}
+              ready={menuReady}
+              typedChars={visibleResponses.length}
+            />
+          </div>
+        )}
+      </Faded>
+
+      {/* Keep commands after the fields in tab order. */}
+      <div className="order-first flex items-start">
         <ContactDialogue
           dialogueText={dialogueText}
           visibleDialogue={visibleDialogue}
@@ -53,25 +73,6 @@ export const Contact = () => {
           />
         </div>
       </div>
-
-      <Faded className="flex min-h-0 grow flex-col">
-        {mode === "form" && (
-          <ContactForm
-            form={form}
-            onSubmit={handleFormSubmit}
-          />
-        )}
-
-        {mode === "menu" && (
-          <div className="mt-2">
-            <Choices
-              items={menuChoices}
-              ready={menuReady}
-              typedChars={visibleResponses.length}
-            />
-          </div>
-        )}
-      </Faded>
     </section>
   );
 };

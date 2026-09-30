@@ -1,3 +1,4 @@
+import { listenbrainzUsername } from "../../src/lib/site";
 import {
   toListen,
   withPlayingNow,
@@ -6,8 +7,8 @@ import {
   type ListenBrainzListen,
 } from "../lib/listens";
 
-// Match the player's disc plus the three songs in its stack.
-const listenCount = 4;
+// Match the player's disc plus the four songs in its stack.
+const listenCount = 5;
 
 // Give up on a slow ListenBrainz quickly, and keep the last good answer for a week to fall back on.
 const upstreamTimeoutMs = 5000;
@@ -33,9 +34,12 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
   const { origin, searchParams } = new URL(request.url);
   const username = searchParams.get("username")?.trim() ?? "";
 
-  // Require a ListenBrainz-style username: letters, digits, dots, dashes, and underscores.
-  if (!/^[\w.-]{1,64}$/.test(username)) {
-    return json({ error: "A valid ListenBrainz username is required." }, 400);
+  // Serve the site owner's listens only, so new names can't bypass the edge cache.
+  if (username !== listenbrainzUsername) {
+    return json(
+      { error: "Only this site's ListenBrainz account is served." },
+      400,
+    );
   }
 
   // Key both caches on the validated username alone, so extra query parameters can't bypass them.
@@ -50,20 +54,27 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
 
   // Serve the saved listens when ListenBrainz fails, or an error if there are none yet.
   const fallback = async () => {
-    const saved = await caches.default.match(lastGoodKey);
-    if (!saved) return json({ error: "Unable to load recent listens." }, 502);
+    // A broken cache read still answers with JSON, since callers return this without awaiting it.
+    try {
+      const saved = await caches.default.match(lastGoodKey);
+      if (!saved) return json({ error: "Unable to load recent listens." }, 502);
 
-    const { listens } = (await saved.json()) as { listens: Listen[] };
+      const { listens } = (await saved.json()) as { listens: Listen[] };
 
-    return new Response(
-      JSON.stringify({ listens: withoutPlayingNow(listens) }),
-      {
-        headers: {
-          "Cache-Control": "no-store",
-          "Content-Type": "application/json; charset=utf-8",
+      return new Response(
+        JSON.stringify({ listens: withoutPlayingNow(listens) }),
+        {
+          headers: {
+            "Cache-Control": "no-store",
+            "Content-Type": "application/json; charset=utf-8",
+          },
         },
-      },
-    );
+      );
+    } catch (error) {
+      console.error("Recent listens fallback error", error);
+
+      return json({ error: "Unable to load recent listens." }, 502);
+    }
   };
 
   try {

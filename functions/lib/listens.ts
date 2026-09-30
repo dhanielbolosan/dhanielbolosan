@@ -20,7 +20,7 @@ export interface Listen {
 }
 
 // Build a Cover Art Archive thumbnail URL only from well-formed release and image ids.
-export const getCoverUrl = (
+const getCoverUrl = (
   mapping: NonNullable<ListenBrainzListen["track_metadata"]>["mbid_mapping"],
 ) => {
   const release = mapping?.caa_release_mbid ?? "";
@@ -29,7 +29,8 @@ export const getCoverUrl = (
   if (!/^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(release)) return null;
   if (!/^\d+$/.test(image)) return null;
 
-  return `https://coverartarchive.org/release/${release}/${image}-250.jpg`;
+  // Go straight to the Internet Archive item Cover Art Archive redirects to, saving a hop per cover.
+  return `https://archive.org/download/mbid-${release}/mbid-${release}-${image}_thumb250.jpg`;
 };
 
 // Reduce a ListenBrainz listen to the fields the Music screen displays.
@@ -45,7 +46,13 @@ export const toListen = (
     album: meta?.release_name?.trim() ?? "",
     durationMs: typeof duration === "number" && duration > 0 ? duration : null,
     coverUrl: getCoverUrl(meta?.mbid_mapping),
-    listenedAt: typeof listened_at === "number" ? listened_at : null,
+    // Playing-now has no scrobble time yet, so stamp it with now for when it is served from the fallback.
+    listenedAt:
+      typeof listened_at === "number"
+        ? listened_at
+        : playingNow
+          ? Math.floor(Date.now() / 1000)
+          : null,
     playingNow,
   };
 };

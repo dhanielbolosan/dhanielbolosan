@@ -34,6 +34,7 @@ export const motionCssVariables = {
   "--window-entry-duration": `${windowEntryMs}ms`,
   "--enter-easing": enterEasing,
   "--pointer-bob-duration": `${windowEntryMs * 2}ms`,
+  "--limit-cycle-duration": `${fadeMs * 3}ms`,
   "--portrait-hit-duration": `${portraitHitMs}ms`,
   "--damage-number-duration": `${damageNumberMs}ms`,
 };

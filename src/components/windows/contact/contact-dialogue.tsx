@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Faded } from "../../window";
 import { keepLastWordsTogether } from "./contact.utils";
 
@@ -30,7 +31,7 @@ export const ContactDialogue = ({
           key={text}
           aria-hidden="true"
           inert
-          className={`invisible ${dialogueClassName}`}
+          className={cn("invisible", dialogueClassName)}
         >
           “{keepLastWordsTogether(text)}”
         </div>

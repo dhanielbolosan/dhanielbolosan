@@ -34,7 +34,7 @@ export const Config = () => {
       />
 
       {/* Settings share label and preview columns; Reset remains the final row. */}
-      <ul className="grid grid-cols-[auto_1fr] items-start gap-y-2 font-heading">
+      <ul className="grid grid-cols-[auto_1fr] items-start gap-y-3 font-heading">
         {settings.map(({ id, label }) => (
           <li
             key={id}
@@ -48,7 +48,7 @@ export const Config = () => {
               // Leave nested controls to handle their own clicks.
               if (
                 !event.currentTarget.contains(target) ||
-                target.closest('[role="radio"], input[type="range"]')
+                target.closest('[aria-haspopup="dialog"], input[type="range"]')
               )
                 return;
 
@@ -111,7 +111,7 @@ export const Config = () => {
                       ) && event.preventDefault()
                     }
                     aria-label={`${label} sliders`}
-                    className="window z-50 flex w-72 max-w-[calc(100vw-24px)] flex-col gap-2 p-4.5 font-heading"
+                    className="window z-50 flex w-78 max-w-[calc(100vw-24px)] flex-col gap-3 p-4.5 font-heading"
                   >
                     {openSetting === id && selectedColorKey && (
                       <RgbSliders

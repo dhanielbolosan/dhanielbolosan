@@ -1,5 +1,5 @@
-import type { Listen } from "../../../functions/lib/listens";
 import { listenbrainzUsername } from "@/lib/site";
+import type { Listen } from "../../../functions/lib/listens";
 
 // The function defines the shape; a type-only import keeps server code out of the bundle.
 export type { Listen };
