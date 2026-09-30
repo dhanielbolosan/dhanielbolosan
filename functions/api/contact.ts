@@ -2,6 +2,7 @@ import { contactSchema } from "../../src/lib/integrations/contact";
 
 interface Env {
   RESEND_API_KEY: string;
+  TURNSTILE_SECRET_KEY: string;
 }
 
 // Validate contact fields and send the message through the server's email service.
@@ -16,7 +17,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   try {
     // Treat malformed JSON as invalid input using the same schema as the form.
-    const payload = await request.json().catch(() => null);
+    const payload = (await request.json().catch(() => null)) as {
+      token?: unknown;
+    } | null;
     const parsed = contactSchema.safeParse(payload);
 
     if (!parsed.success) {
@@ -27,6 +30,35 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const { name, email, message } = parsed.data;
+
+    // Send only for visitors Turnstile verified; without a secret, fail closed instead of letting bots through.
+    if (!env.TURNSTILE_SECRET_KEY) {
+      return new Response(JSON.stringify({ error: "Not configured" }), {
+        status: 503,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const verification = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        signal: AbortSignal.timeout(5000),
+        body: new URLSearchParams({
+          secret: env.TURNSTILE_SECRET_KEY,
+          response: typeof payload?.token === "string" ? payload.token : "",
+          remoteip: request.headers.get("CF-Connecting-IP") ?? "",
+        }),
+      },
+    );
+    const { success } = (await verification.json()) as { success?: boolean };
+
+    if (!success) {
+      return new Response(JSON.stringify({ error: "Verification failed" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

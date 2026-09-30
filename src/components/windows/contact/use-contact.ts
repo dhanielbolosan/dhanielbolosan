@@ -22,6 +22,7 @@ import {
   formatMissingFields,
   getContactTransitionPhase,
 } from "./contact.utils";
+import { useTurnstile } from "./use-turnstile";
 
 // Coordinate form submission, dialogue, and faded screen changes.
 export const useContact = () => {
@@ -42,6 +43,7 @@ export const useContact = () => {
     defaultValues: { name: "", email: "", message: "" },
   });
   const submitting = useRef(false);
+  const turnstile = useTurnstile(mode === "form");
 
   const { fading, fadeTo } = useWindowFade();
 
@@ -98,7 +100,7 @@ export const useContact = () => {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, token: turnstile.token() }),
       });
       if (!response.ok) throw new Error();
 
@@ -108,6 +110,8 @@ export const useContact = () => {
     } catch {
       playSound("error");
       setDialogueText(dialogueLines.failed);
+    } finally {
+      turnstile.reset();
     }
   };
 
@@ -262,6 +266,7 @@ export const useContact = () => {
     reservedDialogueLines,
     form,
     handleFormSubmit,
+    turnstileRef: turnstile.ref,
     commands,
     choicesReady,
     menuChoices,

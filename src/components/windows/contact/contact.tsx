@@ -14,6 +14,7 @@ export const Contact = () => {
     reservedDialogueLines,
     form,
     handleFormSubmit,
+    turnstileRef,
     commands,
     choicesReady,
     menuChoices,
@@ -28,6 +29,7 @@ export const Contact = () => {
           <ContactForm
             form={form}
             onSubmit={handleFormSubmit}
+            turnstileRef={turnstileRef}
           />
         )}
 

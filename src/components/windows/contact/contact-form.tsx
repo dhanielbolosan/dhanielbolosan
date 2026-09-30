@@ -1,4 +1,4 @@
-import type { FormEventHandler } from "react";
+import type { FormEventHandler, Ref } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { ContactFields } from "@/lib/integrations/contact";
 import { cn } from "@/lib/utils";
@@ -9,9 +9,11 @@ const field =
 export const ContactForm = ({
   form,
   onSubmit,
+  turnstileRef,
 }: {
   form: UseFormReturn<ContactFields>;
   onSubmit: FormEventHandler<HTMLFormElement>;
+  turnstileRef: Ref<HTMLDivElement>;
 }) => (
   // Use schema validation so errors appear in dialogue instead of browser popups.
   <form
@@ -74,6 +76,12 @@ export const ContactForm = ({
         field,
       )}
       {...form.register("message")}
+    />
+
+    {/* Turnstile appears here, under the message's right edge, only when Cloudflare asks for a human check. */}
+    <div
+      ref={turnstileRef}
+      className="col-span-2 flex justify-end empty:hidden"
     />
   </form>
 );

@@ -6,3 +6,5 @@ export const avatarUrl =
   "https://avatars.githubusercontent.com/u/120779143?s=216&v=4";
 export const timeZone = "Pacific/Honolulu";
 export const listenbrainzUsername = "dhanielbolosan";
+// The contact form's Turnstile widget key; public by design, the secret stays in the Pages settings.
+export const turnstileSiteKey = "0x4AAAAAAFKBfMtVDx12B2HO";

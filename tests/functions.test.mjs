@@ -254,3 +254,40 @@ test("recent listens returns one playing disc and four queued discs", async () =
     globalThis.caches = originalCaches;
   }
 });
+
+test("contact sends only after Turnstile verifies, and fails closed without a secret", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  let verified = false;
+  globalThis.fetch = async (url, options) => {
+    calls.push(String(url));
+    if (String(url).includes("siteverify"))
+      return Response.json({ success: verified });
+    return Response.json({ id: "sent" });
+  };
+  const send = (env, token) =>
+    contact({
+      request: new Request("https://site.test/api/contact", {
+        method: "POST",
+        headers: { Origin: "https://site.test" },
+        body: JSON.stringify({
+          name: "Audit Bot",
+          email: "audit@example.com",
+          message: "This is an audit test message.",
+          token,
+        }),
+      }),
+      env,
+    });
+  try {
+    const env = { RESEND_API_KEY: "test", TURNSTILE_SECRET_KEY: "test" };
+    assert.equal((await send({ RESEND_API_KEY: "test" }, "t")).status, 503);
+    assert.equal((await send(env, "bad")).status, 403);
+    assert.ok(!calls.some((url) => url.includes("resend")));
+    verified = true;
+    assert.equal((await send(env, "good")).status, 200);
+    assert.ok(calls.at(-1).includes("resend"));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
