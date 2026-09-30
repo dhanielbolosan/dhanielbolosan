@@ -38,6 +38,7 @@ export const ColorPreview = ({
       key={key}
       type="button"
       aria-haspopup="dialog"
+      data-sound={selectedColorKey === key ? "none" : undefined}
       aria-expanded={selectedColorKey === key}
       aria-label={label}
       onClick={(event) => selectColor(key, event.currentTarget)}

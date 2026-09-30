@@ -39,13 +39,18 @@ export const History = () => {
                     }}
                   >
                     <Popover.Trigger
+                      data-sound={
+                        pinnedEntryName === entry.name ? "none" : undefined
+                      }
                       onMouseEnter={() => setHoveredEntryName(entry.name)}
                       onMouseLeave={() => setHoveredEntryName(undefined)}
                       onClick={(event) => {
                         event.preventDefault();
-                        setPinnedEntryName((current) =>
-                          current === entry.name ? undefined : entry.name,
-                        );
+                        // Closing also drops hover, or the still-hovered entry would stay open.
+                        if (pinnedEntryName === entry.name) {
+                          setPinnedEntryName(undefined);
+                          setHoveredEntryName(undefined);
+                        } else setPinnedEntryName(entry.name);
                       }}
                       className="group relative flex w-full cursor-pointer items-start py-1.5 pl-6.5 text-left font-heading outline-none"
                     >

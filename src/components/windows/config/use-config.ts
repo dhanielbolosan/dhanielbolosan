@@ -163,6 +163,10 @@ export const useConfig = () => {
   // Open the color's sliders and remember it for the setting's next visit.
   const selectColor = (key: ColorKey, button: HTMLButtonElement) => {
     colorButtonRef.current = button;
+    if (selectedColorKey === key) {
+      setSelectedColorKey(undefined);
+      return;
+    }
     setSelectedColorKey(key);
     if (openSetting)
       setLastColorKeys((current) => ({ ...current, [openSetting]: key }));
