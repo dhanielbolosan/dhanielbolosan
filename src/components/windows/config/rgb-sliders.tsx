@@ -18,17 +18,17 @@ export const RgbSliders = ({
     <label
       key={channel.name}
       onMouseEnter={() => setActiveChannelIndex(channelIndex)}
-      className="relative grid grid-cols-[1rem_2.25rem_1fr] items-center gap-3 text-sm"
+      className="relative col-span-3 grid grid-cols-subgrid items-center text-sm"
     >
       {channelIndex === activeChannelIndex && (
         <PixelHand className="absolute inset-y-0 right-full my-auto mr-1.5 motion-safe:animate-bob" />
       )}
 
-      <span className={cn("font-semibold", channel.className)}>
+      <span className={cn("mr-1.5 font-semibold", channel.className)}>
         {channel.name}
       </span>
 
-      <span className="text-right tabular-nums">
+      <span className="tabular-nums">
         {String(colors[colorKey][channelIndex]).padStart(3, "0")}
       </span>
 

@@ -111,7 +111,7 @@ export const Config = () => {
                       ) && event.preventDefault()
                     }
                     aria-label={`${label} sliders`}
-                    className="window z-50 flex w-72 max-w-[calc(100vw-24px)] flex-col gap-3 p-4.5 font-heading"
+                    className="window z-50 grid w-72 max-w-[calc(100vw-24px)] grid-cols-[auto_auto_1fr] gap-1.5 p-4.5 font-heading"
                   >
                     {openSetting === id && selectedColorKey && (
                       <RgbSliders

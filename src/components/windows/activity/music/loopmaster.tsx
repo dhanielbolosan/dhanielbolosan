@@ -26,6 +26,7 @@ export const Loopmaster = ({
   knobRef,
   discRef,
   shadowRef,
+  spinRef,
   faceRef,
   lidRef,
   className,
@@ -40,6 +41,7 @@ export const Loopmaster = ({
   knobRef: Ref<HTMLImageElement>;
   discRef: Ref<HTMLSpanElement>;
   shadowRef: Ref<HTMLSpanElement>;
+  spinRef: Ref<HTMLSpanElement>;
   faceRef: Ref<HTMLSpanElement>;
   lidRef: Ref<HTMLSpanElement>;
   className?: string;
@@ -97,36 +99,42 @@ export const Loopmaster = ({
         className="absolute inset-0 rounded-full opacity-0 shadow-[3px_5px_0_var(--text-shadow)]"
       />
 
+      {/* The face ramps between speeds; the spinner around it keeps the steady turn after each ramp. */}
       <span
-        ref={faceRef}
-        className="cd-face absolute inset-0 overflow-hidden rounded-full"
+        ref={spinRef}
+        className="absolute inset-0"
       >
-        {cover === "ready" && coverUrl ? (
-          <img
-            src={coverUrl}
-            alt=""
-            decoding="sync"
-            className="cd-art absolute inset-0 size-full object-cover"
-          />
-        ) : (
-          // A burned CD-R: blank while the cover loads, the title and album in marker when there is none.
-          <span className="cd-art absolute inset-0">
-            {cover === "missing" && (
-              <span className="absolute inset-x-[17%] top-[6%] flex h-[26%] items-center justify-center text-center">
-                <b className="line-clamp-2 font-marker text-[12px] leading-[1.1] font-normal wrap-anywhere text-(--cd-ink) opacity-90 [text-shadow:none]">
-                  {title}
-                </b>
-              </span>
-            )}
+        <span
+          ref={faceRef}
+          className="cd-face absolute inset-0 overflow-hidden rounded-full"
+        >
+          {cover === "ready" && coverUrl ? (
+            <img
+              src={coverUrl}
+              alt=""
+              decoding="sync"
+              className="cd-art absolute inset-0 size-full object-cover"
+            />
+          ) : (
+            // A burned CD-R: blank while the cover loads, the title and album in marker when there is none.
+            <span className="cd-art absolute inset-0">
+              {cover === "missing" && (
+                <span className="absolute inset-x-[17%] top-[6%] flex h-[26%] items-center justify-center text-center">
+                  <b className="line-clamp-2 font-marker text-[12px] leading-[1.1] font-normal wrap-anywhere text-(--cd-ink) opacity-90 [text-shadow:none]">
+                    {title}
+                  </b>
+                </span>
+              )}
 
-            {/* One line; a long album is cut off at the edge with no ellipsis. */}
-            {cover === "missing" && album && (
-              <span className="absolute inset-x-[22%] bottom-[12%] overflow-hidden text-center font-marker text-[10px] leading-[1.2] whitespace-nowrap text-(--cd-ink) opacity-80 [text-shadow:none]">
-                {album}
-              </span>
-            )}
-          </span>
-        )}
+              {/* One line; a long album is cut off at the edge with no ellipsis. */}
+              {cover === "missing" && album && (
+                <span className="absolute inset-x-[22%] bottom-[12%] overflow-hidden text-center font-marker text-[10px] leading-[1.2] whitespace-nowrap text-(--cd-ink) opacity-80 [text-shadow:none]">
+                  {album}
+                </span>
+              )}
+            </span>
+          )}
+        </span>
       </span>
     </span>
 

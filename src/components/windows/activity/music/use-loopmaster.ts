@@ -26,9 +26,20 @@ const linearEasing =
   typeof CSS !== "undefined" &&
   CSS.supports("transition-timing-function", "linear(0, 1)");
 
-// The motor: a constant spin (ms 0) or a ramp between speeds, each starting from `angle`.
+// Sample a ramp's eased turn into linear() stops, so the disc speeds up or slows down along the motor's curve.
+const rampEasing = (from: number, to: number) =>
+  linearEasing
+    ? `linear(${Array.from({ length: 17 }, (_, i) => (rampTurn(from, to, i / 16) / rampTurn(from, to, 1)).toFixed(4)).join(", ")})`
+    : to > from
+      ? "ease-in"
+      : "ease-out";
+
+const turned = (degrees: number) => ({ transform: `rotate(${degrees}deg)` });
+
+// The motor: the face ramps from `angle` over `ms`, then the spinner around it keeps turning at `to`.
 type Motor = {
-  animation?: Animation;
+  ramp?: Animation;
+  spin?: Animation;
   angle: number;
   from: number;
   to: number;
@@ -81,6 +92,7 @@ export const useLoopmaster = ({
 
   const knobRef = useRef<HTMLImageElement>(null);
   const discRef = useRef<HTMLSpanElement>(null);
+  const spinRef = useRef<HTMLSpanElement>(null);
   const faceRef = useRef<HTMLSpanElement>(null);
   const lidRef = useRef<HTMLSpanElement>(null);
   const rowsRef = useRef(new Map<number, HTMLLIElement>());
@@ -91,45 +103,66 @@ export const useLoopmaster = ({
   const busyRef = useRef(false);
   const aliveRef = useRef<AbortController>(null);
 
-  // Read where the disc is and how fast it turns right now.
+  // Read where the disc is and how fast it turns right now: the face's ramp plus the spinner's steady turn after it.
   const motorNow = () => {
-    const { animation, angle, from, to, ms } = motorRef.current;
-    const elapsed = Number(animation?.currentTime ?? 0);
+    const { ramp, spin, angle, from, to, ms } = motorRef.current;
+    const p = ms ? Math.min(1, Number(ramp?.currentTime ?? 0) / ms) : 1;
+    const spun = Math.max(0, Number(spin?.currentTime ?? 0) - ms);
 
-    if (!ms)
-      return {
-        angle: angle + ((elapsed * degreesPerMs * to) % 360),
-        speed: to,
-      };
-
-    const p = Math.min(1, elapsed / ms);
     return {
-      angle: angle + degreesPerMs * ms * rampTurn(from, to, p),
+      angle:
+        angle +
+        degreesPerMs * ms * rampTurn(from, to, p) +
+        ((spun * degreesPerMs * to) % 360),
       speed: from + (to - from) * (1 - (1 - p) ** 2),
     };
   };
 
-  // Hold the disc still at an angle, or spin it at a constant speed from there.
-  const setMotor = (angle: number, speed: number) => {
+  // Ramp from one speed to another, then keep turning; both animations are set up at once, so the compositor runs the whole move.
+  const drive = (angle: number, from: number, to: number, ms: number) => {
     const face = faceRef.current;
-    motorRef.current.animation?.cancel();
+    const spinner = spinRef.current;
+    motorRef.current.ramp?.cancel();
+    motorRef.current.spin?.cancel();
     angle %= 360;
 
-    // The resting angle lives in the style, so the disc stays put between animations.
-    if (face) face.style.rotate = `${angle}deg`;
-    const animation =
-      speed && face
-        ? face.animate(
-            [{ rotate: `${angle}deg` }, { rotate: `${angle + 360}deg` }],
-            {
-              duration: discSpinMs / speed,
-              iterations: Infinity,
-            },
-          )
-        : undefined;
+    const next: Motor = { angle, from, to, ms };
+    const turn = degreesPerMs * ms * rampTurn(from, to, 1);
 
-    motorRef.current = { animation, angle, from: speed, to: speed, ms: 0 };
+    // Start at this frame's time, the moment the angle was read, so a new move neither waits a frame nor snaps back.
+    const now = document.timeline.currentTime;
+
+    // The resting angle lives in the style, so the disc stays put between moves.
+    if (face) face.style.transform = turned(angle).transform;
+
+    if (face && turn) {
+      next.ramp = face.animate([turned(angle), turned(angle + turn)], {
+        duration: ms,
+        easing: rampEasing(from, to),
+        fill: "forwards",
+      });
+      next.ramp.startTime = now;
+    }
+
+    // The steady spin waits out the ramp, then takes over at the speed the ramp ends on.
+    if (spinner && to) {
+      next.spin = spinner.animate([turned(0), turned(360)], {
+        duration: discSpinMs / to,
+        delay: turn ? ms : 0,
+        iterations: Infinity,
+      });
+      next.spin.startTime = now;
+    }
+
+    if (!turn) next.ms = 0;
+    motorRef.current = next;
+
+    return next.ramp;
   };
+
+  // Hold the disc still at an angle, or spin it at a constant speed from there.
+  const setMotor = (angle: number, speed: number) =>
+    void drive(angle, speed, speed, 0);
 
   // Start the spin and stop all motion when the screen unmounts.
   useEffect(() => {
@@ -137,13 +170,15 @@ export const useLoopmaster = ({
     aliveRef.current = alive;
 
     // Reduced motion starts paused; the listener can still press play.
-    setMotor(0, matchMedia(reducedMotionQuery).matches ? 0 : 1);
+    const speed = matchMedia(reducedMotionQuery).matches ? 0 : 1;
+    drive(0, speed, speed, 0);
 
     const motor = motorRef;
 
     return () => {
       alive.abort();
-      motor.current.animation?.cancel();
+      motor.current.ramp?.cancel();
+      motor.current.spin?.cancel();
     };
   }, []);
 
@@ -187,40 +222,10 @@ export const useLoopmaster = ({
       signal?.addEventListener("abort", stop, { once: true });
     });
 
-  // Ease the motor to a new speed as one compositor animation; the newest ramp takes over, settling the one it replaces.
+  // Ease the motor to a new speed; the newest ramp takes over, and a replaced or unmounted one settles quietly.
   const ramp = async (to: number, ms: number) => {
-    const face = faceRef.current;
-    const { angle, speed: from } = motorNow();
-    const turn = degreesPerMs * ms * rampTurn(from, to, 1);
-
-    if (!face || !turn) return setMotor(angle, to);
-
-    // Sample the eased turn into linear() stops, so the disc slows or speeds up exactly as the old per-frame ramp did.
-    const easing = linearEasing
-      ? `linear(${Array.from({ length: 17 }, (_, i) => (rampTurn(from, to, i / 16) / rampTurn(from, to, 1)).toFixed(4)).join(", ")})`
-      : to > from
-        ? "ease-in"
-        : "ease-out";
-
-    motorRef.current.animation?.cancel();
-    face.style.rotate = `${angle % 360}deg`;
-    const animation = face.animate(
-      [
-        { rotate: `${angle % 360}deg` },
-        { rotate: `${(angle % 360) + turn}deg` },
-      ],
-      { duration: ms, easing, fill: "forwards" },
-    );
-    motorRef.current = { animation, angle: angle % 360, from, to, ms };
-
-    // A replaced or unmounted ramp settles quietly; a finished one hands over to the steady spin.
-    await animation.finished.then(
-      () => {
-        if (motorRef.current.animation === animation)
-          setMotor(angle + turn, to);
-      },
-      () => undefined,
-    );
+    const { angle, speed } = motorNow();
+    await drive(angle, speed, to, ms)?.finished.catch(() => undefined);
   };
 
   // Render the new order synchronously, so the swap can measure rows in their new slots.
@@ -463,6 +468,6 @@ export const useLoopmaster = ({
     play,
     togglePlaying,
     registerRow,
-    parts: { knobRef, discRef, shadowRef, faceRef, lidRef },
+    parts: { knobRef, discRef, shadowRef, spinRef, faceRef, lidRef },
   };
 };
