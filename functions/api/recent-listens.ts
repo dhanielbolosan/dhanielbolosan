@@ -14,6 +14,10 @@ const listenCount = 5;
 const upstreamTimeoutMs = 5000;
 const lastGoodSeconds = 60 * 60 * 24 * 7;
 
+// Keep a Deezer cover for a month, and a miss for a day in case the song gets art later.
+const deezerCoverSeconds = 60 * 60 * 24 * 30;
+const deezerMissSeconds = 60 * 60 * 24;
+
 // The part of a ListenBrainz response the player reads.
 type Payload = { payload?: { listens?: ListenBrainzListen[] } };
 
@@ -28,6 +32,79 @@ function json(body: unknown, status = 200) {
     },
   });
 }
+
+// Compare names by their words, ignoring case, punctuation, and "(feat. …)" credits.
+const normalizeName = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/\s*[([].*?[)\]]/g, "")
+    .replace(/\s+(feat|ft)\..*$/, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
+// Match whole words only
+const sameName = (a: string, b: string) => {
+  const [x, y] = [normalizeName(a), normalizeName(b)];
+
+  return (
+    !!x && !!y && (` ${x} `.includes(` ${y} `) || ` ${y} `.includes(` ${x} `))
+  );
+};
+
+// Search Deezer for a cover when the Cover Art Archive has none, caching each answer per song.
+const findDeezerCover = async (
+  origin: string,
+  { artist, track }: Listen,
+  waitUntil: (promise: Promise<unknown>) => void,
+) => {
+  const query = `${artist} ${track}`;
+  const cacheKey = new Request(
+    `${origin}/api/recent-listens/cover?q=${encodeURIComponent(query)}`,
+  );
+
+  const cached = await caches.default.match(cacheKey);
+  if (cached)
+    return ((await cached.json()) as { coverUrl: string | null }).coverUrl;
+
+  const params = new URLSearchParams({ q: query, limit: "1" });
+  const response = await fetch(`https://api.deezer.com/search?${params}`, {
+    signal: AbortSignal.timeout(2000),
+  });
+  
+  // Leave failures uncached so the next request tries again.
+  if (!response.ok) return null;
+
+  const { data } = (await response.json()) as {
+    data?: {
+      title?: string;
+      artist?: { name?: string };
+      album?: { cover_medium?: string };
+    }[];
+  };
+  const song = data?.[0];
+
+  // A text search can land on another song, so both the artist and title must match; otherwise leave it blank.
+  const coverUrl =
+    song?.album?.cover_medium &&
+    sameName(song.artist?.name ?? "", artist) &&
+    sameName(song.title ?? "", track)
+      ? song.album.cover_medium
+      : null;
+
+  waitUntil(
+    caches.default.put(
+      cacheKey,
+      new Response(JSON.stringify({ coverUrl }), {
+        headers: {
+          "Cache-Control": `public, s-maxage=${coverUrl ? deezerCoverSeconds : deezerMissSeconds}`,
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      }),
+    ),
+  );
+
+  return coverUrl;
+};
 
 // Proxy ListenBrainz recent listens; the edge cache absorbs repeat visits and covers outages.
 export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
@@ -101,10 +178,26 @@ export const onRequestGet: PagesFunction = async ({ request, waitUntil }) => {
           ?.listens?.[0]
       : undefined;
 
-    const listens = withPlayingNow(
-      (result.payload?.listens ?? []).map((listen) => toListen(listen)),
-      playing && toListen(playing, true),
-    ).slice(0, listenCount);
+    // Fill covers the Cover Art Archive lacks from Deezer; a failed lookup just leaves the cover blank.
+    const listens = await Promise.all(
+      withPlayingNow(
+        (result.payload?.listens ?? []).map((listen) => toListen(listen)),
+        playing && toListen(playing, true),
+      )
+        .slice(0, listenCount)
+        .map(async (listen) =>
+          listen.coverUrl
+            ? listen
+            : {
+                ...listen,
+                coverUrl: await findDeezerCover(
+                  origin,
+                  listen,
+                  waitUntil,
+                ).catch(() => null),
+              },
+        ),
+    );
 
     // An empty history is not worth saving over a good one.
     if (!listens.length) return fallback();
