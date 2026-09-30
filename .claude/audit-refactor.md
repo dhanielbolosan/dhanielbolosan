@@ -49,36 +49,51 @@ My ground rules for reviewing code. Project conventions live in [project.md](pro
 
 - Start fresh: at the start of a full run, if `audit/` exists, confirm it is Git-ignored (`git check-ignore audit`), then empty it. A single-agent run empties only `audit/<agent>/`. Never delete `audit/` if Git tracks it.
 - Everything a run produces goes in the Git-ignored `audit/` folder at the repo root: reports, screenshots, previews, measurements, logs, and one-off scripts. Never `/tmp/`, `previews.local/`, `preview.local/`, or production assets, unless the user names another place.
-- Reusable tools live in `.claude/audit-kit/` so the fresh start never deletes them: `browser.mjs` (the headless Chromium harness and its scenarios) and `make-report.py` (merges every agent's findings into the report). Agents treat them as read-only; improvements are proposed, then applied by the orchestrator.
+- Reusable tools live in `.claude/audit-kit/` so the fresh start never deletes them: `browser.mjs` (the headless Chromium harness and its scenarios, including `probe` for one-off page scripts), `make-report.py` (merges every agent's findings into the report), `check-report.mjs` (the report's layout and link check at 390 and 1280), `scan-conventions.mjs` (the free pattern pass for `code-conventions`), and `run-lighthouse.mjs` (3 runs per preset, medians in `audit/lighthouse/summary.json`). Agents treat them as read-only; improvements are proposed, then applied by the orchestrator.
 - The report is `audit/audit-report.html` by default. Write findings and proposals before refactoring; after fixes, add the final changes and validation, keeping the original findings marked resolved or outstanding.
 
 ## Agents and run modes
 
 Audit agents live in `.claude/agents/`. The main thread is the orchestrator: it sets up, starts agents, applies fixes, and talks to the user. Agents never edit source.
 
-| Agent                | Job                                                       | Needs the browser        |
-| -------------------- | --------------------------------------------------------- | ------------------------ |
-| `code-conventions`   | writing conventions against project.md                    | no                       |
-| `bug-hunter`         | static correctness                                        | no                       |
-| `security`           | Functions, secrets, dependencies, headers                 | no                       |
-| `stress-tester`      | breaking state in the running app                         | yes                      |
-| `ui-consistency`     | measured visual consistency at every breakpoint           | yes                      |
-| `accessibility`      | keyboard, focus, screen readers, contrast, reduced motion | yes                      |
-| `lighthouse`         | Lighthouse, bundle size, network                          | yes                      |
-| `verifier`           | confirms or rejects every finding                         | sometimes                |
-| `fixer`              | before/after diffs for confirmed findings                 | no                       |
-| `reporter`           | builds and checks `audit/audit-report.html`               | yes (report screenshots) |
-| `regression-checker` | re-runs affected checks after fixes                       | yes                      |
+| Agent                | Job                                                       | Needs the browser | Model  |
+| -------------------- | --------------------------------------------------------- | ----------------- | ------ |
+| `code-conventions`   | writing conventions against project.md                    | no                | sonnet |
+| `bug-hunter`         | static correctness                                        | no                | opus   |
+| `security`           | Functions, secrets, dependencies, headers                 | no                | sonnet |
+| `stress-tester`      | breaking state in the running app                         | yes               | sonnet |
+| `ui-consistency`     | measured visual consistency at every breakpoint           | yes               | sonnet |
+| `accessibility`      | keyboard, focus, screen readers, contrast, reduced motion | yes               | sonnet |
+| `lighthouse`         | Lighthouse, bundle size, network                          | yes               | sonnet |
+| `verifier`           | confirms or rejects high and medium findings              | sometimes         | opus   |
+| `fixer`              | optional: before/after diffs for the picked findings      | no                | sonnet |
+| `reporter`           | optional: diagnoses a report the kit scripts fail on      | yes               | haiku  |
+| `regression-checker` | re-runs affected checks after fixes                       | yes               | sonnet |
+
+Models are set in each agent's frontmatter; judgment-heavy agents keep the session model (`inherit`), the rest run on cheaper ones.
+
+### Choosing finders from the changed files
+
+List the scope with `git diff --name-only <base>...HEAD` plus `git status --porcelain`, then run only the finders it touches:
+
+| Changed                                                                           | Finders                                               |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `functions/`, `src/lib/integrations/`, `package.json`, `public/_headers`          | `security`, `bug-hunter`                              |
+| `src/**/*.ts`, `src/**/*.tsx` logic (hooks, `use-*.ts`, `src/lib/`)               | `bug-hunter`, `code-conventions`, `stress-tester`     |
+| `src/**/*.tsx` markup or class names, `src/index.css`                             | `code-conventions`, `ui-consistency`, `accessibility` |
+| `public/`, `src/assets/`, `index.html`, `vite.config.ts`, fonts, new dependencies | `lighthouse`                                          |
+| only `.claude/`, docs, or `audit/`                                                | none: say so and stop                                 |
 
 ### Run modes
 
-- **Full audit** ("run an audit", `/audit`):
-  1. Setup (orchestrator): start fresh, record the starting revision and scope (diff vs the base, default `main`, plus the working tree) in `audit/baseline.log`, run the baseline checks (lint, build, tests, Prettier, `git diff --check`), and start the test server.
-  2. Find, in parallel: `code-conventions`, `bug-hunter`, `security`, `stress-tester`, `ui-consistency`, `accessibility`, `lighthouse`.
-  3. `verifier`, then `fixer`, then `reporter`. Show the user the report and wait for their picks.
-  4. Apply the picked fixes (orchestrator, one thread, so changes across files stay coherent), then `regression-checker`, then `reporter` again with final results. Stop the test server.
-- **Single agent** (`/audit <agent>`, or "run ui-consistency"): empty only `audit/<agent>/`, start the test server if the agent needs it, run that agent, then `reporter`. Add `verifier` for agents that produce many findings.
-- **Targeted audit** (`/audit <agent> <agent>…`): the named agents, then `verifier`, `fixer`, `reporter`.
+- **Scoped audit** (`/audit` with no agents, the default):
+  1. Setup (orchestrator): start fresh, record the starting revision and scope (diff vs the base, default `main`, plus the working tree) in `audit/baseline.log`, run the baseline checks (lint, build, tests, Prettier, `git diff --check`), and start the test server only if a chosen finder needs the browser.
+  2. Find, in parallel: the finders the table above picks.
+  3. `verifier` when there are any high or medium findings. Then the orchestrator builds the report itself: `python3 .claude/audit-kit/make-report.py` and `node .claude/audit-kit/check-report.mjs`; start `reporter` only if the check fails. Show the user the report and wait for their picks.
+  4. Apply the picked fixes (orchestrator, one thread, so changes across files stay coherent), or hand them to another tool with `/handoff <picks and decisions>`, which writes `audit/handoff-prompt.md` for a tool that can't run these agents (such as Codex). Run `fixer` first only when the user wants Claude-written diffs, and only for the picked IDs. Then `regression-checker`, and rebuild the report with the scripts. Stop the test server.
+- **Full audit** (`/audit full`, before merging a big branch): the same steps with all seven finders.
+- **Single agent** (`/audit <agent>`, or "run ui-consistency"): empty only `audit/<agent>/`, start the test server if the agent needs it, run that agent, then build the report with the scripts. Add `verifier` when it finds anything high or medium.
+- **Targeted audit** (`/audit <agent> <agent>…`): the named agents, then `verifier` (as above) and the report scripts.
 
 ### Agent contract
 
@@ -87,5 +102,6 @@ Audit agents live in `.claude/agents/`. The main thread is the orchestrator: it 
   `{ "agent": "<name>", "base": "main", "scope": "…", "findings": [{ "id": "<PREFIX>-1", "kind": "bug|a11y|performance|security|ux|visual|convention|structure|uncertain|proposal", "sev": "high|medium|low", "title": "…", "where": "path:line", "evidence": "…", "impact": "…", "fix": "…", "screens": ["audit/<agent>/shots/….png"] }] }`
 - Verify every finding before writing it; anything unproven is `uncertain`. Skip what project.md records as deliberate.
 - Browser agents share one test server that the orchestrator starts: `npx wrangler pages dev dist --compatibility-date=2026-08-08 --port 8799 --inspector-port 9441` after `npm run build`. Never use port 8788 (the user's `npm run dev:pages`), never stop a process you did not start, and confirm each page loaded before trusting a result. Run the harness with `AUDIT_OUT=audit/<agent>`.
-- Return only a short summary to the orchestrator (counts by severity, the top three findings, what could not be checked); the details stay in your folder.
-- Cost: a full audit runs about ten agents, several at once, and uses several times the tokens of a single-thread audit. Prefer a single or targeted run for small changes.
+- Return only a short summary to the orchestrator, at most 10 lines: counts by severity, the top three findings, and what could not be checked. Never paste findings JSON into the reply; the details stay in your folder.
+- If the Write tool refuses a file inside `audit/<agent>/` (the background-session worktree guard), write it with a shell heredoc to the same path instead. The user does not use worktrees here. Never write outside `audit/<agent>/` this way.
+- Cost: the last full audit ran ten agents and used about 1.1M subagent tokens, most on the session model. Default to the scoped audit, keep `/audit full` for big branches, and turn deterministic checks into kit scripts instead of agent work.

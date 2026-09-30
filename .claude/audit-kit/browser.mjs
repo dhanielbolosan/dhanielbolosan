@@ -1,5 +1,6 @@
 // Audit browser harness: drives the local Pages build (port 8799) in headless Chromium over CDP.
 // Usage: AUDIT_OUT=audit/<agent> node .claude/audit-kit/browser.mjs <scenario>
+// Scenarios: layout rapid resize persist offline slow contact reduced redirect stats links timeline spacing config hands keyboard probe contactLayout musicKeep malformed
 // Results print as JSON; screenshots land in $AUDIT_OUT/shots/. Contact submissions are always mocked.
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -146,7 +147,7 @@ const helpers = `
   window.__activity = () => document.querySelector("[aria-haspopup=menu]")?.closest("section");
   window.__screen = async (name) => { const s = __activity(); s.querySelector("[aria-haspopup=menu]").click(); await __w(700); [...s.querySelectorAll("button, a")].find((b) => b.textContent.trim() === name)?.click(); await __w(2500); };
   window.__music = () => { const s = __activity(); return s && { now: s.querySelector("h3")?.textContent, stack: [...s.querySelectorAll("ol li")].map((li) => li.querySelector("span.truncate")?.textContent) }; };
-  window.__overflow = () => ({ page: document.documentElement.scrollWidth - innerWidth, offenders: [...document.querySelectorAll("body *")].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1) && getComputedStyle(e).position !== "fixed" && !e.closest(".overflow-x-clip, [class*=overflow-hidden], [class*=overflow-x-hidden], [class*=overflow-y-auto]"); }).slice(0, 5).map((e) => e.tagName + "." + String(e.className).slice(0, 60)) });
+  window.__overflow = () => ({ page: document.documentElement.scrollWidth - innerWidth, offenders: [...document.querySelectorAll("body *")].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1) && getComputedStyle(e).position !== "fixed" && !e.closest(".overflow-x-clip, [class*=overflow-hidden], [class*=overflow-x-hidden], [class*=overflow-y-auto], [role=tablist]"); }).slice(0, 5).map((e) => e.tagName + "." + String(e.className).slice(0, 60)) });
 `;
 const prep = () => run(helpers);
 
@@ -425,7 +426,7 @@ const scenarios = {
 
   // Activity stats at every width: overflow and a cropped screenshot.
   async stats() {
-    const out = {};
+    const res = {};
     for (const [w, h] of [
       [360, 740],
       [390, 844],
@@ -455,18 +456,18 @@ const scenarios = {
         },
       });
       writeFileSync(`${out}/stats-${w}.png`, Buffer.from(data, "base64"));
-      out[w] = {
+      res[w] = {
         overflow: box.overflow,
         tallestCellLines: box.tallestCellLines,
         valuesClipped: box.valuesClipped,
       };
     }
-    return out;
+    return res;
   },
 
   // Links: hover each gold link, check the hand shows and clears its neighbors, and crop a screenshot.
   async links() {
-    const out = {};
+    const res = {};
     await send("Emulation.setEmulatedMedia", {
       features: [
         { name: "hover", value: "hover" },
@@ -499,10 +500,10 @@ const scenarios = {
           `(() => { const a = [...document.querySelectorAll("a")].find((a) => a.textContent.trim() === ${JSON.stringify(text)}); a.focus({ focusVisible: true }); })()`,
         );
         // Control: a History row's hand under the same pointer emulation.
-        out.hoverMedia = await run(`matchMedia("(hover: hover)").matches`);
+        res.hoverMedia = await run(`matchMedia("(hover: hover)").matches`);
         await sleep(300);
         const m = await run(
-          `(() => { const a = [...document.querySelectorAll("a")].find((a) => a.textContent.trim() === ${JSON.stringify(text)}); const hand = a.querySelector("img"); const hb = hand.getBoundingClientRect(); const label = a.closest("dd")?.previousElementSibling; const range = document.createRange(); if (label) range.selectNodeContents(label); const lb = label && range.getBoundingClientRect(); return { handVisible: getComputedStyle(hand).visibility === "visible", bobbing: hand.getAnimations().length > 0, gapToText: Math.round(a.getBoundingClientRect().left - hb.right), color: getComputedStyle(a).color, handLeft: Math.round(hb.left), handRight: Math.round(hb.right), labelRight: lb && Math.round(lb.right), overlapsLabel: !!lb && hb.left < lb.right, clip: { x: Math.max(0, hb.left - 200), y: hb.top - 45, width: 320, height: hb.height + 60, scale: 1 } }; })()`,
+          `(() => { const a = [...document.querySelectorAll("a")].find((a) => a.textContent.trim() === ${JSON.stringify(text)}); const hand = a.querySelector("img"); const bobbing = hand.getAnimations().length > 0; hand.getAnimations().forEach((a) => { a.pause(); a.currentTime = 0; }); const hb = hand.getBoundingClientRect(); const label = a.closest("dd")?.previousElementSibling; const range = document.createRange(); if (label) range.selectNodeContents(label); const lb = label && range.getBoundingClientRect(); return { handVisible: getComputedStyle(hand).visibility === "visible", bobbing, gapToText: Math.round(a.getBoundingClientRect().left - hb.right), color: getComputedStyle(a).color, handLeft: Math.round(hb.left), handRight: Math.round(hb.right), labelRight: lb && Math.round(lb.right), overlapsLabel: !!lb && hb.left < lb.right, clip: { x: Math.max(0, hb.left - 200), y: hb.top - 45, width: 320, height: hb.height + 60, scale: 1 } }; })()`,
         );
         const { data } = await send("Page.captureScreenshot", {
           format: "png",
@@ -513,7 +514,7 @@ const scenarios = {
           Buffer.from(data, "base64"),
         );
         delete m.clip;
-        out[`${w}-${text}`] = m;
+        res[`${w}-${text}`] = m;
         await send("Input.dispatchMouseEvent", {
           type: "mouseMoved",
           x: 1,
@@ -521,7 +522,7 @@ const scenarios = {
         });
       }
     }
-    return out;
+    return res;
   },
 
   // Contact redirect timeline: when each dialogue stage finishes after the click.
@@ -630,7 +631,7 @@ const scenarios = {
 
   // Config: each setting open with its hand showing; gap from the hand to the label text.
   async config() {
-    const out = {};
+    const res = {};
     const sec = `[...document.querySelectorAll("section")].find((s) => s.textContent.includes("Window color"))`;
     for (const [w, h] of [
       [1440, 900],
@@ -678,7 +679,7 @@ const scenarios = {
           `${out}/cfg-${w}-${setting.split(" ")[0]}.png`,
           Buffer.from(data, "base64"),
         );
-        out[`${w} ${setting}`] = m.handToLabelText;
+        res[`${w} ${setting}`] = m.handToLabelText;
         await send("Input.dispatchKeyEvent", {
           type: "keyDown",
           key: "Escape",
@@ -706,7 +707,7 @@ const scenarios = {
         await sleep(300);
       }
     }
-    return out;
+    return res;
   },
 
   // Every hand: gap to what it points at, and its leftmost bob position from the window's edge.
@@ -936,6 +937,110 @@ const scenarios = {
     }
     await shot("keyboard-last");
     return { stops };
+  },
+
+  // One-off probe: PROBE_JS file evaluated at each PROBE_SIZES "w,h;w,h" (after PROBE_PRE if set); PROBE_SHOT names screenshots.
+  async probe() {
+    const { readFileSync } = await import("node:fs");
+    const js = readFileSync(process.env.PROBE_JS, "utf8");
+    const pre = process.env.PROBE_PRE
+      ? readFileSync(process.env.PROBE_PRE, "utf8")
+      : null;
+    const res = {};
+    for (const pair of (process.env.PROBE_SIZES ?? "1440,900").split(";")) {
+      const [w, h] = pair.split(",").map(Number);
+      await size(w, h);
+      await load();
+      await prep();
+      if (pre) await run(pre);
+      res[pair] = await run(js);
+      if (process.env.PROBE_SHOT)
+        await shot(`probe-${process.env.PROBE_SHOT}-${w}x${h}`);
+    }
+    return res;
+  },
+
+  // Contact form at common desktop sizes: the first column must not start scrolling or reflow Status.
+  async contactLayout() {
+    intercept = (url) =>
+      url.includes("/api/contact")
+        ? { status: 200, body: '{"ok":true}' }
+        : undefined;
+    const measure = `(() => { const status = document.querySelector("h1")?.closest("section"); const column = status?.closest(".overflow-y-auto"); return { statusWidth: Math.round(status?.getBoundingClientRect().width ?? 0), columnOverflow: column ? column.scrollHeight - column.clientHeight : 0 }; })()`;
+    const res = {};
+    for (const [w, h] of [
+      [1280, 800],
+      [1366, 768],
+      [1440, 900],
+      [1920, 1080],
+    ]) {
+      await size(w, h);
+      await load();
+      await prep();
+      const menu = await run(measure);
+      await run(
+        `(async () => { [...document.querySelectorAll("button, a")].find((b) => b.textContent.trim() === "Leave a message")?.click(); await __w(1500); })()`,
+      );
+      const form = await run(measure);
+      if (w === 1440) await shot("contact-form-1440x900");
+      res[`${w}x${h}`] = {
+        menu,
+        form,
+        statusShift: menu.statusWidth - form.statusWidth,
+      };
+    }
+    return res;
+  },
+
+  // Music order: a pick should survive leaving Music and coming back with the same listens.
+  async musicKeep() {
+    await size(1440, 900);
+    await load();
+    await prep();
+    await run(`__screen("Music")`);
+    const before = await run(`__music()`);
+    await run(
+      `(async () => { __activity().querySelector("ol li:nth-child(2) button").click(); await __w(6500); })()`,
+    );
+    const picked = await run(`__music()`);
+    await run(`__screen("GitHub")`);
+    await run(`__screen("Music")`);
+    const back = await run(`__music()`);
+    return {
+      before,
+      picked,
+      back,
+      kept: JSON.stringify(picked) === JSON.stringify(back),
+    };
+  },
+
+  // Malformed 200 responses from the calendar endpoint must never blank the app.
+  async malformed() {
+    const bodies = {
+      nulls: '{"calendar":{"weeks":null,"range":null}}',
+      badDays:
+        '{"calendar":{"weeks":[{"firstDay":"x","contributionDays":[{}]}]}}',
+      empty: "{}",
+      html: "<html></html>",
+    };
+    await size(1440, 900);
+    const res = {};
+    for (const [name, body] of Object.entries(bodies)) {
+      intercept = (url) =>
+        url.includes("/api/github-contributions")
+          ? { status: 200, body }
+          : undefined;
+      errors.length = 0;
+      await load();
+      await prep();
+      await run(`__activity() && __screen("GitHub")`);
+      res[name] = {
+        sections: await run(`document.querySelectorAll("section").length`),
+        errors: [...new Set(errors)].slice(0, 3),
+      };
+      if (res[name].sections === 0) await shot(`malformed-${name}`);
+    }
+    return res;
   },
 };
 

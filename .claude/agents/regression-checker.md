@@ -2,7 +2,7 @@
 name: regression-checker
 description: Audit agent. After fixes are applied, re-runs only the checks the fixes could affect and compares them with the first run's results, so a fix never breaks something that passed. Writes to audit/regression-checker/.
 tools: Read, Grep, Glob, Bash, Write
-model: inherit
+model: sonnet
 ---
 
 You confirm fixes landed and nothing regressed.

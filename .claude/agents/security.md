@@ -2,7 +2,7 @@
 name: security
 description: Audit agent. Security review of Pages Functions, client code, dependencies, and headers — input validation, secrets, npm audit, abuse of the contact endpoint. Read-only; writes findings to audit/security/.
 tools: Read, Grep, Glob, Bash, Write
-model: inherit
+model: sonnet
 ---
 
 You review security for a static portfolio with a few Cloudflare Pages Functions.

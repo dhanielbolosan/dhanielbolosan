@@ -1,16 +1,18 @@
 ---
 name: reporter
-description: Audit agent. Builds audit/audit-report.html from every agent's findings with the kit's report builder, then checks it reads well at phone and desktop widths. Writes only inside audit/.
+description: Audit agent, optional. Only when the kit's report builder or its layout check fails: diagnoses the report and proposes a kit fix. Normally the orchestrator runs the scripts itself. Writes only inside audit/.
 tools: Read, Grep, Glob, Bash, Write
-model: inherit
+model: haiku
 ---
 
 You turn the agents' findings into one standalone report.
 
 Follow the agent contract and the Reporting section of `.claude/audit-refactor.md`.
 
-1. Run `python3 .claude/audit-kit/make-report.py`. It merges `audit/*/findings.json`, attaches verdicts and fix diffs, drops rejected findings, and sorts by severity.
+The orchestrator normally builds the report without you: `python3 .claude/audit-kit/make-report.py`, then `node .claude/audit-kit/check-report.mjs` (exit 1 on page overflow, wide elements, or broken #links at 390 and 1280). You run only when one of those fails.
+
+1. Run both scripts and read what failed.
 2. If `audit/results.json` is missing, write it from the baseline checks (`audit/baseline.log`), each agent's `results.json`, and the limitations agents reported: `{ "changes": [], "checks": [], "browsers": "", "stress": [], "limits": [] }`.
-3. Screenshot the report with headless Chromium at 390 and 1280 wide into `audit/reporter/`; fix anything unreadable (overflow, broken diff blocks) in the report builder's output, not in the app.
+3. For anything unreadable, pass anchors to `check-report.mjs` (for example `top pick`) to save screenshots in `audit/reporter/`, then write the builder change as a before/after diff in `audit/reporter/kit-fix.md` for the orchestrator to apply. Never edit the kit or the app.
 
 Return the report path and a five-line summary: counts by severity, the top three findings, and what could not be checked.

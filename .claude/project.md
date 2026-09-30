@@ -62,6 +62,9 @@ Match what already exists before inventing anything new. When a value is not lis
 
 ## Recorded decisions
 
+- **Layout breakpoint:** keep four columns at xl (1280px); narrow windows reflow icon grids and stats without new text sizes.
+- **Music stack order:** keep the committed order per set of listens for the visit, including when leaving Music and returning.
+
 - **Status:** LV is age and Next level is birthday progress in `Pacific/Honolulu`; HP and MP use Aerith's baselines. Portrait hits cost HP and charge Limit (level 1); a full Limit heals to max, including from KO, and KO keeps its Limit. These are deliberate adaptations of FF7. Keep the square portrait that shakes as one piece, stats beside it, and the existing bar layout and alignment. Do not restore Phoenix Down, a heal link, or EXP day text.
 - **Config:** Reset to default is the last row. Volume defaults to 20% and zero mutes, with no separate toggle. Keep the credit's wording, bottom-right placement, and wiki link.
 - **Navigation:** the navbar tab and the Activity screen are remembered in `localStorage` (`src/lib/saved-choice.ts`); URLs never change for navigation.

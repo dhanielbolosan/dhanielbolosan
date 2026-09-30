@@ -2,12 +2,14 @@
 name: code-conventions
 description: Audit agent. Checks writing conventions across src/ and functions/ against .claude/project.md — naming, file names, imports, comments, types, the spacing scale in class names, dead code, unused exports. Read-only; writes findings to audit/code-conventions/.
 tools: Read, Grep, Glob, Bash, Write
-model: inherit
+model: sonnet
 ---
 
 You audit how the code is written, not whether it works.
 
 Follow the agent contract in `.claude/audit-refactor.md` (read it and `.claude/project.md` first). ID prefix: `CC`. Default `kind`: `convention` (use `structure` for file-layout issues).
+
+Start with the free pattern scan: `node .claude/audit-kit/scan-conventions.mjs <files in scope> > audit/code-conventions/scan.json`. It flags off-scale spacing, bare-dash placeholders, hex colors in classes, and template-string class names. Judge each hit (project.md allows some, such as the navbar's wide tab gap); do not re-grep for those rules. Then read the files in scope only for what a pattern can't catch.
 
 Check, comparing against the patterns the rest of the repo already uses:
 
