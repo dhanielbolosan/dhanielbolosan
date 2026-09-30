@@ -1,5 +1,5 @@
-import { PixelHand } from "../../pixel-hand";
 import { cn } from "@/lib/utils";
+import { PixelHand } from "../../pixel-hand";
 import {
   corners,
   textColors,
@@ -28,7 +28,7 @@ export const ColorPreview = ({
     selectColor,
   } = config;
 
-  // Overlay a selectable radio button on a corner or color swatch.
+  // Overlay a button that opens sliders on a corner or color swatch.
   const renderColorButton = (
     key: ColorKey,
     label: string,
@@ -37,8 +37,8 @@ export const ColorPreview = ({
     <button
       key={key}
       type="button"
-      role="radio"
-      aria-checked={selectedColorKey === key}
+      aria-haspopup="dialog"
+      aria-expanded={selectedColorKey === key}
       aria-label={label}
       onClick={(event) => selectColor(key, event.currentTarget)}
       onMouseEnter={() => setHoveredColorKey(key)}
@@ -73,7 +73,7 @@ export const ColorPreview = ({
     return (
       <>
         <div
-          role={active ? "radiogroup" : undefined}
+          role={active ? "group" : undefined}
           aria-label={active ? "Window corner" : undefined}
           onMouseLeave={() => setHoveredColorKey(undefined)}
           className="window-bg bevel h-9 w-25 shrink-0 @min-[21rem]:w-21"
@@ -109,10 +109,10 @@ export const ColorPreview = ({
 
   return (
     <div
-      role={active ? "radiogroup" : undefined}
+      role={active ? "group" : undefined}
       aria-label={active ? "Text color" : undefined}
       onMouseLeave={() => setHoveredColorKey(undefined)}
-      className="grid grid-cols-2 gap-x-7 gap-y-3 @min-[21rem]:grid-cols-4 @min-[21rem]:gap-x-3"
+      className="grid grid-cols-2 gap-3 @min-[21rem]:grid-cols-4"
     >
       {textColors.map((colorDefinition) => (
         <span
@@ -130,7 +130,7 @@ export const ColorPreview = ({
 
           {active &&
             handAt === colorDefinition.key &&
-            renderColorHand("inset-y-0 right-full my-auto mr-2")}
+            renderColorHand("inset-y-0 right-full my-auto mr-1.5")}
         </span>
       ))}
     </div>

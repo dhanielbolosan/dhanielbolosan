@@ -5,11 +5,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSwap } from "@/lib/use-swap";
+import { useSwap } from "@/lib/menu/use-swap";
 import { fadeMs } from "@/lib/motion";
-import { useWindowFade } from "@/lib/window-fade";
+import { useWindowFade } from "@/lib/menu/window-fade";
 import { cn } from "@/lib/utils";
 
+// A box that cross-fades between views and eases to each view's size.
 export const CornerBox = <View,>({
   view,
   id,
@@ -71,7 +72,15 @@ export const CornerBox = <View,>({
   useEffect(() => {
     if (settled) return;
 
-    const timer = setTimeout(() => setSettledId(swap.shownId), fadeMs);
+    const timer = setTimeout(() => {
+      setSettledId(swap.shownId);
+
+      // A swap that removed the focused control drops focus to the page; hand it to the new view.
+      if (document.activeElement === document.body)
+        content.current
+          ?.querySelector<HTMLElement>("a, button, input, textarea")
+          ?.focus();
+    }, fadeMs);
 
     return () => clearTimeout(timer);
   }, [settled, swap.shownId]);

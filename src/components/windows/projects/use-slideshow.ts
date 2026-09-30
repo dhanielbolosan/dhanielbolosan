@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { slideshowIntervalMs } from "@/lib/motion";
 
+// Return the image index of a preview, advancing on a timer while it is active.
 export const useSlideshow = (count: number, active: boolean) => {
   const [index, setIndex] = useState(0);
 

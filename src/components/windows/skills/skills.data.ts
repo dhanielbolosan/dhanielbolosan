@@ -1,6 +1,10 @@
 import { orbs } from "@/lib/materia";
+import type { skillIcons } from "./skill-icons";
 
-export const groups = [
+// Only skills with an icon, so a misspelled name fails the build.
+type Skill = keyof typeof skillIcons;
+
+export const groups: { label: string; orb: string; skills: Skill[] }[] = [
   {
     label: "Languages",
     orb: orbs.language,

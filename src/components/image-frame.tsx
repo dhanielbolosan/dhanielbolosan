@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+// Wrap an image in the beveled FF7 frame.
 export const ImageFrame = ({
   children,
   className,

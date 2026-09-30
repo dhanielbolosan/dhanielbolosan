@@ -1,6 +1,7 @@
-import { PixelHand } from "../../pixel-hand";
 import { cn } from "@/lib/utils";
-import { channels, getColorLabel, type ColorKey } from "./config.data";
+import { PixelHand } from "../../pixel-hand";
+import { channels, type ColorKey } from "./config.data";
+import { getColorLabel } from "./config.utils";
 import type { ConfigState } from "./use-config";
 
 export const RgbSliders = ({
@@ -17,10 +18,10 @@ export const RgbSliders = ({
     <label
       key={channel.name}
       onMouseEnter={() => setActiveChannelIndex(channelIndex)}
-      className="relative grid grid-cols-[1rem_2.25rem_1fr] items-center gap-2 text-sm"
+      className="relative grid grid-cols-[1rem_2.25rem_1fr] items-center gap-3 text-sm"
     >
       {channelIndex === activeChannelIndex && (
-        <PixelHand className="absolute inset-y-0 right-full my-auto mr-2 motion-safe:animate-bob" />
+        <PixelHand className="absolute inset-y-0 right-full my-auto mr-1.5 motion-safe:animate-bob" />
       )}
 
       <span className={cn("font-semibold", channel.className)}>

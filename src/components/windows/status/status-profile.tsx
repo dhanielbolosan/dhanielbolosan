@@ -17,7 +17,7 @@ export const StatusProfile = ({
 }) => {
   // Use age for LV and Aerith's corresponding resource growth for HP and MP.
   const { maxHealth, maxMana } = calculatePortraitResources(level);
-  const { health, hit, attack, limit, useLimit } = usePortrait(maxHealth);
+  const { health, hit, attack, limit, spendLimit } = usePortrait(maxHealth);
   const condition = healthStatus(health, maxHealth);
   const portraitRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +74,7 @@ export const StatusProfile = ({
                 aria-hidden="true"
                 className={cn(
                   "damage-number pointer-events-none absolute top-1 left-1/2 z-10 -translate-x-1/2 text-2xl font-bold tabular-nums [text-shadow:2px_2px_0_#000]",
-                  hit.recovery ? "text-[#70ff80]" : "text-white",
+                  hit.recovery ? "text-(--recovery)" : "text-white",
                 )}
               >
                 {hit.amount}
@@ -85,14 +85,15 @@ export const StatusProfile = ({
 
         {/* Header */}
         <div className="flow-root min-w-0">
-          <h2 className="window-title-float">Status</h2>
+          {/* The tab label floats before the name; the h1 is this window's heading. */}
+          <p className="window-title-float">Status</p>
           <h1 className="text-xl leading-tight font-semibold tracking-wide">
             {displayName}
           </h1>
         </div>
 
         {/* Combat stats and progression */}
-        <div className="col-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-end gap-x-1 gap-y-0.5 self-end text-sm leading-4 @min-[22rem]:grid-cols-[minmax(7rem,1fr)_minmax(0,1.2fr)] @min-[22rem]:gap-x-2">
+        <div className="col-start-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-x-1 gap-y-0.5 self-end text-sm leading-4 @min-[22rem]:grid-cols-[minmax(7rem,1fr)_minmax(0,1.2fr)] @min-[22rem]:gap-x-2">
           {/* LV, HP, and MP */}
           <div className="row-span-3 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] grid-rows-subgrid items-end gap-x-1 self-stretch">
             {/* Age level */}
@@ -106,8 +107,8 @@ export const StatusProfile = ({
             <span className="block text-right leading-4 font-semibold whitespace-nowrap tabular-nums">
               <span
                 className={cn(
-                  condition === "critical" && "text-[#ffff60]",
-                  !health && "text-[#ff6060]",
+                  condition === "critical" && "text-(--critical)",
+                  !health && "text-(--ko)",
                 )}
               >
                 {health}
@@ -138,10 +139,12 @@ export const StatusProfile = ({
           </div>
 
           {/* Shared grid rows align birthday and Limit bars with HP and MP. */}
-          <div className="col-start-2 row-span-2 row-start-2 ml-7 grid min-w-0 grid-rows-subgrid items-end self-stretch">
+          <div className="col-start-2 row-span-2 row-start-2 ml-6.5 grid min-w-0 grid-rows-subgrid items-end self-stretch">
             {/* Birthday progress */}
             <div className="min-w-0 space-y-1">
-              <span className="block text-xs leading-none">next level</span>
+              <span className="block text-xs leading-none whitespace-nowrap">
+                next level
+              </span>
               <Bar
                 value={experienceProgress}
                 label="EXP to next birthday"
@@ -153,20 +156,20 @@ export const StatusProfile = ({
             <button
               type="button"
               data-sound="none"
-              aria-label="Restore full HP with Limit"
+              aria-label="Limit level 1: restore full HP"
               disabled={limit < maxLimit}
               title={
                 limit === maxLimit
                   ? "Restore full HP, including from KO"
                   : "Take damage to charge Limit"
               }
-              onClick={useLimit}
+              onClick={spendLimit}
               className={cn(
                 "min-w-0 space-y-1 text-left outline-none enabled:hover:brightness-125 focus-visible:ring-2 focus-visible:ring-ring",
                 limit === maxLimit && "cursor-pointer",
               )}
             >
-              <span className="block text-xs leading-none">
+              <span className="block text-xs leading-none whitespace-nowrap">
                 Limit level <span className="font-semibold">1</span>
               </span>
               <span className="relative block">
@@ -178,7 +181,7 @@ export const StatusProfile = ({
 
                 {/* Full Limit pointer */}
                 {limit === maxLimit && (
-                  <PixelHand className="pointer-events-none absolute top-1/2 right-full mr-2 -translate-y-1/2 motion-safe:animate-bob" />
+                  <PixelHand className="pointer-events-none absolute top-1/2 right-full mr-1.5 -translate-y-1/2 motion-safe:animate-bob" />
                 )}
               </span>
             </button>

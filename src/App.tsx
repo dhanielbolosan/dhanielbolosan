@@ -1,22 +1,34 @@
-import { useEffect, useRef, useState } from "react";
-import { attachMenuSounds } from "./lib/audio";
-import { useMedia } from "./lib/use-media";
-import { TypewriterReady } from "./lib/use-typewriter";
-import { Window } from "./components/window";
-import { cn } from "./lib/utils";
-import { columns } from "./lib/layout";
-import { Navbar } from "./components/navbar";
-import { getEntryDelay } from "./lib/entrance";
-import { useMenuEntrance } from "./lib/use-menu-entrance";
-import { ScrollHint } from "./components/scroll-hint";
+import { useEffect, useState } from "react";
+import { Navbar } from "@/components/navbar";
+import { Window } from "@/components/window";
+import { attachMenuSounds } from "@/lib/audio";
+import { getEntryDelay } from "@/lib/menu/entrance";
+import { columns } from "@/lib/menu/layout";
+import { useMenuEntrance } from "@/lib/menu/use-menu-entrance";
+import { readChoice, saveChoice } from "@/lib/saved-choice";
+import { TypewriterReady } from "@/lib/typewriter/use-typewriter";
+import { useMedia } from "@/lib/use-media";
+import { cn } from "@/lib/utils";
 
-function App() {
+// Remember the tab by its label, so reordering tabs never restores the wrong one.
+const tabStorageKey = "active-tab";
+const tabLabels = columns.map((column) => column.label);
+
+export const App = () => {
   // Listen once for menu interaction sounds, including controls in portals.
   useEffect(attachMenuSounds, []);
   const isTabletOrWider = useMedia("(min-width: 48rem)");
 
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const activeColumnRef = useRef<HTMLDivElement>(null);
+  // Reopen the tab the visitor last left on.
+  const [activeTabIndex, setActiveTabIndex] = useState(() =>
+    tabLabels.indexOf(readChoice(tabStorageKey, tabLabels, tabLabels[0])),
+  );
+
+  // Switch tabs and remember the choice for the next visit.
+  const selectTab = (index: number) => {
+    setActiveTabIndex(index);
+    saveChoice(tabStorageKey, tabLabels[index]);
+  };
 
   // Tablet keeps Status visible while tabs select the right column.
   const rightColumnIndex = activeTabIndex === 0 ? 1 : activeTabIndex;
@@ -35,23 +47,24 @@ function App() {
       >
         <Navbar
           selectedTabIndex={selectedTabIndex}
-          onSelectTab={setActiveTabIndex}
+          onSelectTab={selectTab}
           entering={entering}
         />
 
         {/* One column on mobile, two on tablet, four on desktop. */}
-        <main className="relative grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {columns.map((column, columnIndex) => (
             <div
               key={column.label}
-              ref={columnIndex === activeTabIndex ? activeColumnRef : undefined}
               className={cn(
                 columnIndex === activeTabIndex ? "flex" : "hidden",
                 columnIndex === 0 || columnIndex === rightColumnIndex
                   ? "md:flex"
                   : "md:hidden",
                 "min-h-0 flex-col gap-3 xl:flex",
-                entering ? "overflow-visible" : "overflow-y-auto",
+                entering
+                  ? "overflow-visible"
+                  : "overflow-y-auto [scrollbar-gutter:stable]",
               )}
             >
               {column.windows.map(
@@ -83,15 +96,8 @@ function App() {
               )}
             </div>
           ))}
-          <ScrollHint
-            key={activeTabIndex}
-            columnRef={activeColumnRef}
-            enabled={!isTabletOrWider && !entering}
-          />
         </main>
       </div>
     </TypewriterReady.Provider>
   );
-}
-
-export default App;
+};

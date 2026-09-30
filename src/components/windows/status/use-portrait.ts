@@ -4,6 +4,7 @@ import { damageNumberMs, portraitAttackCooldownMs } from "@/lib/motion";
 import { calculateHit, limitGain } from "./status.utils";
 import { maxLimit } from "./status.data";
 
+// Track the portrait's HP, Limit gauge, and floating hit number as it is attacked and healed.
 export const usePortrait = (maxHealth: number) => {
   const [currentHealth, setHealth] = useState(maxHealth);
   const health = Math.min(currentHealth, maxHealth);
@@ -46,7 +47,7 @@ export const usePortrait = (maxHealth: number) => {
   };
 
   // Spend a full gauge to restore all HP, including from KO.
-  const useLimit = () => {
+  const spendLimit = () => {
     if (limit < maxLimit) {
       playSound("error");
       return;
@@ -61,5 +62,5 @@ export const usePortrait = (maxHealth: number) => {
     playSound("heal");
   };
 
-  return { health, hit, attack, limit, useLimit };
+  return { health, hit, attack, limit, spendLimit };
 };

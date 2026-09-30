@@ -4,6 +4,7 @@ import support from "@/assets/materia/support.png";
 import independent from "@/assets/materia/independent.png";
 import summon from "@/assets/materia/summon.png";
 
+// Pair each skill group with the materia orb that marks it, like FF7's color-coded materia.
 export const orbs = {
   language: magic,
   framework: command,

@@ -1,6 +1,7 @@
 import { formatTime, formatShortDate } from "@/lib/dates";
 import { timeZone } from "@/lib/site";
 import { Stats } from "../../stats";
+import { TextLink } from "../../text-link";
 import { profileStats } from "./status.data";
 import { StatusProfile } from "./status-profile";
 import { useStatus } from "./use-status";
@@ -16,9 +17,15 @@ export const Status = () => {
         experienceProgress={experienceProgress}
       />
 
-      {/* Personal details and introduction */}
+      {/* Personal details and the resume link */}
       <Stats
-        pairs={profileStats}
+        pairs={[
+          ...profileStats,
+          [
+            "Resume",
+            <TextLink href="/Dhaniel_Bolosan_Resume.pdf">View</TextLink>,
+          ],
+        ]}
         className="text-base"
         valueClassName="text-right font-semibold"
       />
@@ -41,6 +48,9 @@ export const Status = () => {
                 ? `${formatShortDate(latestPush.at, timeZone)} ${formatTime(latestPush.at, timeZone)}`
                 : "Jan 01 00:00:00"}{" "}
               HST
+              {latestPush && (
+                <span className="sr-only"> to {latestPush.repo}</span>
+              )}
             </span>,
           ],
         ]}

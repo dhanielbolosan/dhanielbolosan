@@ -1,8 +1,9 @@
-import { useContext, type ReactNode, type Ref } from "react";
-import { WindowFade } from "@/lib/window-fade";
-import { useWindowTransition } from "@/lib/use-window-transition";
+import type { ReactNode, Ref } from "react";
+import { WindowFade, useWindowFade } from "@/lib/menu/window-fade";
+import { useWindowTransition } from "@/lib/menu/use-window-transition";
 import { cn } from "@/lib/utils";
 
+// The help line and title tab across the top of a window.
 export const WindowHeader = ({
   help = "",
   title,
@@ -14,12 +15,12 @@ export const WindowHeader = ({
   children?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }) => {
-  const { fading } = useContext(WindowFade);
+  const { fading } = useWindowFade();
 
   return (
     <div
       ref={ref}
-      className="relative -mx-5 -mt-5 h-10 shrink-0"
+      className="relative -mx-4.5 -mt-4.5 h-10 shrink-0"
     >
       <div
         className={cn(
@@ -28,10 +29,8 @@ export const WindowHeader = ({
           !help && "invisible",
         )}
       >
-        <p className="window flex size-full items-center pr-32 pl-5 font-heading text-sm">
-          <span className="min-w-0 truncate @max-[26rem]:line-clamp-2 @max-[26rem]:text-xs @max-[26rem]:leading-4 @max-[26rem]:whitespace-normal">
-            {help}
-          </span>
+        <p className="window flex size-full items-center py-0 px-4.5 pr-32 font-heading text-sm">
+          <span className="min-w-0 truncate">{help}</span>
         </p>
       </div>
 
@@ -42,6 +41,7 @@ export const WindowHeader = ({
   );
 };
 
+// A menu window that fades its contents while they change.
 export const Window = ({
   className,
   children,
@@ -55,7 +55,7 @@ export const Window = ({
     <WindowFade.Provider value={{ fading, fadeTo }}>
       <div
         className={cn(
-          "relative isolate flex grow flex-col gap-3 px-5 pt-5 pb-5 [text-shadow:2px_2px_0_var(--text-shadow)]",
+          "relative isolate flex grow flex-col gap-3 p-4.5 [text-shadow:2px_2px_0_var(--text-shadow)]",
           className,
         )}
       >
@@ -76,6 +76,7 @@ export const Window = ({
   );
 };
 
+// Fade content out with its window while the view changes.
 export const Faded = ({
   children,
   className,
@@ -83,7 +84,7 @@ export const Faded = ({
   children: ReactNode;
   className?: string;
 }) => {
-  const { fading } = useContext(WindowFade);
+  const { fading } = useWindowFade();
 
   return (
     <div

@@ -1,7 +1,8 @@
-import hand from "@/assets/ff7-hand.png";
 import { useLayoutEffect, useRef } from "react";
+import hand from "@/assets/ff7-hand.png";
 import { cn } from "@/lib/utils";
 
+// The FF7 glove pointer, kept in step with every other hand on the page.
 export const PixelHand = ({ className }: { className?: string }) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -23,6 +24,7 @@ export const PixelHand = ({ className }: { className?: string }) => {
   );
 };
 
+// Place the hand left of a list row, hidden until the row is pointed at.
 export const RowHand = ({
   show,
   bob,

@@ -1,11 +1,16 @@
-export type Entry = {
+type Entry = {
   name: string;
   subtitle: string;
   date: string;
   description: string[];
 };
 
-export const experience: Entry[] = [
+const experience: Entry[] = [
+  /*
+    - Engineered a geospatial intelligence dashboard and backend data pipeline that queried and rendered live data streams across desktop and mobile platforms.
+    - Built interactive Space Domain Awareness simulations, including ML-based satellite thermal anomaly detection for missile launches, 5G mesh network visualizations, and a game-theoretic drone swarm engine.
+    - Collaborated with the engineering team through daily syncs, translating open-ended defense technology concepts into scoped prototypes and functional software.
+  */
   {
     name: "Black Sand Solutions",
     subtitle: "Software Engineer Intern",
@@ -27,7 +32,11 @@ export const experience: Entry[] = [
       "Executed red-team attack strategies, evaluating their effectiveness against LLM guardrails.",
     ],
   },
-
+  /*
+    - Researched RAG pipeline vulnerabilities, establishing methods to evaluate data retrieval integrity.
+    - Developed exploits using targeted vector manipulation, invisible text, and font poisoning in PDF documents to manipulate LLM data retrieval.
+    - Designed an interactive demonstration UI to showcase attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.
+  */
   {
     name: "Naval Information Warfare Center",
     subtitle: "Undergraduate AI Security Researcher",
@@ -38,7 +47,11 @@ export const experience: Entry[] = [
       "Designed an interactive demonstration UI to showcase attacks on RAG data ingestion, and authored a research paper and poster presentation documenting findings.",
     ],
   },
-
+  /*
+    - Deployed a decentralized supply chain tracker on Base Sepolia Testnet using Solidity smart contracts to verify the origin of local Hawaiian coffee.
+    - Delivered a full-stack Web3 application using Next.js and Vercel, integrating QR code generation, 3D mapping, and NFT creation.
+    - Implemented IPFS-based asset storage to enable immutable data persistence across the supply chain.
+  */
   {
     name: "Blockchain in Paradise",
     subtitle: "Full-Stack Software Engineer Intern",
@@ -50,6 +63,11 @@ export const experience: Entry[] = [
     ],
   },
 
+  /*
+    - Architected a cost-efficient FastAPI backend on Google Cloud, streamlining manual legislative analysis workflows for university staff.
+    - Shipped an automated daily notification system that kept staff informed of legislation impacting the University of Hawaiʻi.
+    - Integrated an AI-powered bill summarization and comparison tool directly into the office's internal website, reducing the time staff spent parsing legislative documents.
+  */
   {
     name: "University of Hawaiʻi Office of Government Relations",
     subtitle: "Backend Cloud Engineer Intern",
@@ -62,7 +80,7 @@ export const experience: Entry[] = [
   },
 ];
 
-export const education: Entry[] = [
+const education: Entry[] = [
   {
     name: "University of Hawaiʻi at Mānoa",
     subtitle: "Computer Science, B.S.",

@@ -8,11 +8,14 @@ const sounds = [
   "delete",
   "limit",
   "fanfare",
+  "switch",
+  "lid",
+  "disc",
 ] as const;
 
 export type Sound = (typeof sounds)[number];
 
-// Restore volume once, preserving the previous setting format's mute preference.
+// Default and persisted volume, 0–100.
 export const defaultSoundSettings = { volume: 20 };
 const storageKey = "sound-settings";
 let settings = defaultSoundSettings;
@@ -31,6 +34,7 @@ try {
 
 // Give React a stable snapshot and subscription for the shared volume setting.
 const listeners = new Set<() => void>();
+// Read the current volume for the Config slider.
 export const getSoundSettings = () => settings;
 
 // Register a volume subscriber and return its cleanup function.
@@ -49,15 +53,17 @@ const loading = new Map<Sound, Promise<AudioBuffer>>();
 const requests = new Map<Sound, number>();
 const lastPlayed = new Map<Sound, number>();
 
+// Treat a repeat within 40 ms as one event, and drop a clip that took over a second to be ready.
+const duplicateWindowMs = 40;
+const staleRequestMs = 1000;
+
 // Clamp volume, apply it immediately, and invalidate pending playback when muted.
 export const setSoundSettings = (next: typeof settings) => {
-  // Bound valid volume to 0–100 and use the default for invalid values.
   const volume = Number.isFinite(next.volume)
     ? Math.max(0, Math.min(100, next.volume))
     : defaultSoundSettings.volume;
   if (volume === settings.volume) return;
 
-  // Apply volume immediately and cancel pending clips when muted.
   settings = { volume };
   if (!settings.volume)
     requests.forEach((request, sound) => requests.set(sound, request + 1));
@@ -113,19 +119,20 @@ const unlockAudio = () => {
         void loadSound(sound).catch(() => undefined);
       });
     }
-    if (context.state === "suspended") return context.resume();
+    // iOS can report "interrupted" after a call or backgrounding; resume from any paused state.
+    if (context.state !== "running" && context.state !== "closed")
+      return context.resume();
   } catch {
     return;
   }
 };
 
-// Coalesce duplicate events and drop superseded or delayed playback requests.
+// Ignore duplicate events and drop superseded or delayed playback requests.
 export const playSound = (sound: Sound) => {
   if (!settings.volume || document.hidden) return;
   const now = performance.now();
 
-  // Ignore repeated requests for the same clip within 40 ms.
-  if (now - (lastPlayed.get(sound) ?? -Infinity) < 40) return;
+  if (now - (lastPlayed.get(sound) ?? -Infinity) < duplicateWindowMs) return;
   lastPlayed.set(sound, now);
   const request = (requests.get(sound) ?? 0) + 1;
   requests.set(sound, request);
@@ -138,7 +145,7 @@ export const playSound = (sound: Sound) => {
       if (
         !settings.volume ||
         document.hidden ||
-        performance.now() - now > 1000 ||
+        performance.now() - now > staleRequestMs ||
         context?.state !== "running" ||
         requests.get(sound) !== request
       )
@@ -152,7 +159,7 @@ export const playSound = (sound: Sound) => {
 };
 
 // Hints never wait for a click to unlock audio.
-export const playSelectHint = () => {
+const playSelectHint = () => {
   if (context?.state === "running" && buffers.has("select"))
     playSound("select");
 };

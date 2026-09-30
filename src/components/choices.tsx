@@ -1,6 +1,8 @@
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
+import { cn } from "@/lib/utils";
 import { PixelHand, RowHand } from "./pixel-hand";
 
+// One dialogue option: a link, a form submit, or an action.
 export type Choice = {
   label: string;
   href?: string;
@@ -33,7 +35,7 @@ export const Choices = ({
       typedChars >= items.map((item) => item.label).join("\n").length);
 
   // Move focus with arrow keys, wrapping between the first and last choices.
-  const handleArrowNavigation = (event: KeyboardEvent<HTMLUListElement>) => {
+  const onArrowKey = (event: KeyboardEvent<HTMLUListElement>) => {
     const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
     if (!step) return;
 
@@ -57,7 +59,7 @@ export const Choices = ({
   return (
     <ul
       className="flex flex-col"
-      onKeyDown={handleArrowNavigation}
+      onKeyDown={onArrowKey}
       inert={!isInteractive}
     >
       {items.map((item, choiceIndex) => {
@@ -85,7 +87,10 @@ export const Choices = ({
             setActiveChoiceIndex(choiceIndex);
             onPoint?.(choiceIndex);
           },
-          className: `relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none ${boxed ? "" : "pl-7"}`,
+          className: cn(
+            "relative flex w-fit cursor-pointer items-center font-heading text-lg leading-snug text-foreground outline-none",
+            !boxed && "pl-6.5",
+          ),
         };
 
         const body = (
@@ -94,7 +99,7 @@ export const Choices = ({
             {boxed ? (
               isInteractive &&
               choiceIndex === activeChoiceIndex && (
-                <PixelHand className="absolute right-full mr-2 motion-safe:animate-bob" />
+                <PixelHand className="absolute right-full mr-1.5 motion-safe:animate-bob" />
               )
             ) : (
               <RowHand

@@ -1,16 +1,19 @@
-import type { FormEventHandler } from "react";
+import type { SubmitEventHandler, Ref } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import type { ContactFields } from "@/lib/contact";
+import type { ContactFields } from "@/lib/integrations/contact";
+import { cn } from "@/lib/utils";
 
 const field =
-  "w-full min-w-0 rounded-[4px] border border-frame/50 bg-input/30 px-2 font-heading text-base transition-colors outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30";
+  "w-full min-w-0 rounded-[4px] border border-frame/50 bg-input/30 px-3 font-heading text-base transition-colors outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30";
 
 export const ContactForm = ({
   form,
   onSubmit,
+  turnstileRef,
 }: {
   form: UseFormReturn<ContactFields>;
-  onSubmit: FormEventHandler<HTMLFormElement>;
+  onSubmit: SubmitEventHandler<HTMLFormElement>;
+  turnstileRef: Ref<HTMLDivElement>;
 }) => (
   // Use schema validation so errors appear in dialogue instead of browser popups.
   <form
@@ -18,7 +21,7 @@ export const ContactForm = ({
     noValidate
     aria-busy={form.formState.isSubmitting}
     onSubmit={onSubmit}
-    className="mt-2 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 font-heading"
+    className="mt-3 grid min-h-0 grow grid-cols-[auto_1fr] grid-rows-[auto_auto_minmax(0,1fr)] items-center gap-3 font-heading"
   >
     {/* Keep the submitted fields unchanged while the request is pending. */}
     <label
@@ -33,7 +36,8 @@ export const ContactForm = ({
       autoComplete="name"
       readOnly={form.formState.isSubmitting}
       placeholder="John Doe"
-      className={`h-10 py-0.5 ${field}`}
+      aria-invalid={!!form.formState.errors.name}
+      className={cn("h-10 py-0.5", field)}
       {...form.register("name")}
     />
 
@@ -50,13 +54,14 @@ export const ContactForm = ({
       autoComplete="email"
       readOnly={form.formState.isSubmitting}
       placeholder="example@gmail.com"
-      className={`h-10 py-0.5 ${field}`}
+      aria-invalid={!!form.formState.errors.email}
+      className={cn("h-10 py-0.5", field)}
       {...form.register("email")}
     />
 
     <label
       htmlFor="contact-message"
-      className="self-start pt-2 text-label"
+      className="self-start pt-1.5 text-label"
     >
       Message
     </label>
@@ -65,8 +70,18 @@ export const ContactForm = ({
       id="contact-message"
       readOnly={form.formState.isSubmitting}
       placeholder="Enter your message here"
-      className={`max-h-76 min-h-24 resize-none self-start overflow-y-auto py-2 field-sizing-content ${field}`}
+      aria-invalid={!!form.formState.errors.message}
+      className={cn(
+        "max-h-76 min-h-24 resize-none self-start overflow-y-auto py-1.5 field-sizing-content",
+        field,
+      )}
       {...form.register("message")}
+    />
+
+    {/* Turnstile appears here, as wide as the message box, only when Cloudflare asks for a human check. */}
+    <div
+      ref={turnstileRef}
+      className="col-start-2 empty:hidden"
     />
   </form>
 );

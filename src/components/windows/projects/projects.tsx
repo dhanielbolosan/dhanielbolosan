@@ -12,7 +12,6 @@ export const Projects = () => {
   const {
     hoveredProjectIndex,
     setHoveredProjectIndex,
-    selectedProjectIndex,
     isExpanded,
     setExpandedView,
     selectedProject,
@@ -79,7 +78,6 @@ export const Projects = () => {
                 <button
                   type="button"
                   aria-label={project.name}
-                  aria-pressed={projectIndex === selectedProjectIndex}
                   onClick={() => {
                     selectProject(projectIndex);
                   }}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+// A list row with an icon and a label that truncates in narrow columns.
 export const IconItem = ({
   icon,
   children,

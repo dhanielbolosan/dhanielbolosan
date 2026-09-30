@@ -1,9 +1,58 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
-@import "@fontsource/m-plus-rounded-1c/latin-500.css";
-@import "@fontsource/m-plus-rounded-1c/latin-700.css";
-@import "@fontsource/m-plus-rounded-1c/latin-ext-500.css";
-@import "@fontsource/m-plus-rounded-1c/latin-ext-700.css";
+@import "@fontsource/permanent-marker/latin-400.css";
+
+@font-face {
+  font-family: "M PLUS Rounded 1c";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("@fontsource/m-plus-rounded-1c/files/m-plus-rounded-1c-latin-500-normal.woff2")
+    format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "M PLUS Rounded 1c";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("@fontsource/m-plus-rounded-1c/files/m-plus-rounded-1c-latin-ext-500-normal.woff2")
+    format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "M PLUS Rounded 1c";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("@fontsource/m-plus-rounded-1c/files/m-plus-rounded-1c-latin-700-normal.woff2")
+    format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "M PLUS Rounded 1c";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("@fontsource/m-plus-rounded-1c/files/m-plus-rounded-1c-latin-ext-700-normal.woff2")
+    format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 :root {
   color-scheme: dark;
@@ -17,6 +66,10 @@
   --frame: #e9e6f0;
   --label: #6fd6e8;
   --gold: #e0c13b;
+  --recovery: #70ff80;
+  --critical: #ffff60;
+  --ko: #ff6060;
+  --cd-ink: #1d2233;
   --window-tl: #4a3f6b;
   --window-tr: #2f284a;
   --window-bl: #2f284a;
@@ -24,6 +77,9 @@
   --text-shadow: #15121a;
   --muted-credit: #8a8895;
   --muted-credit-outline: #000000;
+  --track: #1a1730;
+  --track-border: #c9c7dc;
+  --track-outline: #15121a;
   --frame-bevel:
     inset 0 0 0 1px #6e6e78, inset 0 0 0 2px #a4a4ac, inset 0 0 0 3px #c6c6ca,
     inset 0 0 0 4px #d8d8da, inset 0 0 0 5px #9a9aa2, inset 0 0 0 6px #1e1c28;
@@ -51,7 +107,9 @@
 }
 
 @theme inline {
+  --default-transition-timing-function: var(--enter-easing);
   --font-heading: "M PLUS Rounded 1c", var(--font-sans);
+  --font-marker: "Permanent Marker", cursive;
   --color-frame: var(--frame);
   --color-label: var(--label);
   --color-gold: var(--gold);
@@ -63,9 +121,7 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --animate-bob: bob var(--pointer-bob-duration) steps(1) infinite;
-  --animate-scroll-hint: scroll-hint var(--pointer-bob-duration) steps(1)
-    infinite;
-  --animate-limit: limit 0.4s steps(1) infinite;
+  --animate-limit: limit var(--limit-cycle-duration) steps(1) infinite;
 
   @keyframes limit {
     0% {
@@ -129,12 +185,6 @@
       transform: translateX(-3px);
     }
   }
-
-  @keyframes scroll-hint {
-    50% {
-      transform: translateY(-3px);
-    }
-  }
 }
 
 @layer base {
@@ -161,7 +211,8 @@
   }
 
   .damage-number {
-    animation: damage-number var(--damage-number-duration) ease-out both;
+    animation: damage-number var(--damage-number-duration) var(--enter-easing)
+      both;
   }
 
   @keyframes portrait-hit {
@@ -198,8 +249,7 @@
   }
 
   .menu-enter {
-    animation: menu-enter var(--window-entry-duration)
-      cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: menu-enter var(--window-entry-duration) var(--enter-easing) both;
   }
 
   .menu-enter[data-enter="left"] {
@@ -251,13 +301,43 @@
 
 /* Layer pixel shading over each cell's contribution color. */
 @utility pixel-cell {
-  background-image: url("./assets/contribution-sqaure.svg");
+  background-image: url("./assets/contribution-square.svg");
   background-size: 100% 100%;
   image-rendering: pixelated;
 }
 
+/* Matte CD-R label side: center hole, clear hub, mirror band, then fine grooves. */
+@utility cd-face {
+  background:
+    radial-gradient(
+      circle,
+      transparent 0 8%,
+      rgb(233 230 240 / 30%) 8.5% 13%,
+      #c6c6ca 13.5% 17.5%,
+      transparent 18%
+    ),
+    repeating-radial-gradient(circle, #d3d5dc 0 1px, #c8cad2 1px 2.5px);
+  mask-image: radial-gradient(circle, transparent 0 8%, #000 8.5%);
+}
+
+/* Keep cover art and marker text off the hub and inside the disc edge. */
+@utility cd-art {
+  mask-image: radial-gradient(
+    circle,
+    transparent 0 18%,
+    #000 18.5% 70.2%,
+    transparent 70.7%
+  );
+}
+
+/* Soften the disc under the lid's window, like old frosted plastic. */
+@utility lid-haze {
+  background: rgb(233 238 248 / 10%);
+  backdrop-filter: blur(0.35px) saturate(0.9);
+}
+
 @utility group-heading {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
   font-family: var(--font-heading);
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
@@ -289,7 +369,7 @@
 
 @utility window-title {
   align-self: flex-end;
-  margin-right: -1.25rem;
+  margin-right: -1.125rem;
   width: 7rem;
   padding: 0.5rem 1.25rem;
   text-align: left;
@@ -313,7 +393,7 @@
 }
 
 @utility window-title-float {
-  @apply window-title float-right -mt-5 mb-1 ml-3;
+  @apply window-title float-right -mt-4.5 mb-1 ml-3;
 }
 
 * {
@@ -336,10 +416,10 @@
   box-sizing: border-box;
   width: 100%;
   height: 0.875rem;
-  background: #1a1730;
-  border: 2px solid #c9c7dc;
+  background: var(--track);
+  border: 2px solid var(--track-border);
   border-radius: 2px;
-  box-shadow: 0 0 0 1px #15121a;
+  box-shadow: 0 0 0 1px var(--track-outline);
 }
 
 .ff7-slider::-webkit-slider-thumb {
@@ -349,7 +429,7 @@
   height: 1.25rem;
   margin-top: -5px;
   background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
-  border: 1px solid #15121a;
+  border: 1px solid var(--track-outline);
   border-radius: 1px;
 }
 
@@ -357,10 +437,10 @@
   box-sizing: border-box;
   width: 100%;
   height: 0.875rem;
-  background: #1a1730;
-  border: 2px solid #c9c7dc;
+  background: var(--track);
+  border: 2px solid var(--track-border);
   border-radius: 2px;
-  box-shadow: 0 0 0 1px #15121a;
+  box-shadow: 0 0 0 1px var(--track-outline);
 }
 
 .ff7-slider::-moz-range-thumb {
@@ -368,7 +448,7 @@
   width: 0.75rem;
   height: 1.25rem;
   background: linear-gradient(to right, #9a9aa2, #e2e2e6, #9a9aa2);
-  border: 1px solid #15121a;
+  border: 1px solid var(--track-outline);
   border-radius: 1px;
 }
 

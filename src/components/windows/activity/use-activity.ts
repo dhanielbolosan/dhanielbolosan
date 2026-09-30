@@ -1,27 +1,49 @@
 import { useEffect, useRef, useState } from "react";
-import { useWindowFade } from "@/lib/window-fade";
-import { cornerTransitionMs } from "@/lib/motion";
 import { playSound } from "@/lib/audio";
+import { useWindowFade } from "@/lib/menu/window-fade";
+import { cornerTransitionMs } from "@/lib/motion";
+import { readChoice, saveChoice } from "@/lib/saved-choice";
 import {
   screens,
   activityInstruction,
+  screenInstruction,
   screenHelp,
   type ActivityScreen,
 } from "./activity.data";
+import { preloadListens } from "./music/use-listens";
 
+const screenStorageKey = "activity-screen";
+
+// Manage the Activity window's saved screen, its corner menu, and the help text for the pointed option.
 export const useActivity = () => {
-  const [activeScreen, setActiveScreen] = useState<ActivityScreen>("GitHub");
+  // Reopen the screen the visitor last left on.
+  const [activeScreen, setActiveScreen] = useState(() =>
+    readChoice(screenStorageKey, screens, "GitHub"),
+  );
   const activeScreenIndex = screens.indexOf(activeScreen);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const { fadeTo } = useWindowFade();
   const [pointedOption, setPointedOption] = useState(0);
 
-  // Show help for the pointed option while the menu is open.
+  // Show help for the pointed option while the menu is open, else the screen's own instruction.
   const helpText = isMenuOpen
     ? screenHelp[screens[pointedOption]]
-    : activityInstruction;
+    : (screenInstruction[activeScreen] ?? activityInstruction);
 
   const headerRef = useRef<HTMLDivElement>(null);
+
+  // Load recent listens and decode their covers once the browser is idle, before Music opens.
+  useEffect(() => {
+    const preload = () => void preloadListens();
+
+    if ("requestIdleCallback" in window) {
+      const idle = requestIdleCallback(preload, { timeout: 2000 });
+      return () => cancelIdleCallback(idle);
+    }
+
+    const timer = setTimeout(preload, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Manage dismissal and delayed focus while the screen menu is open.
   useEffect(() => {
@@ -34,7 +56,14 @@ export const useActivity = () => {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      const target = event.target as Node;
+      // One Escape belongs to the menu containing focus.
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        (target === document.body || headerRef.current?.contains(target))
+      ) {
+        event.preventDefault();
         playSound("select");
         setMenuOpen(false);
       }
@@ -65,6 +94,7 @@ export const useActivity = () => {
     else
       fadeTo(() => {
         setActiveScreen(nextScreen);
+        saveChoice(screenStorageKey, nextScreen);
         setMenuOpen(false);
       });
   };

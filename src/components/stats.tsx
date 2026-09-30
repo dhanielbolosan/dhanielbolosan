@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+// Label and value pairs laid out as an FF7 stat sheet, in two or four columns.
 export const Stats = ({
   pairs,
   columns = 2,
@@ -16,8 +17,8 @@ export const Stats = ({
     className={cn(
       "grid font-heading text-sm",
       columns === 4
-        ? "grid-cols-[auto_1fr_auto_1fr] gap-x-3"
-        : "grid-cols-[auto_1fr] gap-x-4",
+        ? "grid-cols-[auto_1fr] gap-x-3 @min-[26rem]:grid-cols-[auto_1fr_auto_1fr]"
+        : "grid-cols-[auto_1fr] gap-x-3",
       className,
     )}
   >
@@ -27,7 +28,7 @@ export const Stats = ({
         key={label}
         className="contents"
       >
-        <dt className="text-label">{label}</dt>
+        <dt className="whitespace-nowrap text-label">{label}</dt>
 
         <dd className={valueClassName}>{value}</dd>
       </div>

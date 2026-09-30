@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { playSound, setSoundSettings, defaultSoundSettings } from "@/lib/audio";
+import { defaultSoundSettings, playSound, setSoundSettings } from "@/lib/audio";
+import { fadeMs } from "@/lib/motion";
+import { saveChoice } from "@/lib/saved-choice";
 import {
   colorDefinitions,
   defaultColors,
@@ -15,6 +17,7 @@ import {
   rgbToHex,
 } from "./config.utils";
 
+// Manage the Config window's saved palette, open setting, color selection, and focus return.
 export const useConfig = () => {
   // Restore the saved palette once when Config mounts.
   const [colors, setColors] = useState(() =>
@@ -25,7 +28,9 @@ export const useConfig = () => {
   const [openSetting, setOpenSetting] = useState<Setting>();
   const [selectedColorKey, setSelectedColorKey] = useState<ColorKey>();
   const [hoveredColorKey, setHoveredColorKey] = useState<ColorKey>();
-  const [lastColorKeys, setLastColorKeys] = useState<Record<string, ColorKey>>({
+  const [lastColorKeys, setLastColorKeys] = useState<
+    Partial<Record<Setting, ColorKey>>
+  >({
     window: "tl",
     text: "text",
   });
@@ -52,16 +57,11 @@ export const useConfig = () => {
       getMutedCreditOutline(mutedCredit),
     );
 
-    const saveColors = () => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(colors));
-      } catch {
-        // Keep customization usable when storage is unavailable.
-      }
-    };
+    // Blocked storage keeps the palette for this visit only.
+    const saveColors = () => saveChoice(storageKey, JSON.stringify(colors));
 
     // Save after dragging settles, and flush before a refresh or navigation.
-    const saveTimer = window.setTimeout(saveColors, 150);
+    const saveTimer = setTimeout(saveColors, fadeMs);
     window.addEventListener("pagehide", saveColors);
 
     return () => {
@@ -101,7 +101,15 @@ export const useConfig = () => {
 
     // Escape follows the same two-step path as Back.
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      const target = event.target as Element;
+      // Include the portalled sliders, and leave other menus alone.
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        (target === document.body ||
+          target.closest(`[data-setting="${openSetting}"], [role="dialog"]`))
+      ) {
+        event.preventDefault();
         playSound("select");
         if (selectedColorKey) setSelectedColorKey(undefined);
         else {
@@ -112,9 +120,9 @@ export const useConfig = () => {
       }
     };
 
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, true);
 
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
   }, [openSetting, selectedColorKey]);
 
   // Close an expanded setting on outside presses after its sliders close.

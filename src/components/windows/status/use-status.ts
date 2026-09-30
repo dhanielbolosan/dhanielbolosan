@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { fetchLatestPush } from "@/lib/github";
+import { fetchLatestPush } from "@/lib/integrations/github";
 import { calculateLevelProgress } from "./status.utils";
 
+// Provide the Status window's live clock, latest GitHub push, and level progress.
 export const useStatus = () => {
   const [now, setNow] = useState(() => new Date());
 

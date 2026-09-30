@@ -9,9 +9,9 @@ export const Skills = () => (
     {groups.map((group) => (
       <div
         key={group.label}
-        className="not-first-of-type:pt-5"
+        className="not-first-of-type:pt-6"
       >
-        <h3 className="group-heading flex items-center gap-2">
+        <h3 className="group-heading flex items-center gap-1.5">
           <img
             src={group.orb}
             alt=""
@@ -21,7 +21,7 @@ export const Skills = () => (
           {group.label}
         </h3>
 
-        <ul className="grid grid-cols-3 gap-x-3 gap-y-1 font-heading text-sm">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 @min-[24rem]:grid-cols-3 font-heading text-sm">
           {group.skills.map((skill) => {
             const icon = skillIcons[skill];
 
@@ -29,17 +29,13 @@ export const Skills = () => (
               <IconItem
                 key={skill}
                 icon={
-                  icon ? (
-                    <svg
-                      viewBox={icon.viewBox ?? "0 0 24 24"}
-                      aria-hidden="true"
-                      className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
-                    >
-                      <path d={icon.path} />
-                    </svg>
-                  ) : (
-                    <span className="size-4 shrink-0" />
-                  )
+                  <svg
+                    viewBox={"viewBox" in icon ? icon.viewBox : "0 0 24 24"}
+                    aria-hidden="true"
+                    className="size-4 shrink-0 fill-current drop-shadow-[2px_2px_0_var(--text-shadow)]"
+                  >
+                    <path d={icon.path} />
+                  </svg>
                 }
               >
                 {skill}

@@ -1,28 +1,16 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { contactSchema, type ContactFields } from "@/lib/contact";
-import { playSound } from "@/lib/audio";
+import { useCallback, useEffect, useState } from "react";
+import { useWindowFade } from "@/lib/menu/window-fade";
+import { redirectDelayMs, redirectResetMs } from "@/lib/motion";
+import { useTypewriter } from "@/lib/typewriter/use-typewriter";
 import type { Choice } from "../../choices";
-import { useWindowFade } from "@/lib/window-fade";
-import { useTypewriter } from "@/lib/use-typewriter";
 import {
+  contactLinks,
   dialogueLines,
-  redirectDelayMs,
-  redirectResetMs,
   type ContactAction,
   type ContactMode,
 } from "./contact.data";
-import {
-  formatMissingFields,
-  getContactTransitionPhase,
-} from "./contact.utils";
+import { getContactTransitionPhase } from "./contact.utils";
+import { useContactForm } from "./use-contact-form";
 
 // Coordinate form submission, dialogue, and faded screen changes.
 export const useContact = () => {
@@ -38,17 +26,11 @@ export const useContact = () => {
   const [pendingAction, setPendingAction] = useState<ContactAction>();
   const [pendingHref, setPendingHref] = useState<string>();
 
-  const form = useForm<ContactFields>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", message: "" },
-  });
-  const submitting = useRef(false);
-
   const { fading, fadeTo } = useWindowFade();
 
   // Swap screens during fade-out, then start dialogue after fade-in finishes.
   const transitionToMode = useCallback(
-    (next: typeof mode) =>
+    (next: ContactMode) =>
       fadeTo(
         () => {
           setMode(next);
@@ -58,6 +40,12 @@ export const useContact = () => {
       ),
     [fadeTo],
   );
+
+  const { form, handleFormSubmit, turnstileRef } = useContactForm({
+    active: mode === "form",
+    setDialogueText,
+    onSent: () => transitionToMode("sent"),
+  });
 
   // Open queued links after the redirect dialogue, then restore the menu.
   useEffect(() => {
@@ -90,79 +78,28 @@ export const useContact = () => {
     };
   }, [dialogueText, visibleDialogue, pendingHref]);
 
-  // Submit the validated message, then show confirmation or retry dialogue.
-  async function submitMessage(data: ContactFields) {
-    playSound("select");
-    setDialogueText(dialogueLines.sending);
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error();
-
-      playSound("fanfare");
-      form.reset();
-      transitionToMode("sent");
-    } catch {
-      playSound("error");
-      setDialogueText(dialogueLines.failed);
-    }
-  }
-
-  // Turn field errors into one dialogue line.
-  const handleValidationErrors = (
-    fieldErrors: typeof form.formState.errors,
-  ) => {
-    playSound("error");
-    setDialogueText(
-      formatMissingFields(
-        Object.values(fieldErrors).flatMap((error) =>
-          error?.message ? [error.message] : [],
-        ),
-      ),
-    );
-  };
-
-  // Block repeat submits, including implicit Enter, until validation and sending finish.
-  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (submitting.current) return;
-    submitting.current = true;
-
-    try {
-      await form.handleSubmit(submitMessage, handleValidationErrors)(event);
-    } finally {
-      submitting.current = false;
-    }
-  };
-
   // Queue navigation; Back starts erasing immediately because it has no menu choices.
   const queueAction = (action: ContactAction) => {
     setPendingAction(action);
     if (action.type === "back") setDialogueText("");
   };
 
-  // Route ordinary link selections through the dialogue sequence.
-  const createLinkChoice = (label: string, href: string): Choice => ({
-    label,
-    href,
-    onSelect: () => queueAction({ type: "redirect", href }),
-  });
+  const backChoice: Choice = {
+    label: "Back",
+    onSelect: () => queueAction({ type: "back" }),
+  };
 
+  // Route link selections through the dialogue sequence.
   const menuChoices: Choice[] = [
     {
       label: "Leave a message",
       onSelect: () => queueAction({ type: "form" }),
     },
-    createLinkChoice("GitHub", "https://github.com/dhanielbolosan"),
-    createLinkChoice(
-      "LinkedIn",
-      "https://www.linkedin.com/in/dhaniel-bolosan/",
-    ),
-    createLinkChoice("Email", "mailto:dhanielb808@gmail.com"),
+    ...contactLinks.map(({ label, href }) => ({
+      label,
+      href,
+      onSelect: () => queueAction({ type: "redirect", href }),
+    })),
   ];
 
   // Type menu choices only after the opening dialogue and fades have finished.
@@ -213,24 +150,11 @@ export const useContact = () => {
     transitionToMode,
   ]);
 
-  const formCommands: Choice[] = [
-    { label: "Send", submit: "contact-form" },
-    {
-      label: "Back",
-      onSelect: () => queueAction({ type: "back" }),
-    },
-  ];
-  const commands: Choice[] | undefined =
-    mode === "form"
-      ? formCommands
-      : mode === "sent"
-        ? [
-            {
-              label: "Back",
-              onSelect: () => queueAction({ type: "back" }),
-            },
-          ]
-        : undefined;
+  const commands: Choice[] | undefined = {
+    menu: undefined,
+    form: [{ label: "Send", submit: "contact-form" }, backChoice],
+    sent: [backChoice],
+  }[mode];
 
   // Reserve space for every message that can appear in the current screen.
   const reservedDialogueLines =
@@ -263,6 +187,7 @@ export const useContact = () => {
     reservedDialogueLines,
     form,
     handleFormSubmit,
+    turnstileRef,
     commands,
     choicesReady,
     menuChoices,
