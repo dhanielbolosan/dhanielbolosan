@@ -94,7 +94,8 @@ const MusicPlayer = ({
           {...parts}
         />
 
-        <div className="flex min-w-0 flex-col self-center font-heading">
+        {/* Hold the tallest the details can get (two title lines, one artist, one album), so a long title never moves the list below. */}
+        <div className="flex min-h-30 min-w-0 flex-col justify-center font-heading">
           {/* Say when this disc was last played; a live or placeholder disc reads "Now Playing". */}
           <p className="mb-1.5 text-sm text-label">
             {!listen.playingNow && listen.listenedAt
@@ -110,14 +111,10 @@ const MusicPlayer = ({
             {listen.track}
           </h3>
 
-          <p className="line-clamp-2 text-sm wrap-break-word">
-            {listen.artist}
-          </p>
+          <p className="truncate text-sm">{listen.artist}</p>
 
           {listen.album && (
-            <p className="mt-1.5 line-clamp-2 text-sm wrap-break-word text-gold">
-              {listen.album}
-            </p>
+            <p className="mt-1.5 truncate text-sm text-gold">{listen.album}</p>
           )}
         </div>
       </div>

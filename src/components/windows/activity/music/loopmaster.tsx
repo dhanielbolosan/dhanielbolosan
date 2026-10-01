@@ -96,7 +96,7 @@ export const Loopmaster = ({
       {/* The lifted disc's drop shadow, faded in as its own layer so the lift never repaints. */}
       <span
         ref={shadowRef}
-        className="absolute inset-0 rounded-full opacity-0 shadow-[3px_5px_0_var(--text-shadow)]"
+        className="absolute inset-0 rounded-full opacity-0 shadow-[3px_5px_0_var(--disc-shadow)]"
       />
 
       {/* The face ramps between speeds; the spinner around it keeps the steady turn after each ramp. */}
