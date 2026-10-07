@@ -22,35 +22,12 @@ export const getContributionStats = (days: ContributionDay[]) => {
     days[0],
   );
 
-  // Sum contributions by YYYY-MM to find the busiest month.
-  const contributionsByMonth = new Map<string, number>();
+  // Count every day with at least one contribution.
+  const activeDays = days.filter((day) => day.contributionCount > 0).length;
 
-  for (const day of days) {
-    const key = day.date.slice(0, 7);
-    contributionsByMonth.set(
-      key,
-      (contributionsByMonth.get(key) ?? 0) + day.contributionCount,
-    );
-  }
-
-  const [busiestMonth] = [...contributionsByMonth].reduce(
-    (busiestSoFar, month) =>
-      month[1] > busiestSoFar[1] ? month : busiestSoFar,
-    ["", 0],
-  );
-
-  let dayIndex = days.length - 1;
-
-  // Today can still gain contributions; keep yesterday's streak alive.
-  if (days[dayIndex]?.contributionCount === 0) dayIndex--;
-
-  // Walk backward through active days to measure the current streak.
-  let currentStreak = 0;
-
-  while (dayIndex >= 0 && days[dayIndex].contributionCount > 0) {
-    currentStreak++;
-    dayIndex--;
-  }
+  // Average contributions per calendar day, to one decimal.
+  const total = days.reduce((sum, day) => sum + day.contributionCount, 0);
+  const dailyAverage = days.length ? (total / days.length).toFixed(1) : "0.0";
 
   const hasNoContributions = !bestDay || bestDay.contributionCount === 0;
 
@@ -66,16 +43,9 @@ export const getContributionStats = (days: ContributionDay[]) => {
         : `${formatShortDate(parseLocalDate(bestDay.date)).replace(" ", "\u00a0")} (${bestDay.contributionCount})`,
     ],
 
-    ["Current Streak", `${currentStreak}\u00a0days`],
+    ["Daily Average", dailyAverage],
 
-    [
-      "Busiest Month",
-      hasNoContributions || !busiestMonth
-        ? `Jan\u00a0${new Date().getFullYear()}`
-        : parseLocalDate(`${busiestMonth}-01`)
-            .toLocaleDateString("en-US", { month: "short", year: "numeric" })
-            .replace(" ", "\u00a0"),
-    ],
+    ["Active Days", `${activeDays}\u00a0days`],
   ];
 
   return pairs;

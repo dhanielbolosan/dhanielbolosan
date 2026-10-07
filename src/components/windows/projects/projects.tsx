@@ -78,6 +78,7 @@ export const Projects = () => {
                 <button
                   type="button"
                   aria-label={project.name}
+                  title={project.name}
                   onClick={() => {
                     selectProject(projectIndex);
                   }}

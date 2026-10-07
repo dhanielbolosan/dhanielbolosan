@@ -14,6 +14,30 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    name: "SENTINEL Mobile App",
+    thumbnail: "/projects/sentinel/thumbnail.webp",
+    images: [
+      "/projects/sentinel/sentinel1.webp",
+      "/projects/sentinel/sentinel2.webp",
+      "/projects/sentinel/sentinel3.webp",
+      "/projects/sentinel/sentinel4.webp",
+    ],
+    description:
+      "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch detection, 5G mesh network, and drone swarm simulations.",
+    stack: [
+      { name: "TypeScript", type: "language" },
+      { name: "Capacitor", type: "framework" },
+      { name: "FastAPI", type: "framework" },
+      { name: "React", type: "library" },
+      { name: "Cesium", type: "library" },
+      { name: "TanStack Query", type: "library" },
+    ],
+    type: "Internship",
+    date: "Jun 2026 – Jul 2026",
+    progress: 100,
+  },
+
+  {
     name: "Kumu",
     thumbnail: "/projects/kumu/thumbnail.webp",
     images: [
@@ -35,35 +59,11 @@ export const projects: Project[] = [
     ],
     type: "Personal",
     date: "Sep 2026",
-    progress: 75,
+    progress: 90,
     link: {
       label: "Repo",
       href: "https://github.com/blockchain-in-paradise/kumu",
     },
-  },
-
-  {
-    name: "SENTINEL Mobile App",
-    thumbnail: "/projects/sentinel/thumbnail.webp",
-    images: [
-      "/projects/sentinel/sentinel1.webp",
-      "/projects/sentinel/sentinel2.webp",
-      "/projects/sentinel/sentinel3.webp",
-      "/projects/sentinel/sentinel4.webp",
-    ],
-    description:
-      "Geospatial intelligence dashboard visualizing live data on a 3D globe and real-time feeds, featuring missile launch detection, 5G mesh network, and drone swarm simulations.",
-    stack: [
-      { name: "TypeScript", type: "language" },
-      { name: "Capacitor", type: "framework" },
-      { name: "FastAPI", type: "framework" },
-      { name: "React", type: "library" },
-      { name: "Cesium", type: "library" },
-      { name: "TanStack Query", type: "library" },
-    ],
-    type: "Internship",
-    date: "June - July 2026",
-    progress: 100,
   },
 
   {
@@ -85,7 +85,7 @@ export const projects: Project[] = [
       { name: "Pinata", type: "tool" },
     ],
     type: "Internship",
-    date: "Jan – May 2026",
+    date: "Jan 2026 – May 2026",
     progress: 100,
     link: { label: "Site", href: "https://kope-chain.vercel.app/" },
   },
@@ -108,7 +108,7 @@ export const projects: Project[] = [
       { name: "SMTP", type: "tool" },
     ],
     type: "Internship",
-    date: "Aug – Dec 2025",
+    date: "Aug 2025 – Dec 2025",
     progress: 100,
     link: {
       label: "Org",
@@ -134,7 +134,7 @@ export const projects: Project[] = [
       { name: "Jupyter Notebook", type: "tool" },
     ],
     type: "Research",
-    date: "Jan – May 2026",
+    date: "Jan 2026 – May 2026",
     progress: 100,
   },
 
@@ -157,7 +157,7 @@ export const projects: Project[] = [
       { name: "Neon Postgres", type: "database" },
     ],
     type: "Hackathon",
-    date: "Oct – Nov 2025",
+    date: "Oct 2025 – Nov 2025",
     progress: 100,
     link: { label: "Repo", href: "https://github.com/HACC25/Pathfinity" },
   },

@@ -31,7 +31,7 @@ export const Status = () => {
       />
 
       <p className="text-lg leading-relaxed">
-        Aloha! I'm a full-stack software engineer based in Maui, Hawaiʻi with a
+        Aloha! I'm a full-stack software engineer based in Hawaiʻi with a
         passion for building impactful applications and tools utilizing modern
         technologies across AI, Cloud, and Web3.
       </p>

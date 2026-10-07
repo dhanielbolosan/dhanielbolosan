@@ -4,10 +4,10 @@
 ⠀⠀⠀⠀⠀⢊⢄⣴⣵⣵⢿⣿⢿⣵⢷⣿⣵⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀   ───────────────
 ⠀⠀⠀⠠⢁⣿⣿⣿⢿⣿⢿⣿⢿⣽⢿⣿⢿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀   LV       22
 ⠀⠀⠀⢅⢿⣿⣿⣿⣿⣽⢿⣿⢿⣽⢿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀   OS       CachyOS
-⠀⠀⠀⣽⣿⠿⠟⠿⠿⢿⢿⢿⢿⢽⠿⠟⠛⠙⠙⠁⠃⠀⠀⠀⠀⠀⠀   Role     Full Stack Software Engineer
-⠀⠀⣔⠉⢵⣴⢵⢄⠄⠄⠁⠉⠙⠁⠁⠄⠔⠄⠀⠀⠄⢠⢀⠀⠀⠀⠀   Base     Maui, Hawai'i
+⠀⠀⠀⣽⣿⠿⠟⠿⠿⢿⢿⢿⢿⢽⠿⠟⠛⠙⠙⠁⠃⠀⠀⠀⠀⠀⠀   Role     Full-Stack Engineer
+⠀⠀⣔⠉⢵⣴⢵⢄⠄⠄⠁⠉⠙⠁⠁⠄⠔⠄⠀⠀⠄⢠⢀⠀⠀⠀⠀   Base     Maui, Hawaiʻi
 ⠀⡎⢽⣜⣿⣷⢵⢥⠅⢄⠅⣴⣅⠀⠅⠄⠅⠄⠀⠄⠅⠄⠀⠁⠀⠀⠀   School   UH Mānoa, B.S. CS
-⠀⢧⢝⣷⠹⢿⢽⢵⠟⠝⢵⣿⣿⣅⠁⠕⠕⠕⠝⠕⠁⠅⠁⠄⠀⠀⠀   Avail    Open to work
+⠀⢧⢝⣷⠹⢿⢽⢵⠟⠝⢵⣿⣿⣅⠁⠕⠕⠕⠝⠕⠁⠅⠁⠄⠀⠀⠀   Avail    Open to Work
 ⠀⢸⢽⣿⣿⣷⢷⢴⢅⣾⠿⣿⢿⠽⢿⠄⢵⢴⢕⠄⠁⠀⠁⠁⠀⠀⠀
 ⠀⠈⢻⣿⢿⣿⢟⢵⢽⣵⢴⣄⢁⣄⠀⢴⢝⠕⠕⠅⠁⠠⠋⠀⠀⠀⠀
 ⠀⠀⠀⣿⢿⣽⢿⢽⠝⢿⢛⣝⢉⣉⠑⠕⠝⠅⠁⠄⠀⠄⠀⠀⠀⠀⠀
@@ -17,4 +17,4 @@
 ⠀⠀⠀⠀⠀⠀⠙⢲⣍⣑⠝⢕⢕⢅⠅⠀⢁⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀   DB       PostgreSQL, Redis
 ```
 
-https://dhanielbolosan.pages.dev | https://linkedin.com/in/dhaniel-bolosan | dhanielb808@gmail.com
+https://dhanielbolosan.pages.dev | https://linkedin.com/in/dhaniel-bolosan

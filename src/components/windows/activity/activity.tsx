@@ -68,7 +68,7 @@ export const Activity = () => {
 
         {activeScreen === "Games" && (
           <p className="flex min-h-64 flex-1 items-center justify-center text-center font-heading text-base">
-            WIP :)
+            Coming soon :)
           </p>
         )}
       </Faded>
