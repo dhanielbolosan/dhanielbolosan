@@ -20,6 +20,8 @@ export const projects: Project[] = [
       "/projects/kumu/kumu1.webp",
       "/projects/kumu/kumu2.webp",
       "/projects/kumu/kumu3.webp",
+      "/projects/kumu/kumu4.webp",
+      "/projects/kumu/kumu5.webp",
     ],
     description:
       "Human-in-loop Claude Code skill that researches a topic, writes a script, and renders a narrated infographic video with captions, music, sound effects, and graphics.",
