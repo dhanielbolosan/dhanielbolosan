@@ -61,7 +61,8 @@ export const App = () => {
                 columnIndex === 0 || columnIndex === rightColumnIndex
                   ? "md:flex"
                   : "md:hidden",
-                "min-h-0 flex-col gap-3 xl:flex",
+                // The left padding sits in the gutter, so hands left of a window are not clipped.
+                "-ml-3 min-h-0 flex-col gap-3 pl-3 xl:flex",
                 entering
                   ? "overflow-visible"
                   : "overflow-y-auto [scrollbar-gutter:stable]",

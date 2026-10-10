@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useWindowFade } from "@/lib/menu/window-fade";
 import { projects } from "./projects.data";
 
-// Track the hovered, selected, and previewed projects, the expanded gallery, and the hand's target.
+// Track the hovered, selected, and previewed projects and the expanded gallery.
 export const useProjects = () => {
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState<number>();
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
@@ -23,40 +23,11 @@ export const useProjects = () => {
         : (hoveredProjectIndex ?? lastPreviewedIndex)
     ];
 
-  const pointedElementRef = useRef<HTMLElement>(null);
-  const [pointerBounds, setPointerBounds] = useState<DOMRect>();
-
-  // Preview the pointed project and measure its thumbnail for the hand.
-  const pointAtProject = (projectIndex: number, element: HTMLElement) => {
+  // Preview the pointed project.
+  const pointAtProject = (projectIndex: number) => {
     setHoveredProjectIndex(projectIndex);
     setLastPreviewedIndex(projectIndex);
-    pointedElementRef.current = element;
-    setPointerBounds(element.getBoundingClientRect());
   };
-
-  // Keep the hand aligned during resizing and scrolling, including nested columns.
-  useEffect(() => {
-    const target =
-      hoveredProjectIndex !== undefined ? pointedElementRef.current : null;
-
-    if (!target) return;
-
-    const updatePointerBounds = () => {
-      const bounds = target.getBoundingClientRect();
-      setPointerBounds(bounds.width ? bounds : undefined);
-    };
-
-    const observer = new ResizeObserver(updatePointerBounds);
-    observer.observe(target);
-    window.addEventListener("scroll", updatePointerBounds, true);
-    window.addEventListener("resize", updatePointerBounds);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", updatePointerBounds, true);
-      window.removeEventListener("resize", updatePointerBounds);
-    };
-  }, [hoveredProjectIndex]);
 
   // Open the selected gallery and clear the thumbnail pointer.
   const selectProject = (projectIndex: number) => {
@@ -74,7 +45,6 @@ export const useProjects = () => {
     selectedProject,
     previewedProject,
     fading,
-    pointerBounds,
     pointAtProject,
     selectProject,
   };

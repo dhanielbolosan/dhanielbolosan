@@ -1,4 +1,3 @@
-import { createPortal } from "react-dom";
 import { Choices } from "../../choices";
 import { CornerBox } from "../../corner-box";
 import { Faded, WindowHeader } from "../../window";
@@ -17,7 +16,6 @@ export const Projects = () => {
     selectedProject,
     previewedProject,
     fading,
-    pointerBounds,
     pointAtProject,
     selectProject,
   } = useProjects();
@@ -82,15 +80,16 @@ export const Projects = () => {
                   onClick={() => {
                     selectProject(projectIndex);
                   }}
-                  onMouseEnter={(event) =>
-                    pointAtProject(projectIndex, event.currentTarget)
-                  }
-                  onFocus={(event) =>
-                    pointAtProject(projectIndex, event.currentTarget)
-                  }
+                  onMouseEnter={() => pointAtProject(projectIndex)}
+                  onFocus={() => pointAtProject(projectIndex)}
                   onBlur={() => setHoveredProjectIndex(undefined)}
                   className="relative block cursor-pointer outline-none"
                 >
+                  {/* The hand lives inside the button so it scrolls with the thumbnail. */}
+                  {projectIndex === hoveredProjectIndex && !fading && (
+                    <PixelHand className="pointer-events-none absolute inset-y-0 right-full z-10 my-auto mr-1.5 motion-safe:animate-bob" />
+                  )}
+
                   <ProjectPreview
                     project={project}
                     active={projectIndex === hoveredProjectIndex}
@@ -102,26 +101,6 @@ export const Projects = () => {
           </ul>
         )}
       </Faded>
-
-      {!isExpanded &&
-        !fading &&
-        hoveredProjectIndex !== undefined &&
-        pointerBounds &&
-        // Render the hand in a portal so the column cannot clip it.
-        createPortal(
-          <span
-            aria-hidden="true"
-            className="pointer-events-none fixed z-50 flex items-center"
-            style={{
-              top: pointerBounds.top,
-              left: Math.max(4, pointerBounds.left - 28),
-              height: pointerBounds.height,
-            }}
-          >
-            <PixelHand className="motion-safe:animate-bob" />
-          </span>,
-          document.body,
-        )}
 
       <ProjectDetails project={previewedProject} />
     </section>

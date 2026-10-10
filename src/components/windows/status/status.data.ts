@@ -19,8 +19,8 @@ export const maxLimit = 255;
 
 // Render personal details through the shared label/value grid.
 export const profileStats: [string, string][] = [
-  ["OS", "CachyOS"],
   ["Role", "Full-Stack Engineer"],
+  ["Degree", "B.S. Computer Science"],
   ["Base", "Maui, Hawaiʻi"],
   ["Avail", "Open to Work"],
 ];
