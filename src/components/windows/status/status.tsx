@@ -10,7 +10,7 @@ export const Status = () => {
   const { now, level, experienceProgress, latestPush } = useStatus();
 
   return (
-    <section className="flex grow flex-col justify-between gap-3">
+    <section className="flex grow flex-col gap-6">
       {/* Profile, birthday progress, and interactive HP/Limit gauges */}
       <StatusProfile
         level={level}
@@ -30,7 +30,8 @@ export const Status = () => {
         valueClassName="text-right font-semibold"
       />
 
-      <p className="text-lg leading-relaxed">
+      {/* The bio centers between the stat blocks, so the clock rests at the bottom. */}
+      <p className="my-auto text-lg leading-relaxed">
         Aloha! I'm a full-stack software engineer based in Hawaiʻi with a
         passion for building impactful applications and tools utilizing modern
         technologies across AI, Cloud, and Web3.

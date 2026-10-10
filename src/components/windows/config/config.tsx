@@ -56,7 +56,7 @@ export const Config = () => {
             }}
             className={cn(
               "col-span-2 grid min-h-9 cursor-pointer grid-cols-subgrid items-center",
-              id === "volume" && "@max-[18rem]:mt-6",
+              id === "volume" && "@max-[18rem]:mt-3",
             )}
           >
             <button

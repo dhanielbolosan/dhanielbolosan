@@ -33,7 +33,7 @@ export const groups: { label: string; orb: string; skills: Skill[] }[] = [
       "Shadcn UI",
       "Prisma ORM",
       "Drizzle ORM",
-      "HyperFrames",
+      "FFmpeg",
     ],
   },
 

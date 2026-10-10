@@ -65,7 +65,7 @@ export const App = () => {
                 "-ml-3 min-h-0 flex-col gap-3 pl-3 xl:flex",
                 entering
                   ? "overflow-visible"
-                  : "overflow-y-auto [scrollbar-gutter:stable]",
+                  : "overflow-y-auto [scrollbar-width:none]",
               )}
             >
               {column.windows.map(
